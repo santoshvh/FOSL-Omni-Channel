@@ -1,0 +1,29 @@
+# FOSL — Multi-Operator Social Commerce Platform
+
+High-fidelity Next.js wireframe prototype for storefront, hub (vendor/creator/operator), and platform admin.
+
+## Quick start
+
+```bash
+npm install
+npm run dev:hub        # http://localhost:3000
+npm run dev:storefront # http://localhost:3001
+npm run dev:admin      # http://localhost:3002
+```
+
+## Apps
+
+| App | Port | Description |
+|-----|------|-------------|
+| `@fosl/hub` | 3000 | Vendor, Creator, Operator workspaces with role switcher |
+| `@fosl/storefront` | 3001 | Customer ecommerce (physical, digital, lead-gen) |
+| `@fosl/admin` | 3002 | Platform administration |
+
+## Docs
+
+- [WIREFRAME_INVENTORY.md](docs/WIREFRAME_INVENTORY.md) — screen specs
+- [DEPLOYMENT-ICDSOFT.md](docs/DEPLOYMENT-ICDSOFT.md) — ICDSoft deploy runbook
+
+## Stack
+
+Next.js 15, React 19, Tailwind, shadcn/ui, MSW mocks, Prisma (MySQL 8 or PostgreSQL), Stripe.

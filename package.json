@@ -1,0 +1,25 @@
+{
+  "name": "fosl",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:hub": "npm run dev -w @fosl/hub",
+    "dev:storefront": "npm run dev -w @fosl/storefront",
+    "dev:admin": "npm run dev -w @fosl/admin",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "db:sync-provider": "node scripts/set-database-provider.mjs"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

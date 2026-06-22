@@ -1,0 +1,25 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body { @apply bg-white text-slate-900 antialiased; }
+
+.product-description h3 {
+  @apply mt-6 mb-2 text-lg font-semibold text-slate-900;
+}
+.product-description p {
+  @apply mb-4 leading-relaxed text-slate-600;
+}
+.product-description ul,
+.product-description ol {
+  @apply mb-4 ml-6 list-disc space-y-1 text-slate-600;
+}
+.product-description ol {
+  @apply list-decimal;
+}
+.product-description li {
+  @apply leading-relaxed;
+}
+.product-description em {
+  @apply text-slate-500 not-italic;
+}
