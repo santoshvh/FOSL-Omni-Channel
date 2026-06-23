@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { prisma, clearCommissionsForOrder, reverseCommissionsForOrder } from "@fosl/db";
+import { settleMultiVendorPayment } from "@/lib/vendor-settlement";
 import { getStripe, getStripeWebhookSecret } from "@/lib/stripe";
 
 export const runtime = "nodejs";
@@ -37,6 +38,14 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
   }
 
   await clearCommissionsForOrder(order.id);
+
+  if (paymentIntent.metadata.settlement === "multi_vendor") {
+    try {
+      await settleMultiVendorPayment(paymentIntent.id);
+    } catch (err) {
+      console.error("[stripe-webhook] multi-vendor settlement failed:", err);
+    }
+  }
 }
 
 async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {

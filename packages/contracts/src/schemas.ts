@@ -80,3 +80,19 @@ export const resetPasswordSchema = z.object({
   token: z.string().min(1, "Reset token is required"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
+
+export const updateOrderSchema = z.object({
+  status: z
+    .enum(["processing", "shipped", "delivered", "cancelled", "refunded", "lead_received"])
+    .optional(),
+  lineUpdates: z
+    .array(
+      z.object({
+        orderLineId: z.string(),
+        trackingNumber: z.string().optional(),
+        downloadUrl: z.string().optional(),
+        leadStatus: z.string().optional(),
+      })
+    )
+    .optional(),
+});

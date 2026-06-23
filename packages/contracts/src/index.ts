@@ -17,6 +17,42 @@ export type SubscriptionState =
 
 export type LedgerState = "pending" | "cleared" | "paid" | "reversed";
 
+export type OrderStatus =
+  | "pending"
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "cancelled"
+  | "refunded"
+  | "lead_received";
+
+export interface OrderLine {
+  id?: string;
+  productId: string;
+  title: string;
+  type: ProductType;
+  qty: number;
+  priceCents: number;
+  vendorName: string;
+  vendorId?: string;
+  trackingNumber?: string;
+  downloadUrl?: string;
+  leadStatus?: string;
+}
+
+export interface Order {
+  id: string;
+  number: string;
+  status: OrderStatus;
+  createdAt: string;
+  totalCents: number;
+  customerEmail?: string;
+  lines: OrderLine[];
+  trackingNumber?: string;
+  downloadUrl?: string;
+  leadStatus?: string;
+}
+
 export interface Product {
   id: string;
   sku: string;

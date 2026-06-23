@@ -1,3 +1,5 @@
+export { isBrowserApiMockingEnabled } from "./api-mocking";
+
 export {
   demoSession,
   products,

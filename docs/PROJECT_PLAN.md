@@ -1,7 +1,7 @@
 # FOSL Omni-Channel — Project Plan
 
 Living document for scope, progress, changelog, and next steps.  
-**Current release:** `v0.15` (Phase C — CI + E2E) · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
+**Current release:** `v0.17` (Phase B — MSW prod guard, marketplace orders) · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
 
 | App | Port | Command |
 |-----|------|---------|
@@ -119,6 +119,23 @@ Use `[x]` for done, `[ ]` for open. Screen-level detail remains in [WIREFRAME_IN
 - [x] **Docker Compose** — optional local Postgres (`docker compose up -d postgres`)
 - [x] **Root `.env` loading** — `scripts/load-root-env.mjs` in Hub + Storefront next.config
 
+### 2.10 Phase B — orders & fulfillment (v0.16)
+
+- [x] **Orders API** — `GET /api/v1/orders`, `GET/PATCH /api/v1/orders/[id]` (storefront + hub)
+- [x] **Storefront order history** — `/orders` and `/orders/[id]` wired to API + localStorage email
+- [x] **Hub order management** — vendor/operator order lists and detail pages
+- [x] **Vendor fulfillment UI** — mark shipped/delivered + tracking on order lines
+- [x] **Multi-vendor Stripe** — `multi_vendor` settlement metadata + transfer job on webhook
+- [x] **Image uploads** — `POST /api/v1/uploads` (hub) with local `uploads/` storage in dev
+- [x] **Subscription banner** — storefront operator subscription state via env
+- [x] **Hub legal pages** — `/legal/terms`, `/legal/privacy` + sidebar links
+- [x] **E2E expansion** — physical checkout, referral attribution, hub role switcher
+
+### 2.11 Phase B — API mocking controls (v0.17)
+
+- [x] **`NEXT_PUBLIC_API_MOCKING`** — explicit dev-only flag; MSW never starts in production
+- [x] **Marketplace orders** — `/marketplace/orders` wired to same orders API as storefront
+
 ---
 
 ## 3. Development changelog
@@ -140,8 +157,20 @@ Chronological summary of meaningful changes (commits and session work).
 | v0.13 | `d61d43d` | Commission Connect payouts, order confirmation email |
 | v0.14 | `0b751da` | Hub password reset email + Prisma migrations workflow |
 | v0.15 | `521f12c` | GitHub Actions CI + Playwright checkout E2E |
+| v0.16 | (pending) | Orders API, fulfillment, multi-vendor Stripe, uploads, E2E expansion |
+| v0.17 | (pending) | MSW production guard, marketplace orders wired to API |
 
-### v0.10 detail (latest)
+### v0.16 detail (latest)
+
+| Area | Change |
+|------|--------|
+| **Orders** | List/detail APIs, storefront `/orders`, hub vendor/operator order pages |
+| **Fulfillment** | PATCH order status + line tracking; vendor detail fulfillment form |
+| **Stripe** | Multi-vendor cart metadata + `settleMultiVendorPayment` on webhook |
+| **Uploads** | Hub `POST /api/v1/uploads` + catalog image field |
+| **Polish** | Subscription banner, hub legal links, expanded Playwright suite |
+
+### v0.10 detail
 
 | Area | Change |
 |------|--------|
@@ -250,13 +279,13 @@ Chronological summary of meaningful changes (commits and session work).
 6. **Run database locally** — `cp .env.example .env`, then either `npm run db:setup` (Docker) or install Postgres and run `npm run db:push && npm run db:seed`
 7. ~~**Auth.js**~~ — Hub sign-in + middleware when `AUTH_SECRET` set
 8. ~~**Stripe test mode**~~ — Payment Element + `POST /api/v1/checkout/payment-intent` (mock without keys)
-9. **Quality** — CI + E2E done; **next:** production deploy (ICDSoft), MSW off in production
+9. **Quality** — CI + E2E done; **next:** production deploy (ICDSoft), MSW off in production, S3 uploads in prod
 
 ### Before go-live
 
 10. **Legal review** — counsel sign-off on `legal-content.ts`
 11. **Production deploy** — ICDSoft WebApps, env vars, `db:migrate:deploy`
-12. **MSW off in production** — `NEXT_PUBLIC_API_MOCKING` or build-time flag
+12. ~~**MSW off in production**~~ — `NEXT_PUBLIC_API_MOCKING` + production guard in `MswInit`
 
 ---
 
@@ -271,4 +300,4 @@ When shipping a milestone:
 
 ---
 
-*Maintainer note: This plan reflects repo state through v0.15 (`521f12c`) on `master`.*
+*Maintainer note: This plan reflects repo state through v0.17 (uncommitted) on `master`.*

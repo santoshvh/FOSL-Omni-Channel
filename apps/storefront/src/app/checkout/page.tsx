@@ -9,6 +9,7 @@ import { getShippingForVendor } from "@fosl/mocks";
 import { useCart } from "@/lib/cart-context";
 import { CheckoutStepSkeleton } from "@/components/checkout-step-skeleton";
 import { CheckoutPayment } from "@/components/checkout-payment";
+import { setStoredOrderEmail } from "@/lib/order-email";
 
 const steps = ["Contact", "Shipping", "Payment"] as const;
 
@@ -134,6 +135,7 @@ export default function CheckoutPage() {
         throw new Error(json.error ?? "Payment could not be completed.");
       }
       const orderId = json.data?.id ?? "unknown";
+      setStoredOrderEmail(form.email.trim());
       router.push(`/checkout/confirmation?orderId=${encodeURIComponent(orderId)}&type=mixed`);
     } catch (err) {
       setPayError(err instanceof Error ? err.message : "Payment could not be completed.");

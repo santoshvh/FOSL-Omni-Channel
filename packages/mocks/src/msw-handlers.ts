@@ -50,6 +50,19 @@ export const foslApiHandlers = [
       data: { mode: "mock", paymentIntentId, settlement: "platform" },
     });
   }),
+  http.patch("/api/v1/orders/:id", async ({ params, request }) => {
+    const order = getOrderById(params.id as string);
+    if (!order) return new HttpResponse(null, { status: 404 });
+    const body = (await request.json()) as {
+      status?: string;
+      lineUpdates?: { orderLineId: string; trackingNumber?: string }[];
+    };
+    if (body.status) order.status = body.status as typeof order.status;
+    if (body.lineUpdates?.[0]?.trackingNumber) {
+      order.trackingNumber = body.lineUpdates[0].trackingNumber;
+    }
+    return HttpResponse.json({ data: order, source: "mock" });
+  }),
   http.post("/api/v1/orders", async ({ request }) => {
     const body = (await request.json()) as { email?: string; lines?: unknown[] };
     if (!body.email || !body.lines?.length) {

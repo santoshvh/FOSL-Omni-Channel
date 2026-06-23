@@ -14,6 +14,7 @@
   },
   "exports": {
     ".": "./src/index.ts",
+    "./api-mocking": "./src/api-mocking.ts",
     "./msw/browser": "./src/msw/browser.ts"
   },
   "devDependencies": {

@@ -9,9 +9,32 @@ import {
   parseAttributionCookieValue,
 } from "@/lib/attribution";
 import { sendOrderConfirmationEmail } from "@/lib/email";
+import { fetchOrdersList } from "@/lib/orders-service";
 
 function orderNumber() {
   return `FOSL-${Date.now().toString(36).toUpperCase()}`;
+}
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const email = searchParams.get("email")?.trim().toLowerCase() || undefined;
+  const vendorId = searchParams.get("vendorId")?.trim() || undefined;
+  const operatorId = searchParams.get("operatorId")?.trim() || undefined;
+
+  if (!email && !vendorId && !operatorId) {
+    return NextResponse.json(
+      { error: "Provide email, vendorId, or operatorId to list orders." },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const { data, source } = await fetchOrdersList({ email, vendorId, operatorId });
+    return NextResponse.json({ data, source });
+  } catch (err) {
+    console.error("[orders] list failed:", err);
+    return NextResponse.json({ error: "Unable to load orders." }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {

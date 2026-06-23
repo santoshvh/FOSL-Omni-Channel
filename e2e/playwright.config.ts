@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 import path from "node:path";
 
 const storefrontDir = path.join(__dirname, "..", "apps", "storefront");
+const hubDir = path.join(__dirname, "..", "apps", "hub");
 
 export default defineConfig({
   testDir: path.join(__dirname),
@@ -17,18 +18,35 @@ export default defineConfig({
   },
   projects: [
     {
-      name: "chromium",
+      name: "storefront",
+      testMatch: /checkout|referral/,
       use: { ...devices["Desktop Chrome"] },
     },
-  ],
-  webServer: {
-    command: "npx next start --port 3001",
-    cwd: storefrontDir,
-    url: "http://localhost:3001",
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-    env: {
-      NODE_ENV: "production",
+    {
+      name: "hub",
+      testMatch: /hub-/,
+      use: {
+        ...devices["Desktop Chrome"],
+        baseURL: "http://localhost:3000",
+      },
     },
-  },
+  ],
+  webServer: [
+    {
+      command: "npx next start --port 3001",
+      cwd: storefrontDir,
+      url: "http://localhost:3001",
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+      env: { NODE_ENV: "production" },
+    },
+    {
+      command: "npx next start --port 3000",
+      cwd: hubDir,
+      url: "http://localhost:3000",
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+      env: { NODE_ENV: "production" },
+    },
+  ],
 });

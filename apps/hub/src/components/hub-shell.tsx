@@ -162,6 +162,12 @@ export function HubShell({ children }: { children: React.ReactNode }) {
             {session.name}
           </Link>
           <p>{session.email}</p>
+          <Link href="/legal/terms" className="mt-2 block hover:text-primary-dark">
+            Terms
+          </Link>
+          <Link href="/legal/privacy" className="block hover:text-primary-dark">
+            Privacy
+          </Link>
           {status === "loading" ? (
             <p className="mt-2 text-slate-400">Loading session…</p>
           ) : (

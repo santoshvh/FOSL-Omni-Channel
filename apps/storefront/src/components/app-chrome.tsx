@@ -10,6 +10,7 @@ import { FosloneFooter } from "./foslone-footer";
 import { CartProvider } from "@/lib/cart-context";
 import { CartDrawer } from "./cart-drawer";
 import { MobileBottomNav } from "./mobile-bottom-nav";
+import { SubscriptionBanner } from "./subscription-banner";
 import { MswInit } from "./msw-init";
 
 export function AppChrome({ children }: { children: React.ReactNode }) {
@@ -20,6 +21,7 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
     <CartProvider mode={isMarketplace ? "marketplace" : "storefront"}>
       <MswInit />
       <div className="flex min-h-screen flex-col pb-16 md:pb-0">
+        <SubscriptionBanner state={process.env.NEXT_PUBLIC_STOREFRONT_SUBSCRIPTION_STATE as "active" | "grace_period" | "suspended" | undefined} />
         {isMarketplace ? <MarketplaceHeader /> : <StorefrontHeader />}
         <main className="flex-1">{children}</main>
         <FosloneFooter />

@@ -59,7 +59,10 @@ jobs:
       - name: Build storefront
         run: npm run build -w @fosl/storefront
 
-      - name: E2E checkout
+      - name: Build hub
+        run: npm run build -w @fosl/hub
+
+      - name: E2E tests
         run: npm run test:e2e
         env:
           CI: true

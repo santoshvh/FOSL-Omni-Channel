@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@fosl/ui";
+import { ImageUploadField } from "@/components/image-upload-field";
 import type { ProductType } from "@fosl/contracts";
 
 const productTypes: { value: ProductType; label: string; description: string }[] = [
@@ -35,6 +36,7 @@ const productTypes: { value: ProductType; label: string; description: string }[]
 
 export default function NewProductPage() {
   const [type, setType] = useState<ProductType>("physical");
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   return (
     <HubShell>
@@ -105,6 +107,10 @@ export default function NewProductPage() {
               <Label htmlFor="category">Category *</Label>
               <Input id="category" placeholder="e.g. Electronics" className="mt-1" />
             </div>
+            <ImageUploadField onUploaded={setImageUrl} />
+            {imageUrl && (
+              <p className="text-xs text-slate-500">Image URL: {imageUrl}</p>
+            )}
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" defaultChecked />
               Publish to operator storefronts immediately
