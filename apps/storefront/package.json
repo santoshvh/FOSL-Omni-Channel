@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@fosl/contracts": "*",
+    "@fosl/db": "*",
     "@fosl/mocks": "*",
     "@fosl/ui": "*",
     "lucide-react": "^0.511.0",

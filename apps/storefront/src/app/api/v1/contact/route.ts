@@ -29,6 +29,22 @@ export async function POST(request: Request) {
 
   const id = `contact_${Date.now()}`;
 
+  if (process.env.DATABASE_URL) {
+    try {
+      const { prisma } = await import("@fosl/db");
+      await prisma.contactSubmission.create({
+        data: {
+          name,
+          email,
+          role: body.role ?? "buyer",
+          message,
+        },
+      });
+    } catch (err) {
+      console.error("[contact] database persist failed:", err);
+    }
+  }
+
   if (process.env.NODE_ENV === "development") {
     console.info("[contact]", { id, name, email, role: body.role, message });
   }

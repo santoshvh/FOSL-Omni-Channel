@@ -1,0 +1,178 @@
+import { PrismaClient, ProductType, CatalogSource, SubscriptionState } from "@prisma/client";
+import { products, getShippingForVendor } from "@fosl/mocks";
+import { marketplaceVendors, platformOperators } from "@fosl/mocks";
+
+const prisma = new PrismaClient();
+
+function mapProductType(t: string): ProductType {
+  if (t === "digital") return ProductType.DIGITAL;
+  if (t === "lead_gen") return ProductType.LEAD_GEN;
+  return ProductType.PHYSICAL;
+}
+
+function mapCatalogSource(s: string): CatalogSource {
+  if (s === "shopify") return CatalogSource.SHOPIFY;
+  if (s === "woocommerce") return CatalogSource.WOOCOMMERCE;
+  return CatalogSource.NATIVE;
+}
+
+async function main() {
+  console.log("Seeding FOSL database…");
+
+  const admin = await prisma.user.upsert({
+    where: { email: "admin@foslone.com" },
+    update: {},
+    create: {
+      email: "admin@foslone.com",
+      name: "Platform Admin",
+      roleAssignments: { create: { role: "ADMIN" } },
+    },
+  });
+
+  const demoUser = await prisma.user.upsert({
+    where: { email: "alex@acmecatalog.com" },
+    update: {},
+    create: {
+      email: "alex@acmecatalog.com",
+      name: "Alex Rivera",
+      roleAssignments: {
+        createMany: {
+          data: [{ role: "VENDOR" }, { role: "CREATOR" }, { role: "OPERATOR" }],
+        },
+      },
+    },
+  });
+
+  const operator = await prisma.operator.upsert({
+    where: { slug: "demo-storefront" },
+    update: {},
+    create: {
+      id: "op_1",
+      name: platformOperators[0]?.name ?? "Demo Storefront Co.",
+      slug: "demo-storefront",
+      contactEmail: platformOperators[0]?.email ?? "ops@demo.fosl.store",
+      ownerUserId: demoUser.id,
+      subscriptionState: SubscriptionState.ACTIVE,
+      planName: "Professional",
+    },
+  });
+
+  await prisma.storefront.upsert({
+    where: { path: "demo" },
+    update: {},
+    create: {
+      operatorId: operator.id,
+      name: "Demo Storefront",
+      path: "demo",
+      isDefault: true,
+      subscriptionState: SubscriptionState.ACTIVE,
+    },
+  });
+
+  for (const mv of marketplaceVendors) {
+    await prisma.vendor.upsert({
+      where: { slug: mv.slug },
+      update: {
+        name: mv.name,
+        tagline: mv.tagline,
+        logoUrl: mv.logoUrl,
+        bannerUrl: mv.bannerUrl,
+      },
+      create: {
+        id: mv.id,
+        name: mv.name,
+        slug: mv.slug,
+        tagline: mv.tagline,
+        logoUrl: mv.logoUrl,
+        bannerUrl: mv.bannerUrl,
+      },
+    });
+
+    await prisma.operatorVendor.upsert({
+      where: {
+        operatorId_vendorId: { operatorId: operator.id, vendorId: mv.id },
+      },
+      update: { status: "APPROVED" },
+      create: {
+        operatorId: operator.id,
+        vendorId: mv.id,
+        status: "APPROVED",
+        minCommissionPct: 8,
+        defaultCommissionPct: 10,
+      },
+    });
+  }
+
+  for (const p of products) {
+    await prisma.product.upsert({
+      where: { vendorId_sku: { vendorId: p.vendorId, sku: p.sku } },
+      update: {
+        title: p.title,
+        description: p.description,
+        fullDescription: p.fullDescription ?? null,
+        priceCents: p.priceCents,
+        inventory: p.inventory,
+        imageUrl: p.imageUrl,
+        published: p.published,
+      },
+      create: {
+        id: p.id,
+        vendorId: p.vendorId,
+        sku: p.sku,
+        title: p.title,
+        description: p.description,
+        fullDescription: p.fullDescription,
+        type: mapProductType(p.type),
+        priceCents: p.priceCents,
+        currency: p.currency,
+        inventory: p.inventory,
+        imageUrl: p.imageUrl,
+        galleryUrls: p.galleryUrls ?? undefined,
+        category: p.category,
+        tags: p.tags ?? undefined,
+        attributes: p.attributes ?? undefined,
+        rating: p.rating ?? undefined,
+        reviewCount: p.reviewCount ?? 0,
+        published: p.published,
+        catalogSource: mapCatalogSource(p.catalogSource),
+      },
+    });
+  }
+
+  for (const vendorId of ["ven_1", "ven_4"]) {
+    for (const method of getShippingForVendor(vendorId)) {
+      await prisma.shippingMethod.upsert({
+        where: { id: method.id },
+        update: {},
+        create: {
+          id: method.id,
+          vendorId: method.vendorId,
+          name: method.name,
+          priceCents: method.priceCents,
+          estimatedDays: method.estimatedDays,
+          zone: method.zone,
+        },
+      });
+    }
+  }
+
+  await prisma.creatorProfile.upsert({
+    where: { userId: demoUser.id },
+    update: {},
+    create: {
+      userId: demoUser.id,
+      displayName: "Alex Rivera",
+      referralCode: "ALEX2026",
+      payoutEmail: demoUser.email,
+    },
+  });
+
+  console.log("Seed complete.", { admin: admin.email, operator: operator.slug });
+}
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(() => prisma.$disconnect());

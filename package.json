@@ -13,7 +13,12 @@
     "dev:admin": "npm run dev -w @fosl/admin",
     "build": "turbo build",
     "lint": "turbo lint",
-    "db:sync-provider": "node scripts/set-database-provider.mjs"
+    "db:sync-provider": "node scripts/set-database-provider.mjs",
+    "db:generate": "npm run db:sync-provider && npm run generate -w @fosl/db",
+    "db:push": "npm run db:sync-provider && npm run push -w @fosl/db",
+    "db:seed": "npm run seed -w @fosl/db",
+    "db:studio": "npm run studio -w @fosl/db",
+    "db:migrate": "npm run db:sync-provider && npm run migrate:dev -w @fosl/db"
   },
   "devDependencies": {
     "turbo": "^2.5.4",

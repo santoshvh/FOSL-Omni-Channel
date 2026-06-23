@@ -1,0 +1,498 @@
+// FOSL Omni-Channel — Phase B data model
+// Provider: set via `npm run db:sync-provider` (postgresql | mysql)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  OPERATOR
+  VENDOR
+  CREATOR
+  CUSTOMER
+}
+
+enum ProductType {
+  PHYSICAL
+  DIGITAL
+  LEAD_GEN
+}
+
+enum CatalogSource {
+  NATIVE
+  SHOPIFY
+  WOOCOMMERCE
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+  LEAD_RECEIVED
+}
+
+enum LedgerState {
+  PENDING
+  CLEARED
+  PAID
+  REVERSED
+}
+
+enum SubscriptionState {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  GRACE_PERIOD
+  SUSPENDED
+  CANCELLED
+  ENTERPRISE
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum CommissionScope {
+  CATALOG_WIDE
+  SKU_LEVEL
+}
+
+enum IntegrationPlatform {
+  SHOPIFY
+  WOOCOMMERCE
+}
+
+enum IntegrationStatus {
+  CONNECTED
+  SYNCING
+  ERROR
+  DISCONNECTED
+}
+
+// ─── Auth (Auth.js / NextAuth compatible) ────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  passwordHash  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts       Account[]
+  sessions       Session[]
+  roleAssignments UserRoleAssignment[]
+  orders         Order[]
+  creatorProfile CreatorProfile?
+  vendorMembers  VendorMember[]
+  operators      Operator[] @relation("OperatorOwner")
+
+  @@map("users")
+}
+
+model UserRoleAssignment {
+  userId String
+  role   UserRole
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, role])
+  @@map("user_role_assignments")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ─── Platform & tenancy ──────────────────────────────────────────────────────
+
+model Operator {
+  id                 String            @id @default(cuid())
+  name               String
+  slug               String            @unique
+  contactEmail       String
+  ownerUserId        String?
+  owner              User?             @relation("OperatorOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  subscriptionState  SubscriptionState @default(TRIAL)
+  planName           String?
+  stripeCustomerId   String?           @unique
+  stripeSubscriptionId String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  storefronts     Storefront[]
+  vendorLinks     OperatorVendor[]
+  orders          Order[]
+  commissions     Commission[]
+  creatorLinks    CreatorLink[]
+
+  @@map("operators")
+}
+
+model Storefront {
+  id                String            @id @default(cuid())
+  operatorId        String
+  operator          Operator          @relation(fields: [operatorId], references: [id], onDelete: Cascade)
+  name              String
+  /// Path segment for path-based routing, e.g. `acme-audio` → /acme-audio
+  path              String            @unique
+  isDefault         Boolean           @default(false)
+  customDomain      String?           @unique
+  subscriptionState SubscriptionState @default(ACTIVE)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  orders Order[]
+
+  @@index([operatorId])
+  @@map("storefronts")
+}
+
+// ─── Vendors & catalog ───────────────────────────────────────────────────────
+
+model Vendor {
+  id                String   @id @default(cuid())
+  name              String
+  slug              String   @unique
+  tagline           String?
+  logoUrl           String?
+  bannerUrl         String?
+  stripeAccountId   String?  @unique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  members          VendorMember[]
+  operatorLinks    OperatorVendor[]
+  products         Product[]
+  shippingMethods  ShippingMethod[]
+  integrations     VendorIntegration[]
+  orderLines       OrderLine[]
+  commissions      Commission[]
+
+  @@map("vendors")
+}
+
+model VendorMember {
+  id        String   @id @default(cuid())
+  vendorId  String
+  userId    String
+  isOwner   Boolean  @default(false)
+  vendor    Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([vendorId, userId])
+  @@map("vendor_members")
+}
+
+model OperatorVendor {
+  id                   String          @id @default(cuid())
+  operatorId           String
+  vendorId             String
+  status               ApprovalStatus  @default(PENDING)
+  scope                CommissionScope @default(CATALOG_WIDE)
+  minCommissionPct     Decimal         @db.Decimal(5, 2)
+  defaultCommissionPct Decimal?        @db.Decimal(5, 2)
+  operator             Operator        @relation(fields: [operatorId], references: [id], onDelete: Cascade)
+  vendor               Vendor          @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  @@unique([operatorId, vendorId])
+  @@map("operator_vendors")
+}
+
+model Product {
+  id              String        @id @default(cuid())
+  vendorId        String
+  vendor          Vendor        @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  sku             String
+  title           String
+  description     String        @db.Text
+  fullDescription String?       @db.Text
+  type            ProductType
+  priceCents      Int
+  currency        String        @default("USD")
+  inventory       Int           @default(0)
+  imageUrl        String
+  galleryUrls     Json?
+  category        String
+  tags            Json?
+  attributes      Json?
+  rating          Decimal?      @db.Decimal(3, 2)
+  reviewCount     Int           @default(0)
+  published       Boolean       @default(false)
+  catalogSource   CatalogSource @default(NATIVE)
+  externalId      String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  orderLines    OrderLine[]
+  creatorLinks  CreatorLink[]
+  commissions   Commission[]
+
+  @@unique([vendorId, sku])
+  @@index([vendorId, published])
+  @@index([category])
+  @@map("products")
+}
+
+model ShippingMethod {
+  id            String @id @default(cuid())
+  vendorId      String
+  vendor        Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  name          String
+  priceCents    Int
+  estimatedDays String
+  zone          String
+
+  @@index([vendorId])
+  @@map("shipping_methods")
+}
+
+model VendorIntegration {
+  id                  String              @id @default(cuid())
+  vendorId            String
+  vendor              Vendor              @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  platform            IntegrationPlatform
+  storeUrl            String
+  status              IntegrationStatus   @default(DISCONNECTED)
+  lastSyncAt          DateTime?
+  syncShipping        Boolean             @default(true)
+  productsSynced      Int                 @default(0)
+  shippingZonesSynced Int                 @default(0)
+  credentialsEncrypted String?            @db.Text
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  @@unique([vendorId, platform])
+  @@map("vendor_integrations")
+}
+
+// ─── Creator program ─────────────────────────────────────────────────────────
+
+model CreatorProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName     String?
+  payoutEmail     String?
+  stripeConnectId String?  @unique
+  referralCode    String   @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  links       CreatorLink[]
+  commissions Commission[]
+
+  @@map("creator_profiles")
+}
+
+model CreatorLink {
+  id         String   @id @default(cuid())
+  creatorId  String
+  creator    CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  productId  String?
+  product    Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  operatorId String?
+  operator   Operator? @relation(fields: [operatorId], references: [id], onDelete: SetNull)
+  slug       String
+  label      String?
+  clickCount Int      @default(0)
+  cookieDays Int      @default(30)
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  orders      Order[]
+  commissions Commission[]
+
+  @@unique([creatorId, slug])
+  @@index([productId])
+  @@map("creator_links")
+}
+
+// ─── Orders & commissions ────────────────────────────────────────────────────
+
+model Order {
+  id                    String      @id @default(cuid())
+  orderNumber           String      @unique
+  customerId            String?
+  customer              User?       @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  customerEmail         String
+  storefrontId          String?
+  storefront            Storefront? @relation(fields: [storefrontId], references: [id], onDelete: SetNull)
+  operatorId            String?
+  operator              Operator?   @relation(fields: [operatorId], references: [id], onDelete: SetNull)
+  attributedCreatorLinkId String?
+  attributedCreatorLink CreatorLink? @relation(fields: [attributedCreatorLinkId], references: [id], onDelete: SetNull)
+  status                OrderStatus @default(PENDING)
+  subtotalCents         Int
+  shippingCents         Int         @default(0)
+  taxCents              Int         @default(0)
+  totalCents            Int
+  currency              String      @default("USD")
+  stripePaymentIntentId String?     @unique
+  shippingName          String?
+  shippingLine1         String?
+  shippingLine2         String?
+  shippingCity          String?
+  shippingState         String?
+  shippingPostal        String?
+  shippingCountry       String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  lines       OrderLine[]
+  commissions Commission[]
+
+  @@index([customerId])
+  @@index([customerEmail])
+  @@index([storefrontId])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderLine {
+  id               String      @id @default(cuid())
+  orderId          String
+  order            Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId        String
+  product          Product     @relation(fields: [productId], references: [id], onDelete: Restrict)
+  vendorId         String
+  vendor           Vendor      @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+  title            String
+  type             ProductType
+  quantity         Int
+  unitPriceCents   Int
+  shippingMethodId String?
+  trackingNumber   String?
+  downloadUrl      String?
+  leadStatus       String?
+
+  commissions Commission[]
+
+  @@index([orderId])
+  @@index([vendorId])
+  @@map("order_lines")
+}
+
+model Commission {
+  id              String       @id @default(cuid())
+  orderId         String
+  order           Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderLineId     String?
+  orderLine       OrderLine?   @relation(fields: [orderLineId], references: [id], onDelete: SetNull)
+  creatorId       String
+  creator         CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Restrict)
+  operatorId      String
+  operator        Operator     @relation(fields: [operatorId], references: [id], onDelete: Restrict)
+  vendorId        String?
+  vendor          Vendor?      @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+  productId       String?
+  product         Product?     @relation(fields: [productId], references: [id], onDelete: SetNull)
+  creatorLinkId   String?
+  creatorLink     CreatorLink? @relation(fields: [creatorLinkId], references: [id], onDelete: SetNull)
+  amountCents     Int
+  ratePct         Decimal      @db.Decimal(5, 2)
+  state           LedgerState  @default(PENDING)
+  stripeTransferId String?
+  createdAt       DateTime     @default(now())
+  paidAt          DateTime?
+
+  @@index([creatorId, state])
+  @@index([operatorId])
+  @@index([orderId])
+  @@map("commissions")
+}
+
+// ─── Platform admin ──────────────────────────────────────────────────────────
+
+model Dispute {
+  id          String   @id @default(cuid())
+  orderId     String?
+  orderNumber String
+  parties     String
+  status      String   @default("open")
+  assignee    String?
+  filedAt     DateTime @default(now())
+  resolvedAt  DateTime?
+  notes       String?  @db.Text
+
+  @@index([status])
+  @@map("disputes")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actorEmail String?
+  action    String
+  resource  String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  role      String
+  message   String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@map("contact_submissions")
+}

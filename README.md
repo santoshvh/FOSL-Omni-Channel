@@ -22,6 +22,7 @@ npm run dev:admin      # http://localhost:3002
 ## Docs
 
 - [PROJECT_PLAN.md](docs/PROJECT_PLAN.md) — roadmap, completed work, changelog, next steps
+- [packages/db/README.md](packages/db/README.md) — Prisma schema & database commands
 - [WIREFRAME_INVENTORY.md](docs/WIREFRAME_INVENTORY.md) — screen specs
 - [LOCAL_DEV_URLS.md](docs/LOCAL_DEV_URLS.md) — local URLs
 - [DEPLOYMENT-ICDSOFT.md](docs/DEPLOYMENT-ICDSOFT.md) — ICDSoft deploy runbook

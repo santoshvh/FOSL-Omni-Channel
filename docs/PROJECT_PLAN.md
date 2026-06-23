@@ -1,7 +1,7 @@
 # FOSL Omni-Channel — Project Plan
 
 Living document for scope, progress, changelog, and next steps.  
-**Current release:** `v0.8` · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
+**Current release:** `v0.9` (Phase B started) · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
 
 | App | Port | Command |
 |-----|------|---------|
@@ -18,7 +18,7 @@ See also: [WIREFRAME_INVENTORY.md](./WIREFRAME_INVENTORY.md) (screen list), [LOC
 | Phase | Goal | Status |
 |-------|------|--------|
 | **A — UI prototype** | High-fidelity wireframes, mocks, FOSLOne branding, cart/checkout UX | **Complete** (v0.8) |
-| **B — Backend** | Prisma schema, Auth.js, Stripe live, real APIs replacing MSW | **Not started** |
+| **B — Backend** | Prisma schema, Auth.js, Stripe live, real APIs replacing MSW | **In progress** (schema landed) |
 | **C — Production** | ICDSoft deploy, legal review, monitoring, vendor onboarding | **Not started** |
 
 ---
@@ -81,6 +81,19 @@ Use `[x]` for done, `[ ]` for open. Screen-level detail remains in [WIREFRAME_IN
 - [x] **Products API route** — `GET /api/v1/products` (MSW + Next.js route)
 - [x] **Legacy route** — `/coseller-support` → `/creator-support` redirect
 - [x] **`Skeleton` component** in `@fosl/ui`; `AlertBanner` success variant
+
+### 2.7 Phase B — database (v0.9)
+
+- [x] **`@fosl/db` package** — Prisma schema + client singleton
+- [x] **Core models** — User, Operator, Storefront, Vendor, Product, Order, OrderLine, CreatorProfile, CreatorLink, Commission
+- [x] **Auth.js-ready tables** — Account, Session, VerificationToken, UserRoleAssignment
+- [x] **Supporting models** — ShippingMethod, VendorIntegration, OperatorVendor, Dispute, AuditLog, ContactSubmission
+- [x] **Seed script** — loads fixtures from `@fosl/mocks`
+- [x] **DB scripts** — `db:generate`, `db:push`, `db:seed`, `db:studio`, `db:migrate`
+- [x] **Contact API** — persists to DB when `DATABASE_URL` is set
+- [ ] Auth.js integration
+- [ ] Stripe Payment Element
+- [ ] Products/checkout APIs backed by Prisma
 
 ---
 
@@ -155,9 +168,10 @@ Chronological summary of meaningful changes (commits and session work).
 - [ ] Hub & Admin: duplicate or link legal policies if required for logged-in flows
 - [ ] Replace placeholder legal address and emails with production values
 
-### 5.2 Phase B — backend (deferred)
+### 5.2 Phase B — backend
 
-- [ ] Prisma schema + migrations (MySQL 8 or PostgreSQL)
+- [x] Prisma schema + seed (`packages/db`)
+- [ ] Prisma migrations workflow (production)
 - [ ] Auth.js (Hub sign-in, roles: vendor / creator / operator / admin)
 - [ ] Stripe: Payment Element, Connect split payouts, Tax, webhooks
 - [ ] REST or tRPC API replacing MSW (`/api/v1/*`)
@@ -192,12 +206,13 @@ Chronological summary of meaningful changes (commits and session work).
 3. ~~Loading skeletons~~ — catalog, cart drawer, checkout
 4. ~~Legacy route~~ — `/coseller-support` redirect exists
 
-### Short term (start Phase B) — **next up**
+### Short term (Phase B) — **next up**
 
-5. **Prisma schema** — `User`, `Operator`, `Vendor`, `Product`, `Order`, `OrderLine`, `CreatorLink`, `Commission`
-6. **Auth.js** — protect Hub routes; session on storefront for order history
-7. **Stripe test mode** — replace mock payment block in checkout with real Payment Element
-8. **API layer** — one vertical slice: `GET /api/v1/products`, `POST /api/v1/cart/checkout` with DB
+5. ~~**Prisma schema**~~ — done (`packages/db/prisma/schema.prisma`)
+6. **Run database locally** — `cp .env.example .env`, `npm run db:push`, `npm run db:seed`
+7. **Auth.js** — protect Hub routes; session on storefront for order history
+8. **Stripe test mode** — replace mock payment block in checkout with real Payment Element
+9. **API vertical slice** — `GET /api/v1/products` from Prisma; checkout creates `Order` rows
 
 ### Before go-live
 
