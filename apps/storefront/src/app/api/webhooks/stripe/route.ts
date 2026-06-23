@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { prisma, clearCommissionsForOrder, reverseCommissionsForOrder } from "@fosl/db";
+import { prisma, clearCommissionsForOrder, reverseCommissionsForOrder, pushOrderToExternalStores } from "@fosl/db";
 import { settleMultiVendorPayment } from "@/lib/vendor-settlement";
 import { getStripe, getStripeWebhookSecret } from "@/lib/stripe";
 
@@ -45,6 +45,12 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
     } catch (err) {
       console.error("[stripe-webhook] multi-vendor settlement failed:", err);
     }
+  }
+
+  try {
+    await pushOrderToExternalStores(order.id);
+  } catch (err) {
+    console.error("[stripe-webhook] order push to external stores failed:", err);
   }
 }
 

@@ -48,7 +48,10 @@ Verify Prisma products: `GET http://localhost:3001/api/v1/products` → `"source
 
 ### Image uploads (Hub)
 
-Product images upload to repo-root `uploads/` (path configured in Admin Settings). Served from Hub at `http://localhost:3000/api/v1/uploads/<filename>`.
+Configure **File storage** in Admin Settings:
+
+- **Local** — saves to the configured directory (default repo-root `uploads/`). Served at `http://localhost:3000/api/v1/uploads/<filename>`.
+- **S3** — uploads to your bucket; returns the public URL (CDN prefix or default S3 URL). Bucket must allow public read on `uploads/*` or use a CloudFront prefix.
 
 ### Stripe webhooks (optional)
 

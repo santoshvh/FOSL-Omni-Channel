@@ -51,6 +51,19 @@ export interface Order {
   trackingNumber?: string;
   downloadUrl?: string;
   leadStatus?: string;
+  externalPushes?: OrderExternalPush[];
+}
+
+export interface OrderExternalPush {
+  platform: "shopify" | "woocommerce";
+  externalOrderId?: string;
+  pushStatus: "pending" | "pushed" | "failed";
+  pushError?: string;
+  externalStatus?: string;
+  trackingNumber?: string;
+  storeUrl?: string;
+  pushedAt?: string;
+  lastStatusSyncAt?: string;
 }
 
 export interface Product {
@@ -108,7 +121,7 @@ export interface VendorIntegration {
 export interface SyncJob {
   id: string;
   integrationId: string;
-  entity: "products" | "inventory" | "shipping";
+  entity: "products" | "inventory" | "shipping" | "orders";
   status: "success" | "partial" | "failed";
   added: number;
   updated: number;

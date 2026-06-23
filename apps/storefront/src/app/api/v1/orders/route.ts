@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createOrderSchema } from "@fosl/contracts";
-import { prisma, createCommissionsForOrder, clearCommissionsForOrder } from "@fosl/db";
+import { prisma, createCommissionsForOrder, clearCommissionsForOrder, pushOrderToExternalStores } from "@fosl/db";
 import type { ProductType as DbProductType } from "@prisma/client";
 import {
   ATTRIBUTION_COOKIE,
@@ -197,6 +197,10 @@ export async function POST(request: Request) {
       commissionCount,
     }).catch((err) => {
       console.error("[orders] confirmation email failed:", err);
+    });
+
+    void pushOrderToExternalStores(order.id).catch((err) => {
+      console.error("[orders] external order push failed:", err);
     });
 
     return NextResponse.json(

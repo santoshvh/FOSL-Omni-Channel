@@ -43,6 +43,27 @@ export {
 export type { PlatformSecrets } from "./runtime-config";
 export { resolvePublicPlatformConfig } from "./resolve-public-platform-config";
 export { sendPlatformEmail } from "./send-platform-email";
+export {
+  uploadPlatformFile,
+  readLocalPlatformFile,
+  getFileStorageProvider,
+} from "./platform-file-storage";
+export type { PlatformFileUpload, PlatformFileUploadResult } from "./platform-file-storage";
+export {
+  listVendorIntegrations,
+  listSyncJobs,
+  getSyncJobById,
+  connectVendorIntegration,
+  runCatalogSync,
+} from "./catalog-sync";
+export type { ConnectIntegrationInput } from "./catalog-sync";
+export {
+  pushOrderToExternalStores,
+  syncExternalOrderStatusForPush,
+  syncAllExternalOrderStatuses,
+  handleExternalOrderWebhook,
+  listOrderExternalPushes,
+} from "./order-sync";
 export { PrismaClient } from "@prisma/client";
 export type {
   User,

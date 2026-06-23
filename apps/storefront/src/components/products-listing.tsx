@@ -23,6 +23,8 @@ export function ProductsListing() {
 
   const [typeFilter, setTypeFilter] = useState<string[]>(["physical", "digital", "lead_gen"]);
   const [vendorFilter, setVendorFilter] = useState<string>("all");
+  const [priceMin, setPriceMin] = useState("");
+  const [priceMax, setPriceMax] = useState("");
   const [inStockOnly, setInStockOnly] = useState(false);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [sort, setSort] = useState("featured");
@@ -59,6 +61,14 @@ export function ProductsListing() {
   let filtered = catalog.filter((p) => typeFilter.includes(p.type));
   if (vendorFilter !== "all") filtered = filtered.filter((p) => p.vendorName === vendorFilter);
   if (inStockOnly) filtered = filtered.filter((p) => p.inventory > 0 || p.type !== "physical");
+  const minCents = priceMin ? Math.round(parseFloat(priceMin) * 100) : null;
+  const maxCents = priceMax ? Math.round(parseFloat(priceMax) * 100) : null;
+  if (minCents !== null && !Number.isNaN(minCents)) {
+    filtered = filtered.filter((p) => p.priceCents >= minCents);
+  }
+  if (maxCents !== null && !Number.isNaN(maxCents)) {
+    filtered = filtered.filter((p) => p.priceCents <= maxCents);
+  }
 
   if (sort === "price-asc") filtered = [...filtered].sort((a, b) => a.priceCents - b.priceCents);
   if (sort === "price-desc") filtered = [...filtered].sort((a, b) => b.priceCents - a.priceCents);
@@ -104,6 +114,33 @@ export function ProductsListing() {
                   </option>
                 ))}
               </select>
+            </div>
+            <div>
+              <p className="font-medium text-slate-700">Price (USD)</p>
+              <div className="mt-2 flex gap-2">
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  placeholder="Min"
+                  value={priceMin}
+                  onChange={(e) => setPriceMin(e.target.value)}
+                  disabled={loading}
+                  className="w-full rounded-md border border-slate-200 px-2 py-1.5 text-sm"
+                  aria-label="Minimum price"
+                />
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  placeholder="Max"
+                  value={priceMax}
+                  onChange={(e) => setPriceMax(e.target.value)}
+                  disabled={loading}
+                  className="w-full rounded-md border border-slate-200 px-2 py-1.5 text-sm"
+                  aria-label="Maximum price"
+                />
+              </div>
             </div>
             <label className="flex items-center gap-2">
               <input

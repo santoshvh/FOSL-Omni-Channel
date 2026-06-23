@@ -40,8 +40,19 @@ export function buildRuntimeEnv(
     NEXT_PUBLIC_STOREFRONT_SUBSCRIPTION_STATE: settings.storefront.subscriptionState,
     NEXT_PUBLIC_API_MOCKING: settings.apiMocking.enabled ? "true" : "false",
     UPLOAD_DIR: settings.fileStorage.localUploadDir,
+    FILE_STORAGE_PROVIDER: settings.fileStorage.provider,
     EMAIL_FROM: settings.email.fromAddress,
   };
+
+  if (settings.fileStorage.provider === "s3") {
+    env.S3_BUCKET = settings.fileStorage.s3Bucket;
+    env.S3_REGION = settings.fileStorage.s3Region;
+    if (settings.fileStorage.s3PublicUrlPrefix) {
+      env.S3_PUBLIC_URL_PREFIX = settings.fileStorage.s3PublicUrlPrefix;
+    }
+    if (secrets.s3AccessKey) env.AWS_ACCESS_KEY_ID = secrets.s3AccessKey;
+    if (secrets.s3SecretKey) env.AWS_SECRET_ACCESS_KEY = secrets.s3SecretKey;
+  }
 
   const databaseUrl = buildDatabaseUrl(settings.database, secrets.databasePassword);
   if (databaseUrl) env.DATABASE_URL = databaseUrl;

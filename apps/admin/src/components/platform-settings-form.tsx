@@ -11,8 +11,17 @@ import {
   CardTitle,
   Input,
   Label,
+  SetupGuide,
 } from "@fosl/ui";
 import { Loader2, Rocket, Save } from "lucide-react";
+import {
+  authSetupGuide,
+  databaseSetupGuide,
+  postmarkEmailGuide,
+  resendEmailGuide,
+  s3StorageGuide,
+  stripeSetupGuide,
+} from "@/lib/settings-guides";
 
 type SecretFields = {
   databasePassword: string;
@@ -188,6 +197,11 @@ export function PlatformSettingsForm() {
           <CardTitle>Database</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <SetupGuide
+            title={databaseSetupGuide.title}
+            steps={databaseSetupGuide.steps}
+            terms={databaseSetupGuide.terms}
+          />
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <Label htmlFor="db-host">MySQL host</Label>
@@ -314,6 +328,11 @@ export function PlatformSettingsForm() {
             />
             Enable Hub route protection (Auth.js)
           </label>
+          <SetupGuide
+            title={authSetupGuide.title}
+            steps={authSetupGuide.steps}
+            terms={authSetupGuide.terms}
+          />
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <Label htmlFor="auth-url">Auth URL (Hub base)</Label>
@@ -551,6 +570,10 @@ export function PlatformSettingsForm() {
           <CardTitle>File storage</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <p className="text-sm text-slate-500">
+            Local saves files on disk and serves them from the Hub. S3 uploads to your bucket and
+            returns the public URL (prefix or default S3 URL).
+          </p>
           <div>
             <Label htmlFor="storage-provider">Provider</Label>
             <select
@@ -588,7 +611,13 @@ export function PlatformSettingsForm() {
               <p className="mt-1 text-xs text-slate-500">Relative to Hub app cwd.</p>
             </div>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <>
+              <SetupGuide
+                title={s3StorageGuide.title}
+                steps={s3StorageGuide.steps}
+                terms={s3StorageGuide.terms}
+              />
+              <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label htmlFor="s3-bucket">S3 bucket</Label>
                 <Input
@@ -655,6 +684,7 @@ export function PlatformSettingsForm() {
                 />
               </div>
             </div>
+            </>
           )}
         </CardContent>
       </Card>
@@ -703,8 +733,14 @@ export function PlatformSettingsForm() {
             </div>
           </div>
           {settings.email.provider === "postmark" && (
-            <div>
-              <Label htmlFor="postmark-token">
+            <>
+              <SetupGuide
+                title={postmarkEmailGuide.title}
+                steps={postmarkEmailGuide.steps}
+                terms={postmarkEmailGuide.terms}
+              />
+              <div>
+                <Label htmlFor="postmark-token">
                 Postmark server token {settings.email.postmarkServerTokenConfigured && "(configured)"}
               </Label>
               <Input
@@ -715,11 +751,18 @@ export function PlatformSettingsForm() {
                 value={secrets.postmarkServerToken}
                 onChange={(e) => setSecrets({ ...secrets, postmarkServerToken: e.target.value })}
               />
-            </div>
+              </div>
+            </>
           )}
           {settings.email.provider === "resend" && (
-            <div>
-              <Label htmlFor="resend-key">
+            <>
+              <SetupGuide
+                title={resendEmailGuide.title}
+                steps={resendEmailGuide.steps}
+                terms={resendEmailGuide.terms}
+              />
+              <div>
+                <Label htmlFor="resend-key">
                 Resend API key {settings.email.resendApiKeyConfigured && "(configured)"}
               </Label>
               <Input
@@ -730,7 +773,8 @@ export function PlatformSettingsForm() {
                 value={secrets.resendApiKey}
                 onChange={(e) => setSecrets({ ...secrets, resendApiKey: e.target.value })}
               />
-            </div>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
@@ -740,6 +784,11 @@ export function PlatformSettingsForm() {
           <CardTitle>Stripe</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
+          <SetupGuide
+            title={stripeSetupGuide.title}
+            steps={stripeSetupGuide.steps}
+            terms={stripeSetupGuide.terms}
+          />
           <label className="flex items-center gap-2">
             <input
               type="checkbox"

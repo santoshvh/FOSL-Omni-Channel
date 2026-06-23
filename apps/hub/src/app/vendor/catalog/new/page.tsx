@@ -14,7 +14,9 @@ import {
   CardTitle,
 } from "@fosl/ui";
 import { ImageUploadField } from "@/components/image-upload-field";
+import { leadGenProductGuide } from "@/lib/integration-guides";
 import type { ProductType } from "@fosl/contracts";
+import { SetupGuide } from "@fosl/ui";
 
 const productTypes: { value: ProductType; label: string; description: string }[] = [
   {
@@ -124,10 +126,24 @@ export default function NewProductPage() {
               <CardTitle>Physical — shipping</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-3">
                 <div>
                   <Label htmlFor="weight">Weight (kg) *</Label>
                   <Input id="weight" type="number" step="0.01" placeholder="0.45" className="mt-1" />
+                </div>
+                <div>
+                  <Label htmlFor="length">Length (cm)</Label>
+                  <Input id="length" type="number" step="0.1" placeholder="20" className="mt-1" />
+                </div>
+                <div>
+                  <Label htmlFor="width">Width (cm)</Label>
+                  <Input id="width" type="number" step="0.1" placeholder="15" className="mt-1" />
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="height">Height (cm)</Label>
+                  <Input id="height" type="number" step="0.1" placeholder="8" className="mt-1" />
                 </div>
                 <div>
                   <Label htmlFor="hsCode">HS code</Label>
@@ -160,16 +176,48 @@ export default function NewProductPage() {
                 <Label htmlFor="downloadLimit">Download limit per purchase</Label>
                 <Input id="downloadLimit" type="number" placeholder="3" className="mt-1" />
               </div>
+              <div>
+                <Label htmlFor="licensePool">License key pool (one per line)</Label>
+                <Textarea
+                  id="licensePool"
+                  rows={4}
+                  className="mt-1 font-mono text-xs"
+                  placeholder={"XXXX-XXXX-XXXX-0001\nXXXX-XXXX-XXXX-0002"}
+                />
+                <p className="mt-1 text-xs text-slate-500">
+                  Keys are assigned one per purchase. Upload a CSV or paste keys manually.
+                </p>
+              </div>
             </CardContent>
           </Card>
         )}
 
         {type === "lead_gen" && (
-          <Card>
+          <>
+            <SetupGuide
+              title={leadGenProductGuide.title}
+              steps={leadGenProductGuide.steps}
+              terms={leadGenProductGuide.terms}
+            />
+            <Card>
             <CardHeader>
               <CardTitle>Lead capture</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div>
+                <Label>Form fields</Label>
+                <div className="mt-2 space-y-2 text-sm">
+                  {["Name", "Email", "Phone", "Company", "Message"].map((field) => (
+                    <label key={field} className="flex items-center gap-2">
+                      <input type="checkbox" defaultChecked={field === "Name" || field === "Email"} />
+                      {field}
+                      {(field === "Name" || field === "Email") && (
+                        <span className="text-xs text-slate-400">(required)</span>
+                      )}
+                    </label>
+                  ))}
+                </div>
+              </div>
               <div>
                 <Label htmlFor="webhook">Webhook URL</Label>
                 <Input id="webhook" type="url" placeholder="https://crm.example.com/leads" className="mt-1" />
@@ -184,6 +232,7 @@ export default function NewProductPage() {
               </label>
             </CardContent>
           </Card>
+          </>
         )}
 
         <div className="flex gap-3">

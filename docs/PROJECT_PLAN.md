@@ -1,7 +1,7 @@
 # FOSL Omni-Channel — Project Plan
 
 Living document for scope, progress, changelog, and next steps.  
-**Current release:** `v0.19` (Admin settings as config source of truth) · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
+**Current release:** `v0.21` (marketplace filters, catalog integrations, setup guides) · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
 
 | App | Port | Command |
 |-----|------|---------|
@@ -263,6 +263,8 @@ Chronological summary of meaningful changes (commits and session work).
 - [ ] Storybook component catalog
 - [x] Operator subscription / plan banners on storefront
 - [x] Hub & Admin: duplicate or link legal policies if required for logged-in flows
+- [x] Marketplace product filters (type, category, vendor, price, rating)
+- [x] Integration & settings setup guides (WooCommerce, Shopify, Stripe, S3, etc.)
 - [ ] Replace placeholder legal address and emails with production values
 
 ### 5.2 Phase B — backend
@@ -274,9 +276,12 @@ Chronological summary of meaningful changes (commits and session work).
 - [x] Stripe: Payment Element, webhooks, single-vendor Connect destination charges, creator commission transfers
 - [ ] Stripe: Tax, transfer reconciliation
 - [x] REST API slice — products, orders (GET/PATCH), contact, payouts, uploads (partial vs MSW)
+- [x] Catalog integrations — `@fosl/integrations` Shopify/WooCommerce adapters, Hub sync API, `jobs:sync-catalog`
 - [ ] Order fulfillment webhooks (inventory sync beyond checkout decrement)
+- [x] Order push-back to connected shops on payment (Shopify/WooCommerce adapters, Stripe + checkout triggers)
+- [x] External order status sync — Hub webhooks + `jobs:sync-order-status` polling
 - [x] Creator attribution cookies + commission ledger (checkout)
-- [x] File storage for product images (local `uploads/` directory; S3 for production later)
+- [x] File storage for product images — local directory or S3 per Admin Settings (`uploadPlatformFile` in `@fosl/db`)
 
 ### 5.3 Phase C — production
 

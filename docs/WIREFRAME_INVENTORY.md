@@ -8,7 +8,7 @@ High-fidelity Next.js prototype screens.
 | Storefront | http://localhost:3001 |
 | Admin | http://localhost:3002 |
 
-**Status: v0.8 — contact API, loading skeletons, Phase A complete**
+**Status: v0.21 — wireframe polish + catalog integrations (Shopify/WooCommerce)**
 
 > Full roadmap, changelog, and next steps: [PROJECT_PLAN.md](./PROJECT_PLAN.md)
 
@@ -34,7 +34,7 @@ High-fidelity Next.js prototype screens.
 | ID | Screen | Route | Status |
 |----|--------|-------|--------|
 | S1 | Home | `/` | Done |
-| S2 | Product listing (vendor filter, grid/list) | `/products` | Done |
+| S2 | Product listing (vendor filter, grid/list, **price range**) | `/products` | Done |
 | S3a-c | Product detail | `/products/[id]` | Done |
 | S4 | Cart | `/cart` | Done |
 | S5-S7 | Checkout (contact/shipping/payment steps) | `/checkout` | Done |
@@ -43,6 +43,9 @@ High-fidelity Next.js prototype screens.
 | S10 | Order detail (timeline) | `/orders/[id]` | Done |
 | S11 | Cookie consent | layout modal | Done |
 | S12 | Storefront suspended | `/suspended` | Done |
+| — | Contact | `/contact` | Done |
+| — | Legal hub | `/legal`, `/legal/[slug]` | Done |
+| — | Operator path storefront | `/[store]` | Done |
 
 ---
 
@@ -53,7 +56,7 @@ High-fidelity Next.js prototype screens.
 | `/vendor` | Done |
 | `/vendor/catalog` | Done |
 | `/vendor/catalog/source` | Done |
-| `/vendor/catalog/new` | Done |
+| `/vendor/catalog/new` | Done (physical dimensions, digital license pool, lead form builder) |
 | `/vendor/catalog/[id]` | Done |
 | `/vendor/integrations` | Done |
 | `/vendor/integrations/connect` | Done |
@@ -141,7 +144,7 @@ High-fidelity Next.js prototype screens.
 
 | ID | Screen | Route | Status |
 |----|--------|-------|--------|
-| H1 | Marketplace home | `/marketplace` | Done |
+| H1 | Marketplace home | `/marketplace` | Done (search, categories, vendors, **product filters**) |
 | H2 | Search results | `/marketplace/search` | Done |
 | H3 | Product detail | `/marketplace/products/[id]` | Done |
 | H4 | Vendor profile | `/marketplace/vendors/[id]` | Done |
@@ -157,8 +160,13 @@ High-fidelity Next.js prototype screens.
 ## Out of scope (deferred)
 
 - Storybook component catalog
-- Field-level wireframe specs document (routes implemented with inline validation)
-- Phase B backend (Prisma, Auth.js, Stripe live API)
+- Field-level wireframe PDF (routes implemented with inline validation)
+
+## Phase B — catalog integrations (v0.21)
+
+- `@fosl/integrations` — Shopify + WooCommerce adapters
+- Hub `POST /api/v1/integrations`, `POST /api/v1/integrations/[id]/sync`
+- `npm run jobs:sync-catalog` — cron-friendly sync script
 
 ## Phase A polish
 

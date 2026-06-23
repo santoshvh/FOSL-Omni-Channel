@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { HubShell } from "@/components/hub-shell";
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@fosl/ui";
+import { catalogSourceGuide } from "@/lib/integration-guides";
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, SetupGuide } from "@fosl/ui";
 import { Plug, Package } from "lucide-react";
 
 export default function CatalogSourcePage() {
@@ -55,6 +56,12 @@ export default function CatalogSourcePage() {
             </CardContent>
           </Card>
         </div>
+
+        <SetupGuide
+          title={catalogSourceGuide.title}
+          steps={catalogSourceGuide.steps}
+          terms={catalogSourceGuide.terms}
+        />
       </div>
     </HubShell>
   );

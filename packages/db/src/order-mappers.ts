@@ -41,7 +41,21 @@ function mapOrderLine(line: DbOrderLineWithVendor): OrderLine {
   };
 }
 
-export function mapDbOrder(order: DbOrderWithLines): Order {
+export function mapDbOrder(
+  order: DbOrderWithLines & {
+    externalPushes?: Array<{
+      platform: import("@prisma/client").IntegrationPlatform;
+      externalOrderId: string | null;
+      pushStatus: import("@prisma/client").ExternalPushStatus;
+      pushError: string | null;
+      externalStatus: string | null;
+      trackingNumber: string | null;
+      pushedAt: Date | null;
+      lastStatusSyncAt: Date | null;
+      integration: { storeUrl: string };
+    }>;
+  }
+): Order {
   const lines = order.lines.map(mapOrderLine);
   const trackingLine = lines.find((line) => line.trackingNumber);
   const downloadLine = lines.find((line) => line.downloadUrl);
@@ -58,6 +72,17 @@ export function mapDbOrder(order: DbOrderWithLines): Order {
     trackingNumber: trackingLine?.trackingNumber,
     downloadUrl: downloadLine?.downloadUrl,
     leadStatus: leadLine?.leadStatus,
+    externalPushes: order.externalPushes?.map((push) => ({
+      platform: push.platform.toLowerCase() as "shopify" | "woocommerce",
+      externalOrderId: push.externalOrderId ?? undefined,
+      pushStatus: push.pushStatus.toLowerCase() as "pending" | "pushed" | "failed",
+      pushError: push.pushError ?? undefined,
+      externalStatus: push.externalStatus ?? undefined,
+      trackingNumber: push.trackingNumber ?? undefined,
+      storeUrl: push.integration.storeUrl,
+      pushedAt: push.pushedAt?.toISOString(),
+      lastStatusSyncAt: push.lastStatusSyncAt?.toISOString(),
+    })),
   };
 }
 
@@ -65,6 +90,11 @@ export const orderListInclude = {
   lines: {
     include: {
       vendor: { select: { id: true, name: true } },
+    },
+  },
+  externalPushes: {
+    include: {
+      integration: { select: { storeUrl: true } },
     },
   },
 } as const;

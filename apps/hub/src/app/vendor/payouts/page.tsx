@@ -1,5 +1,6 @@
 import { HubShell } from "@/components/hub-shell";
-import { Button, StatCard, StatCardCurrency, Card, CardContent, CardHeader, CardTitle } from "@fosl/ui";
+import { stripeConnectGuide } from "@/lib/integration-guides";
+import { Button, StatCard, StatCardCurrency, Card, CardContent, CardHeader, CardTitle, SetupGuide } from "@fosl/ui";
 
 export default function VendorPayoutsPage() {
   return (
@@ -25,6 +26,11 @@ export default function VendorPayoutsPage() {
             <CardTitle>Stripe Connect onboarding</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm text-slate-600">
+            <SetupGuide
+              title={stripeConnectGuide.title}
+              steps={stripeConnectGuide.steps}
+              terms={stripeConnectGuide.terms}
+            />
             <p>Your account is verified. Update bank details or tax info in Stripe Express dashboard.</p>
             <Button variant="outline">Open Stripe Express</Button>
           </CardContent>

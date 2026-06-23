@@ -92,6 +92,40 @@ export function VendorOrderDetailClient({
       <div className="rounded-lg border border-slate-200 bg-white p-6">
         <h2 className="font-semibold">Fulfillment</h2>
         <p className="mt-2 text-sm text-slate-600 capitalize">Status: {order.status.replace("_", " ")}</p>
+        {order.externalPushes && order.externalPushes.length > 0 && (
+          <div className="mt-4 space-y-2 rounded-md border border-slate-100 bg-slate-50 p-3 text-sm">
+            <p className="font-medium text-slate-700">Connected store sync</p>
+            {order.externalPushes.map((push, i) => (
+              <div key={i} className="text-slate-600">
+                <span className="capitalize">{push.platform}</span>
+                {" · "}
+                Push: <span className="capitalize">{push.pushStatus}</span>
+                {push.externalOrderId && (
+                  <>
+                    {" · "}
+                    Store order #{push.externalOrderId}
+                  </>
+                )}
+                {push.externalStatus && (
+                  <>
+                    {" · "}
+                    Store status: <span className="capitalize">{push.externalStatus.replace("_", " ")}</span>
+                  </>
+                )}
+                {push.storeUrl && (
+                  <p className="mt-0.5 text-xs text-slate-500">{push.storeUrl}</p>
+                )}
+                {push.pushError && (
+                  <p className="mt-0.5 text-xs text-red-600">{push.pushError}</p>
+                )}
+              </div>
+            ))}
+            <p className="text-xs text-slate-500">
+              Status updates when Shopify/WooCommerce webhooks fire or via{" "}
+              <code className="rounded bg-white px-1">npm run jobs:sync-order-status</code>.
+            </p>
+          </div>
+        )}
         {physicalLine && (
           <div className="mt-4 space-y-3">
             <div>

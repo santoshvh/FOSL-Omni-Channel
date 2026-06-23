@@ -22,11 +22,15 @@
     "db:migrate:deploy": "npm run db:sync-provider && npm run migrate:deploy -w @fosl/db",
     "db:setup": "npm run db:push && npm run db:seed",
     "jobs:payout-commissions": "node scripts/payout-commissions.mjs",
+    "jobs:sync-catalog": "npx tsx scripts/sync-catalog.ts",
+    "jobs:sync-order-status": "npx tsx scripts/sync-order-status.ts",
     "test:e2e": "playwright test --config e2e/playwright.config.ts",
     "test:e2e:install": "playwright install chromium --with-deps"
   },
   "devDependencies": {
     "@playwright/test": "^1.53.2",
+    "@next/env": "^15.5.19",
+    "tsx": "^4.20.3",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   },

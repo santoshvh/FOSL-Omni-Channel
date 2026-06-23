@@ -83,6 +83,12 @@ enum IntegrationStatus {
   DISCONNECTED
 }
 
+enum ExternalPushStatus {
+  PENDING
+  PUSHED
+  FAILED
+}
+
 // ─── Auth (Auth.js / NextAuth compatible) ────────────────────────────────────
 
 model User {
@@ -222,6 +228,23 @@ model Vendor {
   @@map("vendors")
 }
 
+model SyncJob {
+  id            String            @id @default(cuid())
+  integrationId String
+  integration   VendorIntegration   @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  entity        String
+  status        String
+  added         Int                 @default(0)
+  updated       Int                 @default(0)
+  failed        Int                 @default(0)
+  errorMessage  String?             @db.Text
+  startedAt     DateTime            @default(now())
+  completedAt   DateTime?
+
+  @@index([integrationId, startedAt])
+  @@map("sync_jobs")
+}
+
 model VendorMember {
   id        String   @id @default(cuid())
   vendorId  String
@@ -315,6 +338,9 @@ model VendorIntegration {
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
 
+  syncJobs            SyncJob[]
+  orderPushes         OrderExternalPush[]
+
   @@unique([vendorId, platform])
   @@map("vendor_integrations")
 }
@@ -393,14 +419,39 @@ model Order {
   createdAt             DateTime    @default(now())
   updatedAt             DateTime    @updatedAt
 
-  lines       OrderLine[]
-  commissions Commission[]
+  lines         OrderLine[]
+  commissions   Commission[]
+  externalPushes OrderExternalPush[]
 
   @@index([customerId])
   @@index([customerEmail])
   @@index([storefrontId])
   @@index([createdAt])
   @@map("orders")
+}
+
+model OrderExternalPush {
+  id               String              @id @default(cuid())
+  orderId          String
+  order            Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  integrationId    String
+  integration    VendorIntegration   @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  vendorId         String
+  platform         IntegrationPlatform
+  externalOrderId  String?
+  pushStatus       ExternalPushStatus  @default(PENDING)
+  pushError        String?             @db.Text
+  pushedAt         DateTime?
+  externalStatus   String?
+  trackingNumber   String?
+  lastStatusSyncAt DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  @@unique([orderId, integrationId])
+  @@index([externalOrderId, platform])
+  @@index([vendorId])
+  @@map("order_external_pushes")
 }
 
 model OrderLine {

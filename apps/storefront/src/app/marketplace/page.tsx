@@ -1,18 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
-import {
-  products,
-  marketplaceCategories,
-  marketplaceVendors,
-} from "@fosl/mocks";
-import { Button } from "@fosl/ui";
-import { MarketplaceProductCard } from "@/components/marketplace-product-card";
+import { Suspense } from "react";
+import { marketplaceCategories, marketplaceVendors } from "@fosl/mocks";
+import { Button, Input } from "@fosl/ui";
+import { MarketplaceProductListing } from "@/components/marketplace-product-listing";
 import { Search } from "lucide-react";
-import { Input } from "@fosl/ui";
 
 export default function MarketplaceHomePage() {
-  const bestSellers = products.slice(0, 4);
-
   return (
     <div>
       <section className="bg-gradient-to-br from-primary via-primary-dark to-ink px-4 py-16 text-primary-foreground">
@@ -85,18 +79,17 @@ export default function MarketplaceHomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-12">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Best sellers</h2>
-          <Link href="/marketplace/search" className="text-sm text-primary-dark hover:underline">
-            View all
-          </Link>
-        </div>
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {bestSellers.map((p) => (
-            <MarketplaceProductCard key={p.id} product={p} />
-          ))}
-        </div>
+      <section className="border-t border-slate-200 bg-white">
+        <Suspense
+          fallback={
+            <div className="mx-auto max-w-6xl px-4 py-12 text-slate-500">Loading marketplace catalog…</div>
+          }
+        >
+          <MarketplaceProductListing
+            title="All marketplace products"
+            description="Filter by type, category, vendor, price, and rating across the FOSL network."
+          />
+        </Suspense>
       </section>
     </div>
   );

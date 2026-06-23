@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw";
-import { products } from "./fixtures";
+import { products, integrations, syncJobs } from "./fixtures";
 import { mockOrders, getOrderById } from "./hub-data";
 import {
   getMockPlatformSettings,
@@ -98,5 +98,27 @@ export const foslApiHandlers = [
   }),
   http.post("/api/v1/settings/deploy", () =>
     HttpResponse.json({ data: triggerMockDeploy(), source: "mock" })
+  ),
+  http.get("/api/v1/integrations", () => HttpResponse.json({ data: integrations, source: "mock" })),
+  http.post("/api/v1/integrations", async ({ request }) => {
+    const body = (await request.json()) as { platform?: string; storeUrl?: string };
+    if (!body.platform || !body.storeUrl) {
+      return HttpResponse.json({ error: "platform and storeUrl are required." }, { status: 400 });
+    }
+    return HttpResponse.json({ data: integrations[0], source: "mock" }, { status: 201 });
+  }),
+  http.post("/api/v1/integrations/:id/sync", () =>
+    HttpResponse.json({
+      data: {
+        integration: integrations[0],
+        productStats: { added: 1, updated: 2, failed: 0 },
+        shippingStats: { added: 0, updated: 1, failed: 0 },
+        errors: [],
+      },
+      source: "mock",
+    })
+  ),
+  http.get("/api/v1/integrations/sync-jobs", () =>
+    HttpResponse.json({ data: syncJobs, source: "mock" })
   ),
 ];

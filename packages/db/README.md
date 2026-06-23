@@ -29,4 +29,9 @@ Schema: `prisma/schema.prisma` — User, Operator, Storefront, Vendor, Product, 
 
 ## Image uploads
 
-Hub stores product images under repo-root `uploads/` (path from Admin Settings). Served at `GET /api/v1/uploads/[filename]` on the Hub app.
+Hub product images use **Admin → Settings → File storage**:
+
+- **Local** — files saved under the configured directory (default repo-root `uploads/`). Served at `GET /api/v1/uploads/[filename]` on the Hub app.
+- **S3** — files uploaded to the configured bucket (`uploads/{uuid}.{ext}`). Public URL uses the configured prefix or default S3 virtual-hosted URL.
+
+Configure bucket, region, public URL prefix, and credentials in Admin Settings. Saving writes AWS keys to `.fosl-runtime.json` when provider is S3.

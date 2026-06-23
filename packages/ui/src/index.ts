@@ -11,4 +11,6 @@ export { StatCard, StatCardCurrency } from "./components/stat-card";
 export { FoslLogo } from "./components/fosl-logo";
 export { EmptyState } from "./components/empty-state";
 export { AlertBanner } from "./components/alert-banner";
+export { SetupGuide } from "./components/setup-guide";
+export type { SetupGuideStep, SetupGuideTerm } from "./components/setup-guide";
 export { Skeleton } from "./components/skeleton";

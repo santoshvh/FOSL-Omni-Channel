@@ -40,6 +40,17 @@ export const roleSwitchSchema = z.object({
   role: z.enum(["operator", "vendor", "creator"]),
 });
 
+export const connectIntegrationSchema = z.object({
+  vendorId: z.string().min(1).optional(),
+  platform: z.enum(["shopify", "woocommerce"]),
+  storeUrl: z.string().min(1),
+  syncShipping: z.boolean().default(true),
+  syncIntervalMinutes: z.number().int().min(15).optional(),
+  accessToken: z.string().optional(),
+  consumerKey: z.string().optional(),
+  consumerSecret: z.string().optional(),
+});
+
 export const createOrderLineSchema = z.object({
   productId: z.string().min(1),
   quantity: z.number().int().positive(),

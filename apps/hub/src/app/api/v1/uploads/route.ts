@@ -1,8 +1,5 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
-import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
-import { getUploadDir } from "@/lib/uploads";
+import { uploadPlatformFile } from "@fosl/db";
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -20,15 +17,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Image must be under 5 MB." }, { status: 400 });
   }
 
-  const uploadDir = await getUploadDir();
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const filename = `${randomUUID()}.${ext}`;
-  await mkdir(uploadDir, { recursive: true });
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(uploadDir, filename), buffer);
+  try {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const hubBaseUrl = process.env.NEXT_PUBLIC_HUB_URL ?? "http://localhost:3000";
+    const result = await uploadPlatformFile(
+      {
+        buffer,
+        contentType: file.type,
+        originalName: file.name,
+      },
+      hubBaseUrl
+    );
 
-  const baseUrl = process.env.NEXT_PUBLIC_HUB_URL ?? "http://localhost:3000";
-  const url = `${baseUrl}/api/v1/uploads/${filename}`;
-
-  return NextResponse.json({ data: { url, filename } }, { status: 201 });
+    return NextResponse.json(
+      { data: { url: result.url, filename: result.filename, provider: result.provider } },
+      { status: 201 }
+    );
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Upload failed.";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }

@@ -1,9 +1,27 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import type { SyncJob } from "@fosl/contracts";
 import { HubShell } from "@/components/hub-shell";
-import { IntegrationStatusBadge } from "@fosl/ui";
-import { syncJobs } from "@fosl/mocks";
 
 export default function SyncHistoryPage() {
+  const [jobs, setJobs] = useState<SyncJob[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch("/api/v1/integrations/sync-jobs");
+        const json = (await res.json()) as { data?: SyncJob[] };
+        setJobs(json.data ?? []);
+      } finally {
+        setLoading(false);
+      }
+    }
+    void load();
+  }, []);
+
   return (
     <HubShell>
       <div className="space-y-6">
@@ -11,6 +29,8 @@ export default function SyncHistoryPage() {
           <h1 className="text-2xl font-bold">Sync history</h1>
           <p className="text-slate-600">Products, inventory, and shipping sync runs</p>
         </div>
+
+        {loading && <p className="text-sm text-slate-500">Loading sync history…</p>}
 
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           <table className="w-full text-sm">
@@ -26,7 +46,7 @@ export default function SyncHistoryPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {syncJobs.map((job) => (
+              {jobs.map((job) => (
                 <tr key={job.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 whitespace-nowrap">
                     <Link

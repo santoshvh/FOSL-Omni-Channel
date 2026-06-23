@@ -1,7 +1,5 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import { NextResponse } from "next/server";
-import { getUploadDir } from "@/lib/uploads";
+import { getFileStorageProvider, readLocalPlatformFile } from "@fosl/db";
 
 const mimeByExt: Record<string, string> = {
   jpg: "image/jpeg",
@@ -16,17 +14,27 @@ export async function GET(
   { params }: { params: Promise<{ filename: string }> }
 ) {
   const { filename } = await params;
-  if (filename.includes("..") || filename.includes("/")) {
-    return NextResponse.json({ error: "Invalid filename." }, { status: 400 });
-  }
 
   try {
-    const buffer = await readFile(path.join(await getUploadDir(), filename));
+    const provider = await getFileStorageProvider();
+    if (provider === "s3") {
+      return NextResponse.json(
+        { error: "Files are served from S3 when S3 storage is enabled." },
+        { status: 404 }
+      );
+    }
+
+    const buffer = await readLocalPlatformFile(filename);
+    if (!buffer) {
+      return NextResponse.json({ error: "File not found." }, { status: 404 });
+    }
+
     const ext = filename.split(".").pop()?.toLowerCase() ?? "jpg";
-    return new NextResponse(buffer, {
+    return new NextResponse(new Uint8Array(buffer), {
       headers: { "Content-Type": mimeByExt[ext] ?? "application/octet-stream" },
     });
-  } catch {
-    return NextResponse.json({ error: "File not found." }, { status: 404 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Invalid request.";
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }
