@@ -1,0 +1,215 @@
+# FOSL Local Dev URLs
+
+Quick reference for running and browsing the Phase A prototype locally.
+
+## Start servers
+
+From the repo root (`e:\Code\MV FOSL 2`):
+
+```powershell
+npm run dev:hub          # port 3000
+npm run dev:storefront   # port 3001
+npm run dev:admin        # port 3002
+```
+
+Use **three terminals** (one per app). Always prefix with `npm run` — e.g. `npm run dev:admin`, not `dev:admin`.
+
+## Base URLs
+
+| App | Local | Purpose |
+|-----|-------|---------|
+| **Hub** | http://localhost:3000 | Vendor, Creator, Operator workspaces |
+| **Storefront** | http://localhost:3001 | Customer shop + FOSLOne home + marketplace |
+| **Admin** | http://localhost:3002 | Platform admin |
+
+---
+
+## Storefront — http://localhost:3001
+
+### FOSLOne & operator storefront
+
+| Screen | URL |
+|--------|-----|
+| Home | http://localhost:3001/ |
+| Products | http://localhost:3001/products |
+| Product detail (sample) | http://localhost:3001/products/prod_1 |
+| Cart | http://localhost:3001/cart |
+| Checkout | http://localhost:3001/checkout |
+| Confirmation (mixed) | http://localhost:3001/checkout/confirmation?type=mixed |
+| Confirmation (physical) | http://localhost:3001/checkout/confirmation?type=physical |
+| Confirmation (digital) | http://localhost:3001/checkout/confirmation?type=digital |
+| Confirmation (lead gen) | http://localhost:3001/checkout/confirmation?type=lead_gen |
+| Orders | http://localhost:3001/orders |
+| Order detail (sample) | http://localhost:3001/orders/ord_1 |
+| Incubations | http://localhost:3001/incubations |
+| Creator support | http://localhost:3001/creator-support |
+| Contact | http://localhost:3001/contact |
+| Suspended storefront | http://localhost:3001/suspended |
+
+### Vendor stores (path-based)
+
+| Vendor | URL |
+|--------|-----|
+| Acme Audio Co. | http://localhost:3001/acme-audio |
+| Bright Labs | http://localhost:3001/bright-labs |
+| Creator Academy | http://localhost:3001/creator-academy |
+| Northwind Growth | http://localhost:3001/northwind-growth |
+
+### Marketplace
+
+| Screen | URL |
+|--------|-----|
+| Marketplace home | http://localhost:3001/marketplace |
+| Search | http://localhost:3001/marketplace/search?q=headphones |
+| Category (electronics) | http://localhost:3001/marketplace/category/electronics |
+| Product detail (sample) | http://localhost:3001/marketplace/products/prod_1 |
+| Vendor profile (sample) | http://localhost:3001/marketplace/vendors/ven_1 |
+| Cart | http://localhost:3001/marketplace/cart |
+| Checkout | http://localhost:3001/marketplace/checkout |
+| Confirmation | http://localhost:3001/marketplace/checkout/confirmation |
+| Orders | http://localhost:3001/marketplace/orders |
+
+---
+
+## Hub — http://localhost:3000
+
+Use the **role switcher** in the header to move between Vendor, Creator, and Operator.
+
+### Auth & account
+
+| Screen | URL |
+|--------|-----|
+| Role landing | http://localhost:3000/auth/landing |
+| Sign in | http://localhost:3000/auth/sign-in |
+| Register | http://localhost:3000/auth/register |
+| Forgot password | http://localhost:3000/auth/forgot-password |
+| Reset password | http://localhost:3000/auth/reset-password |
+| Account | http://localhost:3000/account |
+| Edit account | http://localhost:3000/account/edit |
+| Notifications | http://localhost:3000/notifications |
+
+### Vendor
+
+| Screen | URL |
+|--------|-----|
+| Dashboard | http://localhost:3000/vendor |
+| Catalog | http://localhost:3000/vendor/catalog |
+| Catalog source | http://localhost:3000/vendor/catalog/source |
+| New product | http://localhost:3000/vendor/catalog/new |
+| Edit product (sample) | http://localhost:3000/vendor/catalog/prod_1 |
+| Integrations | http://localhost:3000/vendor/integrations |
+| Connect integration | http://localhost:3000/vendor/integrations/connect |
+| Sync history | http://localhost:3000/vendor/integrations/history |
+| Sync job detail (sample) | http://localhost:3000/vendor/integrations/history/sync_1 |
+| Shipping | http://localhost:3000/vendor/shipping |
+| Operator relationships | http://localhost:3000/vendor/relationships |
+| Orders | http://localhost:3000/vendor/orders |
+| Order detail (sample) | http://localhost:3000/vendor/orders/ord_1 |
+| Coupons | http://localhost:3000/vendor/coupons |
+| New coupon | http://localhost:3000/vendor/coupons/new |
+| Campaigns | http://localhost:3000/vendor/campaigns |
+| Payouts | http://localhost:3000/vendor/payouts |
+| Analytics | http://localhost:3000/vendor/analytics |
+
+### Creator
+
+| Screen | URL |
+|--------|-----|
+| Dashboard | http://localhost:3000/creator |
+| Referral links | http://localhost:3000/creator/links |
+| Collections | http://localhost:3000/creator/collections |
+| New collection | http://localhost:3000/creator/collections/new |
+| Collection detail (sample) | http://localhost:3000/creator/collections/col_1 |
+| Coupons | http://localhost:3000/creator/coupons |
+| New coupon | http://localhost:3000/creator/coupons/new |
+| Analytics | http://localhost:3000/creator/analytics |
+| Referral tree | http://localhost:3000/creator/referral-tree |
+| Public profile | http://localhost:3000/creator/profile |
+| Earnings | http://localhost:3000/creator/payouts |
+
+### Operator
+
+| Screen | URL |
+|--------|-----|
+| Dashboard | http://localhost:3000/operator |
+| Catalog | http://localhost:3000/operator/catalog |
+| New product | http://localhost:3000/operator/catalog/new |
+| Edit product (sample) | http://localhost:3000/operator/catalog/prod_1 |
+| Import from vendors | http://localhost:3000/operator/catalog/import |
+| Vendors | http://localhost:3000/operator/vendors |
+| Invite vendor | http://localhost:3000/operator/vendors/invite |
+| Vendor detail (sample) | http://localhost:3000/operator/vendors/ven_1 |
+| Creators | http://localhost:3000/operator/creators |
+| Invite creator | http://localhost:3000/operator/creators/invite |
+| Orders | http://localhost:3000/operator/orders |
+| Order detail (sample) | http://localhost:3000/operator/orders/ord_1 |
+| Coupons | http://localhost:3000/operator/coupons |
+| New coupon | http://localhost:3000/operator/coupons/new |
+| Commissions | http://localhost:3000/operator/commissions |
+| Promotions | http://localhost:3000/operator/promotions |
+| New promotion | http://localhost:3000/operator/promotions/new |
+| Analytics | http://localhost:3000/operator/analytics |
+| Payouts | http://localhost:3000/operator/payouts |
+| Domains | http://localhost:3000/operator/domains |
+| Lead gen | http://localhost:3000/operator/lead-gen |
+| Storefront settings | http://localhost:3000/operator/storefront |
+| Subscription | http://localhost:3000/operator/subscription |
+
+---
+
+## Admin — http://localhost:3002
+
+| Screen | URL |
+|--------|-----|
+| Dashboard | http://localhost:3002/ |
+| Operators | http://localhost:3002/operators |
+| Operator detail (sample) | http://localhost:3002/operators/op_1 |
+| Edit operator (sample) | http://localhost:3002/operators/op_1/edit |
+| Disputes | http://localhost:3002/disputes |
+| Dispute detail (sample) | http://localhost:3002/disputes/disp_1 |
+| Audit log | http://localhost:3002/audit |
+| Payments | http://localhost:3002/payments |
+| Settings | http://localhost:3002/settings |
+| Subscription plans | http://localhost:3002/subscription-plans |
+| Health | http://localhost:3002/health |
+
+---
+
+## Troubleshooting
+
+### Port already in use (`EADDRINUSE`)
+
+```powershell
+foreach ($port in 3000,3001,3002) {
+  Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue |
+    ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }
+}
+```
+
+Then restart the dev servers.
+
+### Storefront blank or 404 on `_next/static` chunks
+
+1. Stop the storefront dev server.
+2. Delete the build cache: `Remove-Item -Recurse -Force "apps\storefront\.next"`
+3. Run `npm run dev:storefront` again.
+4. Hard refresh the browser (`Ctrl+Shift+R`).
+
+### Cross-app links
+
+Storefront login points to the hub sign-in page. Optional env vars:
+
+**`apps/storefront/.env.local`**
+```
+NEXT_PUBLIC_HUB_URL=http://localhost:3000
+```
+
+**`apps/hub/.env.local`**
+```
+NEXT_PUBLIC_STOREFRONT_URL=http://localhost:3001
+NEXT_PUBLIC_ADMIN_URL=http://localhost:3002
+```
+
+---
+
+*See also: [WIREFRAME_INVENTORY.md](./WIREFRAME_INVENTORY.md) for screen status checklist.*

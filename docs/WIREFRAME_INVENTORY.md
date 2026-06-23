@@ -8,7 +8,7 @@ High-fidelity Next.js prototype screens.
 | Storefront | http://localhost:3001 |
 | Admin | http://localhost:3002 |
 
-**Status: v0.4 — full spec inventory including marketplace**
+**Status: v0.5 — gap fill: auth landing, operator CRUD routes, sync drill-down, storefront polish**
 
 ---
 
@@ -20,6 +20,7 @@ High-fidelity Next.js prototype screens.
 | `/auth/register` | Done |
 | `/auth/forgot-password` | Done |
 | `/auth/reset-password` | Done |
+| `/auth/landing` | Done |
 | `/account` | Done |
 | `/account/edit` | Done |
 | `/notifications` | Done |
@@ -31,13 +32,13 @@ High-fidelity Next.js prototype screens.
 | ID | Screen | Route | Status |
 |----|--------|-------|--------|
 | S1 | Home | `/` | Done |
-| S2 | Product listing | `/products` | Done |
+| S2 | Product listing (vendor filter, grid/list) | `/products` | Done |
 | S3a-c | Product detail | `/products/[id]` | Done |
 | S4 | Cart | `/cart` | Done |
 | S5-S7 | Checkout (contact/shipping/payment steps) | `/checkout` | Done |
-| S8 | Confirmation | `/checkout/confirmation` | Done |
+| S8 | Confirmation (physical / digital / lead_gen variants) | `/checkout/confirmation?type=` | Done |
 | S9 | Order history | `/orders` | Done |
-| S10 | Order detail | `/orders/[id]` | Done |
+| S10 | Order detail (timeline) | `/orders/[id]` | Done |
 | S11 | Cookie consent | layout modal | Done |
 | S12 | Storefront suspended | `/suspended` | Done |
 
@@ -55,6 +56,7 @@ High-fidelity Next.js prototype screens.
 | `/vendor/integrations` | Done |
 | `/vendor/integrations/connect` | Done |
 | `/vendor/integrations/history` | Done |
+| `/vendor/integrations/history/[id]` | Done |
 | `/vendor/shipping` | Done |
 | `/vendor/relationships` | Done |
 | `/vendor/orders` | Done |
@@ -91,8 +93,11 @@ High-fidelity Next.js prototype screens.
 |-------|--------|
 | `/operator` | Done |
 | `/operator/catalog` | Done |
+| `/operator/catalog/new` | Done |
+| `/operator/catalog/[id]` | Done |
 | `/operator/catalog/import` | Done |
 | `/operator/vendors` | Done |
+| `/operator/vendors/invite` | Done |
 | `/operator/vendors/[id]` | Done |
 | `/operator/creators` | Done |
 | `/operator/creators/invite` | Done |
@@ -102,6 +107,7 @@ High-fidelity Next.js prototype screens.
 | `/operator/coupons/new` | Done |
 | `/operator/commissions` | Done |
 | `/operator/promotions` | Done |
+| `/operator/promotions/new` | Done |
 | `/operator/analytics` | Done |
 | `/operator/payouts` | Done |
 | `/operator/domains` | Done |
@@ -148,8 +154,11 @@ High-fidelity Next.js prototype screens.
 
 ## Out of scope (deferred)
 
-_None — full 78-screen inventory complete in Next.js prototype._
+- Storybook component catalog
+- Field-level wireframe specs (route checklist only for Phase A)
+- Phase B backend (Prisma, Auth.js, Stripe live API)
+- MSW runtime wiring (handler stubs exported from `@fosl/mocks`)
 
 ---
 
-*Total: 80+ screens implemented across storefront (incl. marketplace), hub, and admin*
+*Total: 85+ screens implemented across storefront (incl. marketplace), hub, and admin*

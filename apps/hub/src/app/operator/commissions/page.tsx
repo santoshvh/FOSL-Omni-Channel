@@ -1,9 +1,36 @@
 "use client";
 
+import { useState } from "react";
 import { HubShell } from "@/components/hub-shell";
-import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle } from "@fosl/ui";
+import { AlertBanner, Button, Input, Label, Card, CardContent, CardHeader, CardTitle } from "@fosl/ui";
+
+const PLATFORM_FEE = 5;
+
+function validateNoLoss(creator: number, operator: number) {
+  const total = PLATFORM_FEE + creator + operator;
+  if (total > 100) {
+    return `Total allocation ${total}% exceeds 100%. Vendor would receive a negative share.`;
+  }
+  const vendorShare = 100 - total;
+  if (vendorShare < 0) {
+    return "Vendor share cannot be negative.";
+  }
+  return null;
+}
 
 export default function OperatorCommissionsPage() {
+  const [creator, setCreator] = useState(10);
+  const [operator, setOperator] = useState(15);
+  const [saved, setSaved] = useState(false);
+  const error = validateNoLoss(creator, operator);
+  const vendorShare = 100 - PLATFORM_FEE - creator - operator;
+
+  function handleSave() {
+    if (error) return;
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+  }
+
   return (
     <HubShell>
       <div className="mx-auto max-w-2xl space-y-6">
@@ -11,6 +38,18 @@ export default function OperatorCommissionsPage() {
           <h1 className="text-2xl font-bold">Commission rules</h1>
           <p className="text-slate-600">Global rules with per-product overrides · no-loss validation</p>
         </div>
+
+        {error && (
+          <AlertBanner variant="error" title="No-loss validation failed">
+            {error} Reduce creator or operator commission before saving.
+          </AlertBanner>
+        )}
+
+        {saved && (
+          <AlertBanner variant="info" title="Rules saved">
+            Global commission rules updated. Per-product overrides unchanged.
+          </AlertBanner>
+        )}
 
         <Card>
           <CardHeader>
@@ -20,17 +59,50 @@ export default function OperatorCommissionsPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label htmlFor="creator">Creator commission (% of base)</Label>
-                <Input id="creator" type="number" defaultValue={10} className="mt-1" />
+                <Input
+                  id="creator"
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={creator}
+                  onChange={(e) => setCreator(Number(e.target.value))}
+                  className="mt-1"
+                />
               </div>
               <div>
                 <Label htmlFor="operator">Operator margin (% of base)</Label>
-                <Input id="operator" type="number" defaultValue={15} className="mt-1" />
+                <Input
+                  id="operator"
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={operator}
+                  onChange={(e) => setOperator(Number(e.target.value))}
+                  className="mt-1"
+                />
               </div>
             </div>
-            <p className="rounded-md bg-blue-50 px-3 py-2 text-xs text-blue-800">
-              Platform fee 5% applied first. Vendor receives remainder. All values validated at save.
-            </p>
-            <Button>Save global rules</Button>
+            <dl className="rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-700">
+              <div className="flex justify-between">
+                <dt>Platform fee</dt>
+                <dd>{PLATFORM_FEE}%</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt>Creator</dt>
+                <dd>{creator}%</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt>Operator</dt>
+                <dd>{operator}%</dd>
+              </div>
+              <div className="mt-1 flex justify-between border-t border-slate-200 pt-1 font-medium">
+                <dt>Vendor remainder</dt>
+                <dd className={vendorShare < 0 ? "text-red-600" : "text-green-700"}>{vendorShare}%</dd>
+              </div>
+            </dl>
+            <Button onClick={handleSave} disabled={!!error}>
+              Save global rules
+            </Button>
           </CardContent>
         </Card>
 

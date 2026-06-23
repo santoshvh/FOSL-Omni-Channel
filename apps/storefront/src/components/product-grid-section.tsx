@@ -2,32 +2,40 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Product } from "@fosl/contracts";
 import { ProductTypeBadge, formatCurrency } from "@fosl/ui";
+import { CreatorEarnButton } from "@/components/creator-earn-button";
 
 export function ProductMiniCard({ product }: { product: Product }) {
   return (
-    <Link
-      href={`/products/${product.id}`}
-      className="group overflow-hidden rounded-lg border border-slate-200 bg-white transition-shadow hover:shadow-md"
-    >
-      <div className="relative aspect-square bg-slate-100">
-        <Image
-          src={product.imageUrl}
-          alt={product.title}
-          fill
-          className="object-cover transition-transform group-hover:scale-105"
-          sizes="(max-width: 640px) 50vw, 25vw"
+    <article className="flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-white transition-shadow hover:shadow-md">
+      <Link href={`/products/${product.id}`} className="group block">
+        <div className="relative aspect-square bg-slate-100">
+          <Image
+            src={product.imageUrl}
+            alt={product.title}
+            fill
+            className="object-cover transition-transform group-hover:scale-105"
+            sizes="(max-width: 640px) 50vw, 25vw"
+          />
+        </div>
+        <div className="p-3">
+          <ProductTypeBadge type={product.type} />
+          <h3 className="mt-1 line-clamp-2 text-sm font-medium group-hover:text-[#2E75B6]">
+            {product.title}
+          </h3>
+          <p className="mt-1 text-sm font-semibold">
+            {product.priceCents > 0 ? formatCurrency(product.priceCents) : "Free"}
+          </p>
+        </div>
+      </Link>
+      <div className="border-t border-slate-100 p-2">
+        <CreatorEarnButton
+          productId={product.id}
+          productTitle={product.title}
+          variant="outline"
+          className="w-full"
         />
       </div>
-      <div className="p-3">
-        <ProductTypeBadge type={product.type} />
-        <h3 className="mt-1 line-clamp-2 text-sm font-medium group-hover:text-[#2E75B6]">
-          {product.title}
-        </h3>
-        <p className="mt-1 text-sm font-semibold">
-          {product.priceCents > 0 ? formatCurrency(product.priceCents) : "Free"}
-        </p>
-      </div>
-    </Link>
+    </article>
   );
 }
 

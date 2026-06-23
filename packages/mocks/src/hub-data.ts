@@ -62,7 +62,7 @@ export const mockOrders: MockOrder[] = [
         vendorName: "Creator Academy",
       },
     ],
-    downloadUrl: "https://demo.fosl.store/downloads/ecm-101.zip",
+    downloadUrl: "/downloads/ecm-101.zip",
   },
   {
     id: "ord_3",
@@ -101,7 +101,7 @@ export const vendorRelationships: OperatorRelationship[] = [
   {
     id: "rel_1",
     operatorName: "Demo Storefront",
-    storefront: "demo.fosl.store",
+    storefront: "/",
     status: "approved",
     scope: "catalog_wide",
     minCommissionPct: 8,
@@ -109,7 +109,7 @@ export const vendorRelationships: OperatorRelationship[] = [
   {
     id: "rel_2",
     operatorName: "Urban Market",
-    storefront: "urban.fosl.store",
+    storefront: "/bright-labs",
     status: "pending",
     scope: "sku_level",
     minCommissionPct: 10,

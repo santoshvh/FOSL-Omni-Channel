@@ -2,6 +2,7 @@ import { HubShell } from "@/components/hub-shell";
 import { Button, ProductTypeBadge } from "@fosl/ui";
 import { products } from "@fosl/mocks";
 import Image from "next/image";
+import { Link2 } from "lucide-react";
 
 export default function CreatorPublicProfilePage() {
   return (
@@ -18,7 +19,7 @@ export default function CreatorPublicProfilePage() {
               <p className="mt-1 text-slate-600">
                 Audio enthusiast &amp; course creator. Curated picks for your setup.
               </p>
-              <p className="mt-2 text-sm text-[#2E75B6]">demo.fosl.store/creator/alex</p>
+              <p className="mt-2 text-sm text-[#2E75B6]">/creator/alex</p>
             </div>
           </div>
         </div>
@@ -34,6 +35,10 @@ export default function CreatorPublicProfilePage() {
                 <div className="p-3">
                   <ProductTypeBadge type={p.type} />
                   <p className="mt-1 font-medium">{p.title}</p>
+                  <Button variant="outline" size="sm" className="mt-2 w-full">
+                    <Link2 className="mr-1.5 h-4 w-4" />
+                    Promote and earn
+                  </Button>
                 </div>
               </div>
             ))}

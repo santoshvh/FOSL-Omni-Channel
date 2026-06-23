@@ -30,12 +30,12 @@ export default function VendorAnalyticsPage() {
               </thead>
               <tbody className="divide-y">
                 <tr>
-                  <td className="py-2">demo.fosl.store</td>
+                  <td className="py-2">/ (operator)</td>
                   <td className="py-2 text-right">$8,420</td>
                   <td className="py-2 text-right">62</td>
                 </tr>
                 <tr>
-                  <td className="py-2">urban.fosl.store</td>
+                  <td className="py-2">/bright-labs</td>
                   <td className="py-2 text-right">$4,030</td>
                   <td className="py-2 text-right">28</td>
                 </tr>

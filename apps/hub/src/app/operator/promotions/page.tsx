@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { HubShell } from "@/components/hub-shell";
 import { Button } from "@fosl/ui";
 import { operatorPromotions } from "@fosl/mocks";
@@ -12,9 +13,11 @@ export default function OperatorPromotionsPage() {
             <h1 className="text-2xl font-bold">Bundles & promotions</h1>
             <p className="text-slate-600">Multi-vendor bundles and buy-X-get-Y campaigns</p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            New promotion
+          <Button asChild>
+            <Link href="/operator/promotions/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New promotion
+            </Link>
           </Button>
         </div>
 

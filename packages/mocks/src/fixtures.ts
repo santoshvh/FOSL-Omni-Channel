@@ -217,6 +217,10 @@ export function getProductById(id: string): Product | undefined {
   return products.find((p) => p.id === id);
 }
 
+export function getSyncJobById(id: string) {
+  return syncJobs.find((j) => j.id === id);
+}
+
 export function getShippingForVendor(vendorId: string): ShippingMethod[] {
   return shippingMethods.filter((m) => m.vendorId === vendorId);
 }

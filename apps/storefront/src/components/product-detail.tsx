@@ -19,7 +19,7 @@ import {
   enrichProduct,
 } from "@fosl/mocks";
 import { Truck, Zap, MessageSquare, Star, ChevronRight } from "lucide-react";
-import { CosellEarnButton } from "@/components/cosell-earn-button";
+import { CreatorEarnButton } from "@/components/creator-earn-button";
 import { ProductGridSection } from "@/components/product-grid-section";
 
 type TabId = "description" | "additional" | "reviews";
@@ -245,7 +245,7 @@ function PurchaseSummary({
       )}
 
       <div className="mt-4">
-        <CosellEarnButton productId={product.id} productTitle={product.title} />
+        <CreatorEarnButton productId={product.id} productTitle={product.title} />
       </div>
 
       {product.type === "digital" && (
@@ -345,7 +345,7 @@ export function ProductDetail({ product: rawProduct }: { product: Product }) {
               </Link>
             </p>
             <div className="mt-4">
-              <CosellEarnButton productId={product.id} productTitle={product.title} />
+              <CreatorEarnButton productId={product.id} productTitle={product.title} />
             </div>
             <form className="mt-8 space-y-4 rounded-lg border border-slate-200 bg-slate-50 p-6">
               <h2 className="flex items-center gap-2 font-semibold">

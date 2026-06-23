@@ -56,6 +56,7 @@ const operatorNav = [
   { href: "/operator/coupons", label: "Coupons", icon: Package },
   { href: "/operator/commissions", label: "Commissions", icon: BarChart3 },
   { href: "/operator/promotions", label: "Promotions", icon: Package },
+  { href: "/operator/lead-gen", label: "Lead gen", icon: Users },
   { href: "/operator/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/operator/payouts", label: "Payouts", icon: Wallet },
   { href: "/operator/storefront", label: "Storefront", icon: Store },
@@ -96,7 +97,7 @@ export function HubShell({ children }: { children: React.ReactNode }) {
       >
         <div className="flex h-14 items-center border-b border-slate-200 px-4">
           <Link href="/" className="text-lg font-bold text-[#2E75B6]">
-            FOSL Hub
+            FOSLOne Hub
           </Link>
           <button
             className="ml-auto lg:hidden"
@@ -151,6 +152,12 @@ export function HubShell({ children }: { children: React.ReactNode }) {
             <Menu className="h-5 w-5" />
           </button>
           <div className="flex-1" />
+          <a
+            href={process.env.NEXT_PUBLIC_STOREFRONT_URL ?? "http://localhost:3001"}
+            className="hidden text-sm text-slate-600 hover:text-[#2E75B6] sm:inline"
+          >
+            Storefront
+          </a>
           <RoleSwitcher
             roles={session.roles}
             activeRole={session.activeRole}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { HubShell } from "@/components/hub-shell";
 import { Button, ProductTypeBadge, formatCurrency } from "@fosl/ui";
 import { products } from "@fosl/mocks";
+import { Plus } from "lucide-react";
 
 export default function OperatorCatalogPage() {
   const listed = products.filter((p) => p.published);
@@ -12,11 +13,19 @@ export default function OperatorCatalogPage() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">Storefront catalog</h1>
-            <p className="text-slate-600">Products live on demo.fosl.store</p>
+            <p className="text-slate-600">Products live on the operator storefront at /products</p>
           </div>
-          <Button asChild>
-            <Link href="/operator/catalog/import">Import from vendors</Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" asChild>
+              <Link href="/operator/catalog/import">Import from vendors</Link>
+            </Button>
+            <Button asChild>
+              <Link href="/operator/catalog/new">
+                <Plus className="mr-2 h-4 w-4" />
+                New product
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
@@ -32,8 +41,12 @@ export default function OperatorCatalogPage() {
             </thead>
             <tbody className="divide-y">
               {listed.map((p) => (
-                <tr key={p.id}>
-                  <td className="px-4 py-3 font-medium">{p.title}</td>
+                <tr key={p.id} className="hover:bg-slate-50">
+                  <td className="px-4 py-3 font-medium">
+                    <Link href={`/operator/catalog/${p.id}`} className="text-[#2E75B6] hover:underline">
+                      {p.title}
+                    </Link>
+                  </td>
                   <td className="px-4 py-3">
                     <ProductTypeBadge type={p.type} />
                   </td>

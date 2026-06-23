@@ -8,9 +8,9 @@ export default function HomePage() {
     <HubShell>
       <div className="mx-auto max-w-3xl space-y-6">
         <div>
-          <h1 className="text-2xl font-bold">Welcome to FOSL Hub</h1>
+          <h1 className="text-2xl font-bold">Welcome to FOSLOne Hub</h1>
           <p className="mt-1 text-slate-600">
-            Switch roles in the header to explore Vendor, Creator, and Operator workspaces.
+            Incubated by AIOne — switch roles to explore Vendor, Creator, and Operator workspaces.
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-3">

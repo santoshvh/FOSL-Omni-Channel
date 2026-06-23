@@ -53,6 +53,37 @@ export default async function OrderDetailPage({
       </div>
 
       <div className="mt-6 space-y-4">
+        <h2 className="font-semibold">Order timeline</h2>
+        <ol className="relative border-l-2 border-slate-200 pl-6">
+          <li className="mb-4">
+            <span className="absolute -left-[9px] mt-1.5 h-4 w-4 rounded-full bg-green-500 ring-4 ring-white" />
+            <p className="text-sm font-medium">Order placed</p>
+            <p className="text-xs text-slate-500">{new Date(order.createdAt).toLocaleString()}</p>
+          </li>
+          {order.status !== "pending" && (
+            <li className="mb-4">
+              <span className="absolute -left-[9px] mt-1.5 h-4 w-4 rounded-full bg-[#2E75B6] ring-4 ring-white" />
+              <p className="text-sm font-medium capitalize">{order.status.replace("_", " ")}</p>
+              <p className="text-xs text-slate-500">Payment confirmed</p>
+            </li>
+          )}
+          {order.trackingNumber && (
+            <li className="mb-4">
+              <span className="absolute -left-[9px] mt-1.5 h-4 w-4 rounded-full bg-[#2E75B6] ring-4 ring-white" />
+              <p className="text-sm font-medium">Shipped</p>
+              <p className="text-xs text-slate-500">Tracking {order.trackingNumber}</p>
+            </li>
+          )}
+          {order.status === "delivered" && (
+            <li>
+              <span className="absolute -left-[9px] mt-1.5 h-4 w-4 rounded-full bg-green-500 ring-4 ring-white" />
+              <p className="text-sm font-medium">Delivered</p>
+            </li>
+          )}
+        </ol>
+      </div>
+
+      <div className="mt-6 space-y-4">
         <h2 className="font-semibold">Fulfillment</h2>
 
         {order.trackingNumber && (

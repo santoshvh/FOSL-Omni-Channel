@@ -7,7 +7,7 @@ import {
   ProductTypeBadge,
   formatCurrency,
 } from "@fosl/ui";
-import { ExternalLink, Store } from "lucide-react";
+import { CreatorEarnButton } from "@/components/creator-earn-button";
 import { MarketplaceProductCard } from "@/components/marketplace-product-card";
 import { getProductsByVendorId } from "@fosl/mocks";
 
@@ -53,24 +53,25 @@ export default async function MarketplaceProductPage({
               <div className="relative h-10 w-10 overflow-hidden rounded-full">
                 <Image src={vendor.logoUrl} alt="" fill className="object-cover" sizes="40px" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <p className="text-sm text-slate-500">Sold by</p>
                 <Link
-                  href={`/marketplace/vendors/${vendor.id}`}
-                  className="font-semibold text-[#2E75B6] hover:underline"
+                  href={vendor.storefrontUrl}
+                  className="font-semibold text-slate-900 hover:underline"
                 >
                   {vendor.name}
                 </Link>
                 <p className="text-xs text-slate-500">
                   via {vendor.operatorName} · ★ {vendor.rating}
+                  {" · "}
+                  <Link
+                    href={`/marketplace/vendors/${vendor.id}`}
+                    className="text-slate-400 hover:text-slate-600 hover:underline"
+                  >
+                    marketplace profile
+                  </Link>
                 </p>
               </div>
-              <Button variant="outline" size="sm" asChild>
-                <a href={vendor.storefrontUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="mr-1 h-3 w-3" />
-                  Vendor store
-                </a>
-              </Button>
             </div>
           )}
 
@@ -83,14 +84,12 @@ export default async function MarketplaceProductPage({
             <Button asChild size="lg">
               <Link href="/marketplace/cart">Add to marketplace cart</Link>
             </Button>
-            {vendor && (
-              <Button variant="outline" size="lg" asChild>
-                <Link href={`/marketplace/vendors/${vendor.id}`}>
-                  <Store className="mr-2 h-4 w-4" />
-                  View vendor
-                </Link>
-              </Button>
-            )}
+            <CreatorEarnButton
+              productId={product.id}
+              productTitle={product.title}
+              variant="outline"
+              className="h-11 px-8"
+            />
           </div>
 
           <p className="mt-4 text-xs text-slate-500">

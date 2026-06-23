@@ -13,9 +13,11 @@ export default function OperatorVendorsPage() {
             <h1 className="text-2xl font-bold">Vendors</h1>
             <p className="text-slate-600">Approve relationships and set commission rates</p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Invite vendor
+          <Button asChild>
+            <Link href="/operator/vendors/invite">
+              <Plus className="mr-2 h-4 w-4" />
+              Invite vendor
+            </Link>
           </Button>
         </div>
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">

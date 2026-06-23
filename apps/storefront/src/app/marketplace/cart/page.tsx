@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { getMarketplaceCartProducts, getShippingForVendor } from "@fosl/mocks";
 import { Button, ProductTypeBadge, formatCurrency, Input, Label } from "@fosl/ui";
+import { CreatorEarnButton } from "@/components/creator-earn-button";
 
 export default function MarketplaceCartPage() {
   const cartItems = getMarketplaceCartProducts();
@@ -47,15 +48,22 @@ export default function MarketplaceCartPage() {
             </div>
             <ul className="mt-3 divide-y">
               {group.items.map((p) => (
-                <li key={p.id} className="flex justify-between py-3">
-                  <div>
+                <li key={p.id} className="flex flex-wrap items-start justify-between gap-3 py-3">
+                  <div className="min-w-0 flex-1">
                     <ProductTypeBadge type={p.type} />
                     <p className="mt-1 font-medium">{p.title}</p>
                     {p.type === "digital" && (
                       <p className="text-xs text-purple-600">Instant delivery — no shipping</p>
                     )}
                   </div>
-                  <p className="font-semibold">{formatCurrency(p.priceCents)}</p>
+                  <div className="flex flex-col items-end gap-2">
+                    <p className="font-semibold">{formatCurrency(p.priceCents)}</p>
+                    <CreatorEarnButton
+                      productId={p.id}
+                      productTitle={p.title}
+                      variant="outline"
+                    />
+                  </div>
                 </li>
               ))}
             </ul>

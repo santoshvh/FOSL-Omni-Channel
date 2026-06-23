@@ -5,7 +5,7 @@ import { Button, Input } from "@fosl/ui";
 import { generateReferralLink, type ReferralLink } from "@/lib/referral";
 import { Link2, Copy, Check, X } from "lucide-react";
 
-export function CosellEarnButton({
+export function CreatorEarnButton({
   productId,
   productTitle,
   variant = "default",
@@ -28,7 +28,6 @@ export function CosellEarnButton({
       e.preventDefault();
       e.stopPropagation();
       setLoading(true);
-      // Simulate brief API round-trip for link creation
       window.setTimeout(() => {
         const generated = generateReferralLink(productId);
         setLink(generated);
@@ -58,7 +57,7 @@ export function CosellEarnButton({
         disabled={loading}
       >
         <Link2 className="mr-1.5 h-4 w-4" />
-        {loading ? "Generating…" : "Cosell and earn"}
+        {loading ? "Generating…" : "Promote and earn"}
       </Button>
 
       {open && link && (
@@ -66,7 +65,7 @@ export function CosellEarnButton({
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
           role="dialog"
           aria-modal="true"
-          aria-labelledby="cosell-dialog-title"
+          aria-labelledby="creator-dialog-title"
           onClick={() => setOpen(false)}
         >
           <div
@@ -75,7 +74,7 @@ export function CosellEarnButton({
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 id="cosell-dialog-title" className="text-lg font-semibold">
+                <h2 id="creator-dialog-title" className="text-lg font-semibold">
                   Your referral link
                 </h2>
                 <p className="mt-1 text-sm text-slate-500 line-clamp-2">{productTitle}</p>
@@ -91,8 +90,8 @@ export function CosellEarnButton({
             </div>
 
             <p className="mt-4 text-sm text-slate-600">
-              Share this link to earn commission when someone purchases. Attribution window: 30 days
-              (last click).
+              Share this link to earn commission as a Creator when someone purchases. Attribution
+              window: 30 days (last click).
             </p>
 
             <div className="mt-4">

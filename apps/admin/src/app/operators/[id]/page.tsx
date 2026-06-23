@@ -58,8 +58,12 @@ export default async function AdminOperatorDetailPage({
           <h2 className="font-semibold">Domains</h2>
           <ul className="mt-4 space-y-2 text-sm">
             <li className="flex justify-between border-b border-slate-100 pb-2">
-              <span>demo.fosl.store</span>
+              <span>/ (operator storefront)</span>
               <span className="text-green-600">Active</span>
+            </li>
+            <li className="flex justify-between border-b border-slate-100 pb-2">
+              <span>/acme-audio, /bright-labs, …</span>
+              <span className="text-green-600">Vendor paths</span>
             </li>
             <li className="flex justify-between">
               <span>shop.{op.name.split(" ")[0].toLowerCase()}.com</span>

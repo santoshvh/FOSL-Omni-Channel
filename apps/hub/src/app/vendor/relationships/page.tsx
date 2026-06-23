@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { HubShell } from "@/components/hub-shell";
+import { VendorConflictBanner } from "@/components/vendor-conflict-banner";
 import { Button } from "@fosl/ui";
 import { vendorRelationships } from "@fosl/mocks";
 
@@ -7,6 +8,8 @@ export default function VendorRelationshipsPage() {
   return (
     <HubShell>
       <div className="space-y-6">
+        <VendorConflictBanner />
+
         <div>
           <h1 className="text-2xl font-bold">Operator relationships</h1>
           <p className="text-slate-600">Approve operators who want to list your products</p>

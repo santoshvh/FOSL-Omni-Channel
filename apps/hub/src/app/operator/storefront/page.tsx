@@ -11,7 +11,7 @@ export default function OperatorStorefrontPage() {
         <div className="space-y-6">
           <div>
             <h1 className="text-2xl font-bold">Storefront design</h1>
-            <p className="text-slate-600">Branding, colors, and layout for demo.fosl.store</p>
+            <p className="text-slate-600">Branding, colors, and layout for your storefront at /</p>
           </div>
 
           <Card>
@@ -48,9 +48,9 @@ export default function OperatorStorefrontPage() {
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <p>
-                <span className="font-medium">Primary:</span> demo.fosl.store
+                <span className="font-medium">Store path:</span> / (operator home)
               </p>
-              <p className="text-slate-500">Custom domain: shop.yourbrand.com (DNS pending)</p>
+              <p className="text-slate-500">Vendor stores use paths like /acme-audio, /bright-labs</p>
               <Button variant="outline" size="sm" className="mt-2" asChild>
                 <Link href="/operator/domains">Manage domains</Link>
               </Button>

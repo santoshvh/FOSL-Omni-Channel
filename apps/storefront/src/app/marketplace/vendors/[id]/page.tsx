@@ -4,7 +4,6 @@ import Image from "next/image";
 import { getMarketplaceVendorById, getProductsByVendorId } from "@fosl/mocks";
 import { Button } from "@fosl/ui";
 import { MarketplaceProductCard } from "@/components/marketplace-product-card";
-import { ExternalLink } from "lucide-react";
 
 export default async function MarketplaceVendorPage({
   params,
@@ -35,20 +34,20 @@ export default async function MarketplaceVendorPage({
           </div>
           <div className="flex gap-2 pb-2">
             <Button variant="secondary">Follow</Button>
-            <Button variant="secondary" asChild>
-              <a href={vendor.storefrontUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 h-4 w-4" />
-                Visit store
-              </a>
-            </Button>
           </div>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-6 text-sm text-slate-600">
+        <div className="mt-6 flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-600">
           <span>★ {vendor.rating} ({vendor.reviewCount} reviews)</span>
           <span>{vendor.productCount} products</span>
           <span>{vendor.followers.toLocaleString()} followers</span>
           <span>Listed on {vendor.operatorName}</span>
+          <Link
+            href={vendor.storefrontUrl}
+            className="text-slate-400 hover:text-slate-600 hover:underline"
+          >
+            visit store
+          </Link>
         </div>
 
         <section className="mt-12">
@@ -59,13 +58,6 @@ export default async function MarketplaceVendorPage({
             ))}
           </div>
         </section>
-
-        <p className="mt-8 text-center text-sm text-slate-500">
-          Purchases can be made here on the marketplace or directly on{" "}
-          <a href={vendor.storefrontUrl} className="text-[#2E75B6] hover:underline">
-            {vendor.storefrontUrl.replace("https://", "")}
-          </a>
-        </p>
       </div>
     </div>
   );

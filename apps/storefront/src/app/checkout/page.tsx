@@ -123,12 +123,20 @@ export default function CheckoutPage() {
                 <dd>{formatCurrency(total)}</dd>
               </div>
             </dl>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
               <Button asChild>
-                <Link href="/checkout/confirmation">Pay {formatCurrency(total)}</Link>
+                <Link href="/checkout/confirmation?type=mixed">Pay {formatCurrency(total)}</Link>
               </Button>
             </div>
+            <p className="text-center text-xs text-slate-400">
+              Demo:{" "}
+              <Link href="/checkout/confirmation?type=physical" className="underline">physical</Link>
+              {" · "}
+              <Link href="/checkout/confirmation?type=digital" className="underline">digital</Link>
+              {" · "}
+              <Link href="/checkout/confirmation?type=lead_gen" className="underline">lead gen</Link>
+            </p>
           </div>
         )}
       </div>

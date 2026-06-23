@@ -18,8 +18,14 @@ export interface MarketplaceVendor {
   reviewCount: number;
   productCount: number;
   followers: number;
+  /** Path-based vendor store URL, e.g. /acme-audio */
   storefrontUrl: string;
   operatorName: string;
+}
+
+/** Vendor store path on the storefront app (no subdomains). */
+export function vendorStorePath(slug: string) {
+  return `/${slug}`;
 }
 
 export const marketplaceCategories: MarketplaceCategory[] = [
@@ -61,7 +67,7 @@ export const marketplaceVendors: MarketplaceVendor[] = [
     reviewCount: 312,
     productCount: 48,
     followers: 2840,
-    storefrontUrl: "https://demo.fosl.store",
+    storefrontUrl: vendorStorePath("acme-audio"),
     operatorName: "Demo Storefront",
   },
   {
@@ -75,7 +81,7 @@ export const marketplaceVendors: MarketplaceVendor[] = [
     reviewCount: 128,
     productCount: 22,
     followers: 920,
-    storefrontUrl: "https://urban.fosl.store",
+    storefrontUrl: vendorStorePath("bright-labs"),
     operatorName: "Urban Market",
   },
   {
@@ -89,13 +95,31 @@ export const marketplaceVendors: MarketplaceVendor[] = [
     reviewCount: 540,
     productCount: 12,
     followers: 6100,
-    storefrontUrl: "https://demo.fosl.store",
+    storefrontUrl: vendorStorePath("creator-academy"),
+    operatorName: "Demo Storefront",
+  },
+  {
+    id: "ven_3",
+    name: "Northwind Growth",
+    slug: "northwind-growth",
+    tagline: "Strategy and growth consulting for commerce teams",
+    bannerUrl: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200",
+    logoUrl: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=200",
+    rating: 4.7,
+    reviewCount: 64,
+    productCount: 3,
+    followers: 410,
+    storefrontUrl: vendorStorePath("northwind-growth"),
     operatorName: "Demo Storefront",
   },
 ];
 
 export function getMarketplaceVendorById(id: string) {
   return marketplaceVendors.find((v) => v.id === id);
+}
+
+export function getMarketplaceVendorBySlug(slug: string) {
+  return marketplaceVendors.find((v) => v.slug === slug);
 }
 
 export function getMarketplaceCategoryBySlug(slug: string) {

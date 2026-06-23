@@ -5,6 +5,7 @@ export {
   integrations,
   syncJobs,
   getProductById,
+  getSyncJobById,
   getShippingForVendor,
 } from "./fixtures";
 
@@ -19,6 +20,8 @@ export {
   marketplaceCategories,
   marketplaceVendors,
   getMarketplaceVendorById,
+  getMarketplaceVendorBySlug,
+  vendorStorePath,
   getMarketplaceCategoryBySlug,
   getProductsByCategorySlug,
   searchMarketplaceProducts,
@@ -47,6 +50,9 @@ export {
   operatorPromotions,
   vendorCampaigns,
 } from "./hub-data";
+
+export { foslApiHandlers } from "./msw-handlers";
+export type { FoslApiHandler } from "./msw-handlers";
 export type {
   MockOrder,
   MockCollection,

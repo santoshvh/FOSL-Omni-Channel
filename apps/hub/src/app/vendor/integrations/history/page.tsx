@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { HubShell } from "@/components/hub-shell";
 import { IntegrationStatusBadge } from "@fosl/ui";
 import { syncJobs } from "@fosl/mocks";
@@ -26,9 +27,14 @@ export default function SyncHistoryPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {syncJobs.map((job) => (
-                <tr key={job.id}>
+                <tr key={job.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 whitespace-nowrap">
-                    {new Date(job.startedAt).toLocaleString()}
+                    <Link
+                      href={`/vendor/integrations/history/${job.id}`}
+                      className="text-[#2E75B6] hover:underline"
+                    >
+                      {new Date(job.startedAt).toLocaleString()}
+                    </Link>
                   </td>
                   <td className="px-4 py-3 capitalize">{job.entity}</td>
                   <td className="px-4 py-3">

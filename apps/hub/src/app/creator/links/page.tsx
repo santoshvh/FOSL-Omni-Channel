@@ -10,7 +10,8 @@ export default function CreatorLinksPage() {
   const [selectedId, setSelectedId] = useState(products[0].id);
   const [copied, setCopied] = useState(false);
   const selected = products.find((p) => p.id === selectedId)!;
-  const link = `https://demo.fosl.store/p/${selected.id}?ref=CREATOR_ALEX`;
+  const storefrontBase = process.env.NEXT_PUBLIC_STOREFRONT_URL ?? "http://localhost:3001";
+  const link = `${storefrontBase}/products/${selected.id}?ref=CREATOR_ALEX`;
 
   function copyLink() {
     navigator.clipboard.writeText(link);

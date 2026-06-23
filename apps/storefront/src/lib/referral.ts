@@ -5,7 +5,7 @@
 export function generateReferralLink(productId: string, baseUrl?: string) {
   const origin =
     baseUrl ??
-    (typeof window !== "undefined" ? window.location.origin : "https://demo.fosl.store");
+    (typeof window !== "undefined" ? window.location.origin : "http://localhost:3001");
   const code = `REF_${crypto.randomUUID().replace(/-/g, "").slice(0, 10).toUpperCase()}`;
   const url = `${origin}/products/${productId}?ref=${code}`;
   return { url, code, productId };

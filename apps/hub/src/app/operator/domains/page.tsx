@@ -12,7 +12,7 @@ export default function OperatorDomainsPage() {
 
         <div>
           <h1 className="text-2xl font-bold">Domain management</h1>
-          <p className="text-slate-600">Primary and custom domains for demo.fosl.store</p>
+          <p className="text-slate-600">Optional custom domains — vendor stores use /&lt;slug&gt; paths by default</p>
         </div>
 
         <div className="rounded-lg border border-slate-200 bg-white p-6">
@@ -20,17 +20,17 @@ export default function OperatorDomainsPage() {
           <ul className="mt-4 divide-y text-sm">
             <li className="flex items-center justify-between py-3">
               <div>
-                <p className="font-medium">demo.fosl.store</p>
-                <p className="text-slate-500">Primary · SSL active</p>
+                <p className="font-medium">/ (operator storefront)</p>
+                <p className="text-slate-500">Default path · no subdomain required</p>
               </div>
-              <span className="text-green-600">Verified</span>
+              <span className="text-green-600">Active</span>
             </li>
             <li className="flex items-center justify-between py-3">
               <div>
-                <p className="font-medium">shop.yourbrand.com</p>
-                <p className="text-slate-500">CNAME → cname.fosl.store</p>
+                <p className="font-medium">/acme-audio, /bright-labs, …</p>
+                <p className="text-slate-500">Vendor store paths</p>
               </div>
-              <span className="text-amber-600">DNS pending</span>
+              <span className="text-green-600">Active</span>
             </li>
           </ul>
         </div>

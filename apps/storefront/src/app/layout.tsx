@@ -3,8 +3,9 @@ import "./globals.css";
 import { AppChrome } from "@/components/app-chrome";
 
 export const metadata: Metadata = {
-  title: "Demo Storefront | FOSL",
-  description: "Operator-branded social commerce storefront",
+  title: "FOSLOne — Social eCommerce",
+  description:
+    "FOSLOne supports communities with social eCommerce — incubated by AIOne. Marketplace, Creators, and seller tools.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

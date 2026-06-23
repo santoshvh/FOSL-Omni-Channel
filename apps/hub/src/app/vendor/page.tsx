@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { HubShell } from "@/components/hub-shell";
+import { VendorConflictBanner } from "@/components/vendor-conflict-banner";
 import {
   Button,
   StatCard,
@@ -15,6 +16,8 @@ export default function VendorDashboardPage() {
   return (
     <HubShell>
       <div className="space-y-6">
+        <VendorConflictBanner />
+
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">Vendor dashboard</h1>

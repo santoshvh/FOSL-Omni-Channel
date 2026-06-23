@@ -68,7 +68,7 @@ export default function MarketplaceHomePage() {
             {marketplaceVendors.map((v) => (
               <Link
                 key={v.id}
-                href={`/marketplace/vendors/${v.id}`}
+                href={v.storefrontUrl}
                 className="rounded-lg border border-slate-200 bg-white p-4 transition-shadow hover:shadow-md"
               >
                 <div className="relative h-20 overflow-hidden rounded-md">

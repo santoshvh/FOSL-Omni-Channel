@@ -11,7 +11,7 @@ export default function OperatorDashboardPage() {
 
         <div>
           <h1 className="text-2xl font-bold">Operator dashboard</h1>
-          <p className="text-slate-600">Demo Storefront · demo.fosl.store</p>
+          <p className="text-slate-600">Demo Storefront · path /</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
