@@ -18,6 +18,16 @@ export const foslApiHandlers = [
     if (!order) return new HttpResponse(null, { status: 404 });
     return HttpResponse.json({ data: order });
   }),
+  http.post("/api/v1/contact", async ({ request }) => {
+    const body = (await request.json()) as Record<string, string>;
+    if (!body.name?.trim() || !body.email?.trim() || !body.message?.trim()) {
+      return HttpResponse.json({ error: "Name, email, and message are required." }, { status: 400 });
+    }
+    return HttpResponse.json(
+      { data: { id: `contact_mock_${Date.now()}`, status: "received", ...body } },
+      { status: 201 }
+    );
+  }),
   http.post("/api/v1/leads", async ({ request }) => {
     const body = await request.json();
     return HttpResponse.json({ data: { id: "lead_1", status: "received", ...body as object } }, { status: 201 });

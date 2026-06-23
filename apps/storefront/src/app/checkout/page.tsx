@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button, Input, Label, ShippingMethodSelector, AlertBanner } from "@fosl/ui";
 import { formatCurrency } from "@fosl/ui";
 import { getShippingForVendor } from "@fosl/mocks";
 import { useCart } from "@/lib/cart-context";
+import { CheckoutStepSkeleton } from "@/components/checkout-step-skeleton";
 
 const steps = ["Contact", "Shipping", "Payment"] as const;
 
@@ -43,8 +44,9 @@ function FieldError({ message }: { message?: string }) {
 }
 
 export default function CheckoutPage() {
+  const [ready, setReady] = useState(false);
   const [step, setStep] = useState(0);
-  const { lines, subtotalCents } = useCart();
+  const { lines, subtotalCents, isHydrated } = useCart();
   const [form, setForm] = useState<FormData>(initialForm);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const physicalVendorIds = [
@@ -54,6 +56,10 @@ export default function CheckoutPage() {
     ven_1: "ship_1",
     ven_4: "ship_3",
   });
+
+  useEffect(() => {
+    setReady(true);
+  }, []);
 
   const subtotal = subtotalCents;
   const shipping = physicalVendorIds.reduce((s, vid) => {
@@ -105,6 +111,10 @@ export default function CheckoutPage() {
       </ol>
 
       <div className="mt-8 space-y-6">
+        {!ready || !isHydrated ? (
+          <CheckoutStepSkeleton />
+        ) : (
+          <>
         {step === 0 && (
           <div className="space-y-4 rounded-lg border border-slate-200 p-6">
             <fieldset className="space-y-2">
@@ -344,6 +354,8 @@ export default function CheckoutPage() {
               </Button>
             </div>
           </div>
+        )}
+          </>
         )}
       </div>
     </div>

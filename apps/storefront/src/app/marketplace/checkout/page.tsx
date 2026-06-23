@@ -1,16 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button, Input, Label, ShippingMethodSelector, formatCurrency } from "@fosl/ui";
 import { getShippingForVendor } from "@fosl/mocks";
 import { useCart } from "@/lib/cart-context";
+import { CheckoutStepSkeleton } from "@/components/checkout-step-skeleton";
 
 const steps = ["Contact", "Shipping", "Payment"] as const;
 
 export default function MarketplaceCheckoutPage() {
+  const [ready, setReady] = useState(false);
   const [step, setStep] = useState(0);
-  const { lines, subtotalCents } = useCart();
+  const { lines, subtotalCents, isHydrated } = useCart();
   const subtotal = subtotalCents;
 
   const physicalVendors = [
@@ -21,6 +23,10 @@ export default function MarketplaceCheckoutPage() {
     ven_1: "ship_1",
     ven_4: "ship_3",
   });
+
+  useEffect(() => {
+    setReady(true);
+  }, []);
 
   const shipping = physicalVendors.reduce((s, vid) => {
     const methods = getShippingForVendor(vid);
@@ -57,6 +63,10 @@ export default function MarketplaceCheckoutPage() {
       </ol>
 
       <div className="mt-8 space-y-6">
+        {!ready || !isHydrated ? (
+          <CheckoutStepSkeleton />
+        ) : (
+          <>
         {step === 0 && (
           <div className="space-y-4 rounded-lg border border-slate-200 p-6">
             <div>
@@ -173,6 +183,8 @@ export default function MarketplaceCheckoutPage() {
               </Button>
             </div>
           </div>
+        )}
+          </>
         )}
       </div>
     </div>

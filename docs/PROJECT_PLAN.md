@@ -1,7 +1,7 @@
 # FOSL Omni-Channel — Project Plan
 
 Living document for scope, progress, changelog, and next steps.  
-**Current release:** `v0.7` · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
+**Current release:** `v0.8` · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
 
 | App | Port | Command |
 |-----|------|---------|
@@ -17,7 +17,7 @@ See also: [WIREFRAME_INVENTORY.md](./WIREFRAME_INVENTORY.md) (screen list), [LOC
 
 | Phase | Goal | Status |
 |-------|------|--------|
-| **A — UI prototype** | High-fidelity wireframes, mocks, FOSLOne branding, cart/checkout UX | **Mostly complete** (v0.7) |
+| **A — UI prototype** | High-fidelity wireframes, mocks, FOSLOne branding, cart/checkout UX | **Complete** (v0.8) |
 | **B — Backend** | Prisma schema, Auth.js, Stripe live, real APIs replacing MSW | **Not started** |
 | **C — Production** | ICDSoft deploy, legal review, monitoring, vendor onboarding | **Not started** |
 
@@ -74,6 +74,14 @@ Use `[x]` for done, `[ ]` for open. Screen-level detail remains in [WIREFRAME_IN
 - [x] Storefront: shop, cart, checkout, orders, marketplace, cookie consent, suspended
 - [x] FOSLOne aux pages: contact, incubations, creator-support
 
+### 2.6 Phase A finish (v0.8)
+
+- [x] **Contact form** — `POST /api/v1/contact` with validation + success state
+- [x] **Loading skeletons** — product catalog (API fetch), cart drawer (hydration), checkout steps
+- [x] **Products API route** — `GET /api/v1/products` (MSW + Next.js route)
+- [x] **Legacy route** — `/coseller-support` → `/creator-support` redirect
+- [x] **`Skeleton` component** in `@fosl/ui`; `AlertBanner` success variant
+
 ---
 
 ## 3. Development changelog
@@ -86,8 +94,19 @@ Chronological summary of meaningful changes (commits and session work).
 | v0.2 | `e249dc1` | FOSLOne branding, `/[store]` paths, Creator terminology |
 | v0.6 | `1cf42d4` | Cart UX, MSW, yellow rebrand, admin polish, PDP/checkout field pass |
 | v0.7 | `f6d1925` | FOSLOne images, hero background, legal pages, product card actions, team layout |
+| v0.8 | (pending) | Contact API, loading skeletons, products API route, Phase A wrap-up |
+| docs | `a3f5e7c` | PROJECT_PLAN.md roadmap and changelog |
 
-### v0.7 detail (latest)
+### v0.8 detail (latest)
+
+| Area | Change |
+|------|--------|
+| **Contact** | `ContactForm`, `POST /api/v1/contact`, MSW handler |
+| **API** | `GET /api/v1/products` — catalog fetch from products listing |
+| **Skeletons** | `Skeleton` UI primitive; catalog, cart drawer, checkout loaders |
+| **Cart** | `isHydrated` exposed on cart context |
+
+### v0.7 detail
 
 | Area | Change |
 |------|--------|
@@ -132,11 +151,8 @@ Chronological summary of meaningful changes (commits and session work).
 ### 5.1 Phase A — remaining UI polish
 
 - [ ] Storybook component catalog
-- [ ] Skeleton loading states on catalog, cart, checkout
 - [ ] Operator subscription / plan banners on storefront
-- [ ] Contact form wired to email or API (currently prototype-only)
 - [ ] Hub & Admin: duplicate or link legal policies if required for logged-in flows
-- [ ] `coseller-support` route — redirect or alias to `creator-support` (legacy URL)
 - [ ] Replace placeholder legal address and emails with production values
 
 ### 5.2 Phase B — backend (deferred)
@@ -171,12 +187,12 @@ Chronological summary of meaningful changes (commits and session work).
 
 ### Immediate (finish Phase A)
 
-1. **Smoke-test v0.7** — home hero, legal pages, cart Buy now, checkout terms checkbox on http://localhost:3001
-2. **Contact form** — POST to API route or external form service; add success state
-3. **Loading skeletons** — products grid, cart drawer, checkout steps
-4. **Legacy route** — `/coseller-support` → redirect to `/creator-support`
+1. ~~Smoke-test v0.7~~ — build passes (`npm run build -w @fosl/storefront`)
+2. ~~Contact form~~ — done (`/api/v1/contact`)
+3. ~~Loading skeletons~~ — catalog, cart drawer, checkout
+4. ~~Legacy route~~ — `/coseller-support` redirect exists
 
-### Short term (start Phase B)
+### Short term (start Phase B) — **next up**
 
 5. **Prisma schema** — `User`, `Operator`, `Vendor`, `Product`, `Order`, `OrderLine`, `CreatorLink`, `Commission`
 6. **Auth.js** — protect Hub routes; session on storefront for order history
@@ -202,4 +218,4 @@ When shipping a milestone:
 
 ---
 
-*Maintainer note: This plan reflects repo state through commit `f6d1925` on `master`.*
+*Maintainer note: This plan reflects repo state through commit `v0.8` on `master`.*

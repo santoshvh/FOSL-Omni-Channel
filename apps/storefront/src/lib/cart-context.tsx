@@ -27,6 +27,7 @@ type CartContextValue = {
   itemCount: number;
   subtotalCents: number;
   isOpen: boolean;
+  isHydrated: boolean;
   openCart: () => void;
   closeCart: () => void;
   toggleCart: () => void;
@@ -230,6 +231,7 @@ export function CartProvider({
     itemCount,
     subtotalCents,
     isOpen,
+    isHydrated: hydrated,
     openCart,
     closeCart,
     toggleCart,

@@ -2,20 +2,23 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { products } from "@fosl/mocks";
+import type { Product } from "@fosl/contracts";
 import { ProductCatalogCard } from "@/components/product-catalog-card";
+import { ProductCatalogSkeleton } from "@/components/product-catalog-skeleton";
 import { EmptyState } from "@fosl/ui";
 import { Button } from "@fosl/ui";
 import Link from "next/link";
 import { LayoutGrid, List } from "lucide-react";
 
-const vendors = [...new Set(products.map((p) => p.vendorName))];
-
 export function ProductsListing() {
   const searchParams = useSearchParams();
   const vendorFromUrl = searchParams.get("vendor");
+  const [catalog, setCatalog] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
   const vendorNameFromUrl = vendorFromUrl
-    ? products.find((p) => p.vendorId === vendorFromUrl)?.vendorName
+    ? catalog.find((p) => p.vendorId === vendorFromUrl)?.vendorName
     : null;
 
   const [typeFilter, setTypeFilter] = useState<string[]>(["physical", "digital", "lead_gen"]);
@@ -25,10 +28,35 @@ export function ProductsListing() {
   const [sort, setSort] = useState("featured");
 
   useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setLoadError(null);
+    fetch("/api/v1/products")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load products.");
+        return res.json() as Promise<{ data: Product[] }>;
+      })
+      .then((json) => {
+        if (!cancelled) setCatalog(json.data);
+      })
+      .catch((err) => {
+        if (!cancelled) setLoadError(err instanceof Error ? err.message : "Failed to load products.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     if (vendorNameFromUrl) setVendorFilter(vendorNameFromUrl);
   }, [vendorNameFromUrl]);
 
-  let filtered = products.filter((p) => typeFilter.includes(p.type));
+  const vendors = [...new Set(catalog.map((p) => p.vendorName))];
+
+  let filtered = catalog.filter((p) => typeFilter.includes(p.type));
   if (vendorFilter !== "all") filtered = filtered.filter((p) => p.vendorName === vendorFilter);
   if (inStockOnly) filtered = filtered.filter((p) => p.inventory > 0 || p.type !== "physical");
 
@@ -50,22 +78,24 @@ export function ProductsListing() {
             <div>
               <p className="font-medium text-slate-700">Product type</p>
               {(["physical", "digital", "lead_gen"] as const).map((t) => (
-                <label key={t} className="mt-2 flex items-center gap-2 capitalize">
+                <label key={t} className="mt-2 flex items-center gap-2">
                   <input
                     type="checkbox"
                     checked={typeFilter.includes(t)}
                     onChange={() => toggleType(t)}
+                    disabled={loading}
                   />
-                  {t.replace("_", " ")}
+                  {t === "lead_gen" ? "Lead gen" : t.charAt(0).toUpperCase() + t.slice(1)}
                 </label>
               ))}
             </div>
             <div>
               <p className="font-medium text-slate-700">Vendor</p>
               <select
+                className="mt-2 w-full rounded-md border border-slate-200 px-2 py-1.5"
                 value={vendorFilter}
                 onChange={(e) => setVendorFilter(e.target.value)}
-                className="mt-2 w-full rounded-md border border-slate-200 px-2 py-1.5"
+                disabled={loading}
               >
                 <option value="all">All vendors</option>
                 {vendors.map((v) => (
@@ -80,22 +110,26 @@ export function ProductsListing() {
                 type="checkbox"
                 checked={inStockOnly}
                 onChange={(e) => setInStockOnly(e.target.checked)}
+                disabled={loading}
               />
               In stock only
             </label>
           </div>
         </aside>
 
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <h1 className="text-2xl font-bold">All products</h1>
+            <p className="text-sm text-slate-600">
+              {loading ? "Loading products…" : `${filtered.length} products`}
+            </p>
             <div className="flex items-center gap-2">
               <select
+                className="rounded-md border border-slate-200 px-2 py-1.5 text-sm"
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
-                className="rounded-md border border-slate-200 px-3 py-1.5 text-sm"
+                disabled={loading}
               >
-                <option value="featured">Sort: Featured</option>
+                <option value="featured">Featured</option>
                 <option value="price-asc">Price: Low to high</option>
                 <option value="price-desc">Price: High to low</option>
               </select>
@@ -118,7 +152,20 @@ export function ProductsListing() {
             </div>
           </div>
 
-          {filtered.length === 0 ? (
+          {loading ? (
+            <ProductCatalogSkeleton layout={view} />
+          ) : loadError ? (
+            <EmptyState
+              className="mt-6"
+              title="Could not load products"
+              description={loadError}
+              action={
+                <Button type="button" variant="outline" size="sm" onClick={() => window.location.reload()}>
+                  Retry
+                </Button>
+              }
+            />
+          ) : filtered.length === 0 ? (
             <EmptyState
               className="mt-6"
               title="No products match your filters"

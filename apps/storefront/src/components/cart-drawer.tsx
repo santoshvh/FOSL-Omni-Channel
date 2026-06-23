@@ -4,6 +4,7 @@ import Link from "next/link";
 import { X } from "lucide-react";
 import { Button, formatCurrency } from "@fosl/ui";
 import { CartLineItem } from "@/components/cart-line-item";
+import { CartDrawerSkeleton } from "@/components/cart-drawer-skeleton";
 import { useCart } from "@/lib/cart-context";
 
 export function CartDrawer() {
@@ -15,6 +16,7 @@ export function CartDrawer() {
     cartHref,
     checkoutHref,
     mode,
+    isHydrated,
     setQuantity,
     removeItem,
     saveForLater,
@@ -47,7 +49,9 @@ export function CartDrawer() {
         </div>
 
         <ul className="flex-1 overflow-y-auto divide-y divide-slate-100 px-4">
-          {lines.length === 0 ? (
+          {!isHydrated ? (
+            <CartDrawerSkeleton />
+          ) : lines.length === 0 ? (
             <li className="py-8 text-center text-sm text-slate-500">Your cart is empty.</li>
           ) : (
             lines.map((line) => (

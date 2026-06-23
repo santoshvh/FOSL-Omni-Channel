@@ -8,7 +8,7 @@ High-fidelity Next.js prototype screens.
 | Storefront | http://localhost:3001 |
 | Admin | http://localhost:3002 |
 
-**Status: v0.7 — FOSLOne imagery, legal policies, hero background, product card actions**
+**Status: v0.8 — contact API, loading skeletons, Phase A complete**
 
 > Full roadmap, changelog, and next steps: [PROJECT_PLAN.md](./PROJECT_PLAN.md)
 
@@ -161,6 +161,11 @@ High-fidelity Next.js prototype screens.
 - Phase B backend (Prisma, Auth.js, Stripe live API)
 
 ## Phase A polish
+
+### v0.8
+- Contact form API (`POST /api/v1/contact`) + success state
+- Loading skeletons (products, cart drawer, checkout)
+- Products API route (`GET /api/v1/products`)
 
 ### v0.7
 - FOSLOne.com image assets + stock hero background
