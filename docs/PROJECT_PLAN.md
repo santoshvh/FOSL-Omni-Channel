@@ -1,7 +1,7 @@
 # FOSL Omni-Channel — Project Plan
 
 Living document for scope, progress, changelog, and next steps.  
-**Current release:** `v0.13` (Phase B — Commission payouts + order email) · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
+**Current release:** `v0.14` (Phase B — Password reset + migrations) · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
 
 | App | Port | Command |
 |-----|------|---------|
@@ -108,6 +108,8 @@ Use `[x]` for done, `[ ]` for open. Screen-level detail remains in [WIREFRAME_IN
 - [x] **Creator attribution** — `?ref=` cookie (marketing consent), commission ledger on order
 - [x] **Commission payouts** — Stripe Connect transfers + `POST /api/v1/payouts/commissions`
 - [x] **Order confirmation email** — Resend when configured; console fallback in dev
+- [x] **Password reset email** — Hub forgot/reset flow with hashed tokens
+- [x] **Prisma migrations** — initial migration + `db:migrate:deploy` for production
 - [x] **`mapDbProduct`** — Prisma → `@fosl/contracts` mapper
 - [x] **Docker Compose** — optional local Postgres (`docker compose up -d postgres`)
 - [x] **Root `.env` loading** — `scripts/load-root-env.mjs` in Hub + Storefront next.config
@@ -130,7 +132,8 @@ Chronological summary of meaningful changes (commits and session work).
 | v0.10 | `f3b0a6a` | Auth.js Hub sign-in, Prisma products API, docker-compose, root env loading |
 | v0.11 | `855513f` | Stripe webhooks, Connect destination charges on payment intent |
 | v0.12 | `c4dd5d1` | Creator attribution cookies + commission ledger on checkout |
-| v0.13 | (pending) | Commission Connect payouts, order confirmation email |
+| v0.13 | `d61d43d` | Commission Connect payouts, order confirmation email |
+| v0.14 | (pending) | Hub password reset email + Prisma migrations workflow |
 
 ### v0.10 detail (latest)
 
@@ -202,7 +205,7 @@ Chronological summary of meaningful changes (commits and session work).
 ### 5.2 Phase B — backend
 
 - [x] Prisma schema + seed (`packages/db`)
-- [ ] Prisma migrations workflow (production)
+- [x] Prisma initial migration + `npm run db:migrate:deploy`
 - [x] Auth.js (Hub sign-in, roles: vendor / creator / operator / admin)
 - [ ] Stripe: Connect multi-vendor settlement, Tax, transfer reconciliation
 - [x] Stripe: Payment Element, webhooks, single-vendor Connect destination charges, creator commission transfers
@@ -212,6 +215,7 @@ Chronological summary of meaningful changes (commits and session work).
 - [ ] File storage for product images (S3 or equivalent)
 - [ ] Email transactional (password reset)
 - [x] Order confirmation email (Resend / console fallback)
+- [x] Password reset email (Hub)
 
 ### 5.3 Phase C — production
 
@@ -245,12 +249,12 @@ Chronological summary of meaningful changes (commits and session work).
 6. **Run database locally** — `cp .env.example .env`, then either `npm run db:setup` (Docker) or install Postgres and run `npm run db:push && npm run db:seed`
 7. ~~**Auth.js**~~ — Hub sign-in + middleware when `AUTH_SECRET` set
 8. ~~**Stripe test mode**~~ — Payment Element + `POST /api/v1/checkout/payment-intent` (mock without keys)
-9. **API vertical slice** — payouts + order email done; **next:** password reset email, Prisma migrations workflow
+9. **API vertical slice** — complete for prototype; **next:** CI pipeline, E2E checkout tests
 
 ### Before go-live
 
 10. **Legal review** — counsel sign-off on `legal-content.ts`
-11. **Production deploy** — ICDSoft WebApps, env vars, database
+11. **Production deploy** — ICDSoft WebApps, env vars, `db:migrate:deploy`
 12. **MSW off in production** — `NEXT_PUBLIC_API_MOCKING` or build-time flag
 
 ---
@@ -266,4 +270,4 @@ When shipping a milestone:
 
 ---
 
-*Maintainer note: This plan reflects repo state through v0.13 (uncommitted) on `master`.*
+*Maintainer note: This plan reflects repo state through v0.14 (uncommitted) on `master`.*

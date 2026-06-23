@@ -8,6 +8,7 @@
     "generate": "prisma generate",
     "push": "dotenv -e ../../.env -- prisma db push",
     "migrate:dev": "dotenv -e ../../.env -- prisma migrate dev",
+    "migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
     "studio": "dotenv -e ../../.env -- prisma studio",
     "seed": "dotenv -e ../../.env -- prisma db seed",
     "validate": "dotenv -e ../../.env -- prisma validate",
@@ -15,11 +16,11 @@
     "build": "prisma generate"
   },
   "dependencies": {
-    "@prisma/client": "^6.12.0"
+    "@prisma/client": "^6.12.0",
+    "bcryptjs": "^3.0.2"
   },
   "devDependencies": {
     "@fosl/mocks": "*",
-    "bcryptjs": "^3.0.2",
     "dotenv-cli": "^8.0.0",
     "prisma": "^6.12.0",
     "tsx": "^4.20.3",

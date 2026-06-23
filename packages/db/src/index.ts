@@ -8,6 +8,11 @@ export {
   markCommissionsPaid,
 } from "./payouts";
 export type { PayoutBatch } from "./payouts";
+export {
+  issuePasswordResetToken,
+  resetPasswordWithToken,
+  createPasswordResetToken,
+} from "./password-reset";
 export { PrismaClient } from "@prisma/client";
 export type {
   User,

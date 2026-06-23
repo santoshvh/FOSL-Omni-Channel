@@ -24,6 +24,10 @@ npm run db:setup
 # Option B — local PostgreSQL on port 5432
 npm run db:push
 npm run db:seed
+
+# Production / shared environments — versioned migrations
+npm run db:migrate:deploy
+npm run db:seed
 ```
 
 Set `AUTH_SECRET` in `.env` to enable Hub route protection. Hub loads root `.env` via `dotenv-cli` — **restart `dev:hub` after changing `.env`**.
@@ -36,6 +40,8 @@ Demo logins (password `demo123`):
 | `vendor@demo.fosl` | vendor |
 | `creator@demo.fosl` | creator |
 | `operator@demo.fosl` | operator |
+
+Password reset (Hub): http://localhost:3000/auth/forgot-password — emails log to the Hub server console unless `RESEND_API_KEY` is set.
 
 Verify Prisma products: `GET http://localhost:3001/api/v1/products` → `"source": "database"` when DB is up.
 

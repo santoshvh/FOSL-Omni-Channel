@@ -4,12 +4,13 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle } from "@fosl/ui";
+import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, AlertBanner } from "@fosl/ui";
 
 export function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/vendor";
+  const resetSuccess = searchParams.get("reset") === "success";
 
   const [email, setEmail] = useState("alex@acmecatalog.com");
   const [password, setPassword] = useState("demo123");
@@ -48,6 +49,11 @@ export function SignInForm() {
         <p className="text-sm text-slate-500">One account for Vendor, Creator, and Operator roles</p>
       </CardHeader>
       <CardContent>
+        {resetSuccess && (
+          <AlertBanner variant="success" title="Password updated" className="mb-4">
+            Sign in with your new password.
+          </AlertBanner>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">

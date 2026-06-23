@@ -32,7 +32,7 @@ rsync -a --delete \
 cd /home/<user>/private/fosl
 npm install --include=dev
 node ../../scripts/set-database-provider.mjs   # if db package present
-npx prisma generate && npx prisma db push      # when DB ready
+npx prisma generate && npm run db:migrate:deploy && npm run db:seed
 
 export LOW_MEMORY_BUILD=true
 export NODE_OPTIONS=--max-old-space-size=768

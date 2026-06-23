@@ -70,3 +70,13 @@ export const referralClickSchema = z.object({
 export const commissionPayoutJobSchema = z.object({
   creatorId: z.string().optional(),
 });
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Enter a valid email address"),
+});
+
+export const resetPasswordSchema = z.object({
+  email: z.string().email("Enter a valid email address"),
+  token: z.string().min(1, "Reset token is required"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});

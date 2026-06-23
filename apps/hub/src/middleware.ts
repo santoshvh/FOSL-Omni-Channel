@@ -10,7 +10,8 @@ export default auth((req) => {
 
   const { pathname } = req.nextUrl;
   const isAuthRoute = pathname.startsWith("/auth");
-  const isApiAuth = pathname.startsWith("/api/auth");
+  const isApiAuth =
+    pathname.startsWith("/api/auth") || pathname.startsWith("/api/v1/auth");
 
   if (!req.auth && !isAuthRoute && !isApiAuth) {
     const signIn = new URL("/auth/sign-in", req.nextUrl.origin);
