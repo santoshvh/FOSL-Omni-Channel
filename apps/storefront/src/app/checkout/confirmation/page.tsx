@@ -22,6 +22,7 @@ export default async function ConfirmationPage({
       <p className="mt-2 text-slate-600">
         Order {orderId ? `#${orderId}` : "#ORD-1043"}
       </p>
+      <p className="mt-1 text-sm text-slate-500">A confirmation email has been sent to your inbox.</p>
 
       <div className="mt-8 space-y-4 rounded-lg border border-slate-200 p-6 text-left text-sm">
         {(type === "mixed" || type === "physical") && (

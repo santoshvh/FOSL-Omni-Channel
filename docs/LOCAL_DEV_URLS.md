@@ -57,6 +57,18 @@ Copy the `whsec_...` signing secret into `.env` as `STRIPE_WEBHOOK_SECRET`, then
 
 Re-seed after pulling: `npm run db:seed` (creates `CREATOR_ALEX` link for Alex Rivera).
 
+### Commission payouts (optional)
+
+After a referred checkout, commissions move to `CLEARED`. Run the payout job:
+
+```powershell
+npm run jobs:payout-commissions
+```
+
+Set `PAYOUT_JOB_SECRET` in `.env` for production; locally the job works without it when `NODE_ENV` is not `production`.
+
+Order confirmation emails log to the server console unless `RESEND_API_KEY` is set.
+
 ## Base URLs
 
 | App | Local | Purpose |

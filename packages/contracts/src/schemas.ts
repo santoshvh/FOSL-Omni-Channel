@@ -66,3 +66,7 @@ export const referralClickSchema = z.object({
   slug: z.string().min(1),
   productId: z.string().optional(),
 });
+
+export const commissionPayoutJobSchema = z.object({
+  creatorId: z.string().optional(),
+});

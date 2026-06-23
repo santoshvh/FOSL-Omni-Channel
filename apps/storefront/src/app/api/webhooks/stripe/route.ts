@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { prisma } from "@fosl/db";
+import { prisma, clearCommissionsForOrder, reverseCommissionsForOrder } from "@fosl/db";
 import { getStripe, getStripeWebhookSecret } from "@/lib/stripe";
 
 export const runtime = "nodejs";
@@ -35,6 +35,8 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
       data: { status: "PROCESSING" },
     });
   }
+
+  await clearCommissionsForOrder(order.id);
 }
 
 async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
@@ -84,6 +86,7 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
     data: { status: "REFUNDED" },
   });
   await restoreInventoryForOrder(order.id);
+  await reverseCommissionsForOrder(order.id);
 }
 
 export async function POST(request: Request) {

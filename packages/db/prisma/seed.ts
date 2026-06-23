@@ -190,12 +190,13 @@ async function main() {
 
   const creatorProfile = await prisma.creatorProfile.upsert({
     where: { userId: demoUser.id },
-    update: {},
+    update: { stripeConnectId: "acct_demo_creator_alex" },
     create: {
       userId: demoUser.id,
       displayName: "Alex Rivera",
       referralCode: "ALEX2026",
       payoutEmail: demoUser.email,
+      stripeConnectId: "acct_demo_creator_alex",
     },
   });
 

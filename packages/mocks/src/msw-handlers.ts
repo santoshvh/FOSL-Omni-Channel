@@ -32,6 +32,11 @@ export const foslApiHandlers = [
     const body = await request.json();
     return HttpResponse.json({ data: { id: "lead_1", status: "received", ...body as object } }, { status: 201 });
   }),
+  http.post("/api/v1/payouts/commissions", async () =>
+    HttpResponse.json({
+      data: { source: "mock", paid: 0, skipped: 0, failed: 0, results: [] },
+    })
+  ),
   http.post("/api/v1/referral/click", async () =>
     HttpResponse.json({ data: { tracked: true, source: "mock" } })
   ),

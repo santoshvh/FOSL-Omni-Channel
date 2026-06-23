@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createOrderSchema } from "@fosl/contracts";
-import { prisma, createCommissionsForOrder } from "@fosl/db";
+import { prisma, createCommissionsForOrder, clearCommissionsForOrder } from "@fosl/db";
 import type { ProductType as DbProductType } from "@prisma/client";
 import {
   ATTRIBUTION_COOKIE,
   isAttributionValid,
   parseAttributionCookieValue,
 } from "@/lib/attribution";
+import { sendOrderConfirmationEmail } from "@/lib/email";
 
 function orderNumber() {
   return `FOSL-${Date.now().toString(36).toUpperCase()}`;
@@ -156,9 +157,23 @@ export async function POST(request: Request) {
       if (creatorLink) {
         const commissions = await createCommissionsForOrder(tx, created, creatorLink, email);
         commissionCount = commissions.length;
+        if (commissionCount > 0) {
+          await clearCommissionsForOrder(created.id, tx);
+        }
       }
 
       return created;
+    });
+
+    void sendOrderConfirmationEmail({
+      to: email,
+      orderNumber: order.orderNumber,
+      orderId: order.id,
+      totalCents: order.totalCents,
+      attributed: Boolean(creatorLink),
+      commissionCount,
+    }).catch((err) => {
+      console.error("[orders] confirmation email failed:", err);
     });
 
     return NextResponse.json(
