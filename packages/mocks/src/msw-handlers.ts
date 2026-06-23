@@ -1,6 +1,11 @@
 import { http, HttpResponse } from "msw";
 import { products } from "./fixtures";
 import { mockOrders, getOrderById } from "./hub-data";
+import {
+  getMockPlatformSettings,
+  triggerMockDeploy,
+  updateMockPlatformSettings,
+} from "./platform-settings";
 
 export const foslApiHandlers = [
   http.get("/api/v1/health", () =>
@@ -76,5 +81,18 @@ export const foslApiHandlers = [
   }),
   http.post("/api/v1/checkout/sessions", async () =>
     HttpResponse.json({ data: { sessionId: "cs_test_mock", url: "/checkout/confirmation?type=mixed" } })
+  ),
+  http.get("/api/v1/settings", () =>
+    HttpResponse.json({ data: getMockPlatformSettings(), source: "mock" })
+  ),
+  http.patch("/api/v1/settings", async ({ request }) => {
+    const body = await request.json();
+    return HttpResponse.json({
+      data: updateMockPlatformSettings(body as Record<string, unknown>),
+      source: "mock",
+    });
+  }),
+  http.post("/api/v1/settings/deploy", () =>
+    HttpResponse.json({ data: triggerMockDeploy(), source: "mock" })
   ),
 ];

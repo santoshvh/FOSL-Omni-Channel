@@ -1,0 +1,524 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import type { PlatformSettings } from "@fosl/contracts";
+import {
+  AlertBanner,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+} from "@fosl/ui";
+import { Loader2, Rocket, Save } from "lucide-react";
+
+type SecretFields = {
+  postmarkServerToken: string;
+  resendApiKey: string;
+  s3AccessKey: string;
+  s3SecretKey: string;
+  webhookSecret: string;
+};
+
+const emptySecrets: SecretFields = {
+  postmarkServerToken: "",
+  resendApiKey: "",
+  s3AccessKey: "",
+  s3SecretKey: "",
+  webhookSecret: "",
+};
+
+export function PlatformSettingsForm() {
+  const [settings, setSettings] = useState<PlatformSettings | null>(null);
+  const [secrets, setSecrets] = useState<SecretFields>(emptySecrets);
+  const [source, setSource] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [deploying, setDeploying] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    void loadSettings();
+  }, []);
+
+  async function loadSettings() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/v1/settings");
+      const json = (await res.json()) as { data?: PlatformSettings; source?: string; error?: string };
+      if (!res.ok) throw new Error(json.error ?? "Failed to load settings.");
+      setSettings(json.data ?? null);
+      setSource(json.source ?? null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load settings.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSave() {
+    if (!settings) return;
+    setSaving(true);
+    setMessage(null);
+    setError(null);
+    try {
+      const payload = {
+        featureFlags: settings.featureFlags,
+        autoDeploy: {
+          ...settings.autoDeploy,
+          webhookSecret: secrets.webhookSecret || undefined,
+        },
+        fileStorage: {
+          ...settings.fileStorage,
+          s3AccessKey: secrets.s3AccessKey || undefined,
+          s3SecretKey: secrets.s3SecretKey || undefined,
+        },
+        email: {
+          ...settings.email,
+          postmarkServerToken: secrets.postmarkServerToken || undefined,
+          resendApiKey: secrets.resendApiKey || undefined,
+        },
+        stripe: settings.stripe,
+      };
+
+      const res = await fetch("/api/v1/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const json = (await res.json()) as { data?: PlatformSettings; source?: string; error?: string };
+      if (!res.ok) throw new Error(json.error ?? "Save failed.");
+      setSettings(json.data ?? null);
+      setSource(json.source ?? null);
+      setSecrets(emptySecrets);
+      setMessage("Settings saved.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Save failed.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDeploy() {
+    setDeploying(true);
+    setMessage(null);
+    setError(null);
+    try {
+      const res = await fetch("/api/v1/settings/deploy", { method: "POST" });
+      const json = (await res.json()) as { data?: PlatformSettings; error?: string };
+      if (!res.ok) throw new Error(json.error ?? "Deploy failed.");
+      setSettings(json.data ?? null);
+      setMessage(json.data?.autoDeploy.lastDeployMessage ?? "Deploy triggered.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Deploy failed.");
+    } finally {
+      setDeploying(false);
+    }
+  }
+
+  if (loading) {
+    return <p className="text-sm text-slate-500">Loading platform settings…</p>;
+  }
+
+  if (!settings) {
+    return <p className="text-sm text-red-600">{error ?? "Settings unavailable."}</p>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">Platform settings</h1>
+          <p className="text-slate-600">Auto deploy, storage, email, and feature flags</p>
+          {source && <p className="mt-1 text-xs text-slate-400">Data source: {source}</p>}
+        </div>
+        <Button onClick={() => void handleSave()} disabled={saving}>
+          {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+          Save all
+        </Button>
+      </div>
+
+      {message && <AlertBanner variant="success" title="Saved">{message}</AlertBanner>}
+      {error && <AlertBanner variant="error" title="Error">{error}</AlertBanner>}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Auto deploy</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={settings.autoDeploy.enabled}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  autoDeploy: { ...settings.autoDeploy, enabled: e.target.checked },
+                })
+              }
+            />
+            Enable deploy on push to target branch
+          </label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="deploy-branch">Target branch</Label>
+              <Input
+                id="deploy-branch"
+                className="mt-1"
+                value={settings.autoDeploy.branch}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    autoDeploy: { ...settings.autoDeploy, branch: e.target.value },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="github-repo">GitHub repository</Label>
+              <Input
+                id="github-repo"
+                className="mt-1"
+                placeholder="org/repo"
+                value={settings.autoDeploy.githubRepo}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    autoDeploy: { ...settings.autoDeploy, githubRepo: e.target.value },
+                  })
+                }
+              />
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="deploy-webhook">Deploy webhook URL (ICDSoft / sureapp)</Label>
+            <Input
+              id="deploy-webhook"
+              className="mt-1"
+              placeholder="https://..."
+              value={settings.autoDeploy.webhookUrl}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  autoDeploy: { ...settings.autoDeploy, webhookUrl: e.target.value },
+                })
+              }
+            />
+          </div>
+          <div>
+            <Label htmlFor="webhook-secret">Webhook secret (leave blank to keep current)</Label>
+            <Input
+              id="webhook-secret"
+              type="password"
+              className="mt-1"
+              value={secrets.webhookSecret}
+              onChange={(e) => setSecrets({ ...secrets, webhookSecret: e.target.value })}
+            />
+          </div>
+          <div className="flex flex-wrap gap-4 text-sm">
+            {(
+              [
+                ["deployHub", "Hub"],
+                ["deployStorefront", "Storefront"],
+                ["deployAdmin", "Admin"],
+              ] as const
+            ).map(([key, label]) => (
+              <label key={key} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={settings.autoDeploy[key]}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      autoDeploy: { ...settings.autoDeploy, [key]: e.target.checked },
+                    })
+                  }
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-3 border-t border-slate-100 pt-4">
+            <Button type="button" variant="outline" onClick={() => void handleDeploy()} disabled={deploying}>
+              {deploying ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Rocket className="mr-2 h-4 w-4" />
+              )}
+              Deploy now
+            </Button>
+            {settings.autoDeploy.lastDeployAt && (
+              <p className="text-xs text-slate-500">
+                Last deploy: {new Date(settings.autoDeploy.lastDeployAt).toLocaleString()} ·{" "}
+                <span className="capitalize">{settings.autoDeploy.lastDeployStatus}</span>
+                {settings.autoDeploy.lastDeployMessage
+                  ? ` — ${settings.autoDeploy.lastDeployMessage}`
+                  : ""}
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>File storage</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label htmlFor="storage-provider">Provider</Label>
+            <select
+              id="storage-provider"
+              className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
+              value={settings.fileStorage.provider}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  fileStorage: {
+                    ...settings.fileStorage,
+                    provider: e.target.value as "local" | "s3",
+                  },
+                })
+              }
+            >
+              <option value="local">Local directory</option>
+              <option value="s3">Amazon S3</option>
+            </select>
+          </div>
+          {settings.fileStorage.provider === "local" ? (
+            <div>
+              <Label htmlFor="upload-dir">Upload directory</Label>
+              <Input
+                id="upload-dir"
+                className="mt-1"
+                value={settings.fileStorage.localUploadDir}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    fileStorage: { ...settings.fileStorage, localUploadDir: e.target.value },
+                  })
+                }
+              />
+              <p className="mt-1 text-xs text-slate-500">
+                Relative to Hub app cwd, or set `UPLOAD_DIR` in `.env`.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="s3-bucket">S3 bucket</Label>
+                <Input
+                  id="s3-bucket"
+                  className="mt-1"
+                  value={settings.fileStorage.s3Bucket}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      fileStorage: { ...settings.fileStorage, s3Bucket: e.target.value },
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="s3-region">Region</Label>
+                <Input
+                  id="s3-region"
+                  className="mt-1"
+                  value={settings.fileStorage.s3Region}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      fileStorage: { ...settings.fileStorage, s3Region: e.target.value },
+                    })
+                  }
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <Label htmlFor="s3-prefix">Public URL prefix</Label>
+                <Input
+                  id="s3-prefix"
+                  className="mt-1"
+                  placeholder="https://cdn.example.com/"
+                  value={settings.fileStorage.s3PublicUrlPrefix}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      fileStorage: { ...settings.fileStorage, s3PublicUrlPrefix: e.target.value },
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="s3-key">Access key {settings.fileStorage.s3AccessKeyConfigured && "(configured)"}</Label>
+                <Input
+                  id="s3-key"
+                  type="password"
+                  className="mt-1"
+                  placeholder="Leave blank to keep"
+                  value={secrets.s3AccessKey}
+                  onChange={(e) => setSecrets({ ...secrets, s3AccessKey: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="s3-secret">Secret key {settings.fileStorage.s3SecretConfigured && "(configured)"}</Label>
+                <Input
+                  id="s3-secret"
+                  type="password"
+                  className="mt-1"
+                  placeholder="Leave blank to keep"
+                  value={secrets.s3SecretKey}
+                  onChange={(e) => setSecrets({ ...secrets, s3SecretKey: e.target.value })}
+                />
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Email delivery</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="email-provider">Provider</Label>
+              <select
+                id="email-provider"
+                className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
+                value={settings.email.provider}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    email: {
+                      ...settings.email,
+                      provider: e.target.value as "postmark" | "resend" | "console",
+                    },
+                  })
+                }
+              >
+                <option value="console">Console (dev)</option>
+                <option value="postmark">Postmark</option>
+                <option value="resend">Resend</option>
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="from-address">From address</Label>
+              <Input
+                id="from-address"
+                type="email"
+                className="mt-1"
+                value={settings.email.fromAddress}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    email: { ...settings.email, fromAddress: e.target.value },
+                  })
+                }
+              />
+            </div>
+          </div>
+          {settings.email.provider === "postmark" && (
+            <div>
+              <Label htmlFor="postmark-token">
+                Postmark server token {settings.email.postmarkServerTokenConfigured && "(configured)"}
+              </Label>
+              <Input
+                id="postmark-token"
+                type="password"
+                className="mt-1"
+                placeholder="Leave blank to keep current"
+                value={secrets.postmarkServerToken}
+                onChange={(e) => setSecrets({ ...secrets, postmarkServerToken: e.target.value })}
+              />
+            </div>
+          )}
+          {settings.email.provider === "resend" && (
+            <div>
+              <Label htmlFor="resend-key">
+                Resend API key {settings.email.resendApiKeyConfigured && "(configured)"}
+              </Label>
+              <Input
+                id="resend-key"
+                type="password"
+                className="mt-1"
+                placeholder="Leave blank to keep current"
+                value={secrets.resendApiKey}
+                onChange={(e) => setSecrets({ ...secrets, resendApiKey: e.target.value })}
+              />
+            </div>
+          )}
+          <p className="text-xs text-slate-500">
+            Order confirmations, password reset, and payout notices use this provider. Env vars override when set.
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Stripe</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={settings.stripe.connectEnabled}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  stripe: { ...settings.stripe, connectEnabled: e.target.checked },
+                })
+              }
+            />
+            Stripe Connect enabled for vendor payouts
+          </label>
+          <ul className="space-y-1 text-slate-600">
+            <li>Secret key: {settings.stripe.secretKeyConfigured ? "Configured" : "Not set"}</li>
+            <li>Publishable key: {settings.stripe.publishableKeyConfigured ? "Configured" : "Not set"}</li>
+            <li>Webhook secret: {settings.stripe.webhookConfigured ? "Configured" : "Not set"}</li>
+          </ul>
+          <p className="text-xs text-slate-500">
+            Set `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, and `STRIPE_WEBHOOK_SECRET` in `.env`.
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Feature flags</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {(
+            [
+              ["marketplace", "Master marketplace (fosl.com)"],
+              ["referralTree", "Creator referral tree (2-level)"],
+              ["leadGen", "Lead-gen product type"],
+              ["bigcommerce", "BigCommerce integration (beta)"],
+            ] as const
+          ).map(([key, label]) => (
+            <label
+              key={key}
+              className="flex items-center justify-between border-b border-slate-100 py-3 text-sm last:border-0"
+            >
+              <span>{label}</span>
+              <input
+                type="checkbox"
+                checked={settings.featureFlags[key]}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    featureFlags: { ...settings.featureFlags, [key]: e.target.checked },
+                  })
+                }
+              />
+            </label>
+          ))}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

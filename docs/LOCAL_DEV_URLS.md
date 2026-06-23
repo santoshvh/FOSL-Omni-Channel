@@ -18,10 +18,10 @@ Use **three terminals** (one per app). Always prefix with `npm run` — e.g. `np
 
 ```powershell
 cp .env.example .env
-# Option A — Docker (if installed)
+# Option A — Docker MySQL 8 (if installed)
 npm run db:setup
 
-# Option B — local PostgreSQL on port 5432
+# Option B — local MySQL 8 on port 3306
 npm run db:push
 npm run db:seed
 
@@ -44,6 +44,10 @@ Demo logins (password `demo123`):
 Password reset (Hub): http://localhost:3000/auth/forgot-password — emails log to the Hub server console unless `RESEND_API_KEY` is set.
 
 Verify Prisma products: `GET http://localhost:3001/api/v1/products` → `"source": "database"` when DB is up.
+
+### Image uploads (Hub)
+
+Product images upload to repo-root `uploads/` (configure via `UPLOAD_DIR` in `.env`). Served from Hub at `http://localhost:3000/api/v1/uploads/<filename>`.
 
 ### Stripe webhooks (optional)
 
@@ -242,6 +246,8 @@ Use the **role switcher** in the header to move between Vendor, Creator, and Ope
 | Settings | http://localhost:3002/settings |
 | Subscription plans | http://localhost:3002/subscription-plans |
 | Health | http://localhost:3002/health |
+
+Platform **Settings** covers auto deploy, file storage (local/S3), Postmark/Resend email, Stripe status, and feature flags. Persists to `platform_config` when MySQL is up; otherwise uses MSW mock storage.
 
 ---
 

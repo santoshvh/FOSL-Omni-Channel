@@ -26,6 +26,13 @@ export {
 } from "./password-reset";
 export { computeVendorSettlementShares } from "./settlement";
 export type { VendorSettlementShare } from "./settlement";
+export {
+  getPlatformSettingsFromDb,
+  updatePlatformSettingsInDb,
+  recordDeployInDb,
+} from "./platform-settings";
+export type { SettingsPatch } from "./platform-settings";
+export { defaultPlatformSettings } from "./platform-settings-defaults";
 export { PrismaClient } from "@prisma/client";
 export type {
   User,

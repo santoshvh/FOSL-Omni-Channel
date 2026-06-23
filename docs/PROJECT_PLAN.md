@@ -1,7 +1,7 @@
 # FOSL Omni-Channel — Project Plan
 
 Living document for scope, progress, changelog, and next steps.  
-**Current release:** `v0.17` (Phase B — MSW prod guard, marketplace orders) · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
+**Current release:** `v0.18` (MySQL 8, Admin platform settings) · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
 
 | App | Port | Command |
 |-----|------|---------|
@@ -116,7 +116,7 @@ Use `[x]` for done, `[ ]` for open. Screen-level detail remains in [WIREFRAME_IN
 - [x] **GitHub Actions CI** — build, TypeScript lint, Playwright E2E on PR/push
 - [x] **Playwright checkout test** — digital product happy path against production server
 - [x] **`mapDbProduct`** — Prisma → `@fosl/contracts` mapper
-- [x] **Docker Compose** — optional local Postgres (`docker compose up -d postgres`)
+- [x] **Docker Compose** — optional local MySQL 8 (`docker compose up -d mysql`)
 - [x] **Root `.env` loading** — `scripts/load-root-env.mjs` in Hub + Storefront next.config
 
 ### 2.10 Phase B — orders & fulfillment (v0.16)
@@ -135,6 +135,13 @@ Use `[x]` for done, `[ ]` for open. Screen-level detail remains in [WIREFRAME_IN
 
 - [x] **`NEXT_PUBLIC_API_MOCKING`** — explicit dev-only flag; MSW never starts in production
 - [x] **Marketplace orders** — `/marketplace/orders` wired to same orders API as storefront
+
+### 2.12 Phase B — MySQL & Admin settings (v0.18)
+
+- [x] **MySQL 8 default** — Docker Compose, Prisma provider, migration regenerated
+- [x] **Local uploads** — repo-root `uploads/` via `UPLOAD_DIR` and Hub `getUploadDir()`
+- [x] **Admin platform settings** — auto deploy, file storage, Postmark/Resend, Stripe status, feature flags
+- [x] **`platform_config` table** — persisted settings API (`GET/PATCH /api/v1/settings`, deploy trigger)
 
 ---
 
@@ -159,6 +166,7 @@ Chronological summary of meaningful changes (commits and session work).
 | v0.15 | `521f12c` | GitHub Actions CI + Playwright checkout E2E |
 | v0.16 | `df86c62` | Orders API, fulfillment, multi-vendor Stripe, uploads, E2E expansion |
 | v0.17 | `00fc766` | MSW production guard, marketplace orders API, upload routes fix |
+| v0.18 | (pending) | MySQL 8 default, Admin platform settings, local upload dir |
 
 ### v0.16 detail (latest)
 
@@ -248,7 +256,7 @@ Chronological summary of meaningful changes (commits and session work).
 - [x] REST API slice — products, orders (GET/PATCH), contact, payouts, uploads (partial vs MSW)
 - [ ] Order fulfillment webhooks (inventory sync beyond checkout decrement)
 - [x] Creator attribution cookies + commission ledger (checkout)
-- [x] File storage for product images (local dev uploads; S3 for production)
+- [x] File storage for product images (local `uploads/` directory; S3 for production later)
 
 ### 5.3 Phase C — production
 
@@ -301,4 +309,4 @@ When shipping a milestone:
 
 ---
 
-*Maintainer note: This plan reflects repo state through v0.17 (uncommitted) on `master`.*
+*Maintainer note: This plan reflects repo state through v0.18 (pending push) on `master`.*

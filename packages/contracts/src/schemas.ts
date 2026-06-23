@@ -96,3 +96,52 @@ export const updateOrderSchema = z.object({
     )
     .optional(),
 });
+
+const secretField = z.string().optional();
+
+export const platformSettingsPatchSchema = z.object({
+  featureFlags: z
+    .object({
+      marketplace: z.boolean().optional(),
+      referralTree: z.boolean().optional(),
+      leadGen: z.boolean().optional(),
+      bigcommerce: z.boolean().optional(),
+    })
+    .optional(),
+  autoDeploy: z
+    .object({
+      enabled: z.boolean().optional(),
+      branch: z.string().min(1).optional(),
+      githubRepo: z.string().optional(),
+      webhookUrl: z.string().optional(),
+      deployHub: z.boolean().optional(),
+      deployStorefront: z.boolean().optional(),
+      deployAdmin: z.boolean().optional(),
+      webhookSecret: secretField,
+    })
+    .optional(),
+  fileStorage: z
+    .object({
+      provider: z.enum(["local", "s3"]).optional(),
+      localUploadDir: z.string().min(1).optional(),
+      s3Bucket: z.string().optional(),
+      s3Region: z.string().optional(),
+      s3PublicUrlPrefix: z.string().optional(),
+      s3AccessKey: secretField,
+      s3SecretKey: secretField,
+    })
+    .optional(),
+  email: z
+    .object({
+      provider: z.enum(["postmark", "resend", "console"]).optional(),
+      fromAddress: z.string().email().optional(),
+      postmarkServerToken: secretField,
+      resendApiKey: secretField,
+    })
+    .optional(),
+  stripe: z
+    .object({
+      connectEnabled: z.boolean().optional(),
+    })
+    .optional(),
+});

@@ -9,6 +9,9 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@fosl/contracts": "*",
+    "@fosl/db": "*",
+    "@fosl/mocks": "*",
     "@fosl/ui": "*",
     "lucide-react": "^0.511.0",
     "next": "^15.3.2",

@@ -5,7 +5,7 @@ No Docker. Deploy to ICDSoft WebApps using the **sureapp** CLI (same pattern as 
 ## Prerequisites
 
 - ICDSoft WebApps plan with Node.js LTS (22+)
-- PostgreSQL (ICDSoft PG script) or MySQL 8
+- MySQL 8 (default; ICDSoft MySQL script) or PostgreSQL
 - SSH access + sureapp CLI
 - Stripe webhook URL: `https://your-domain.com/api/webhooks/stripe`
 

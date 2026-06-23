@@ -66,7 +66,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
         <div className="border-t border-white/10 p-4 text-xs text-white/50">
-          FOSL Omni-Channel · Phase A
+          FOSL Omni-Channel · Phase B
         </div>
       </aside>
 

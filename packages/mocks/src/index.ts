@@ -54,6 +54,12 @@ export {
 } from "./hub-data";
 
 export { foslApiHandlers } from "./msw-handlers";
+export {
+  defaultPlatformSettings,
+  getMockPlatformSettings,
+  updateMockPlatformSettings,
+  triggerMockDeploy,
+} from "./platform-settings";
 export type {
   MockOrder,
   MockCollection,

@@ -8,7 +8,7 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const provider = (process.env.DATABASE_PROVIDER || "postgresql").toLowerCase();
+const provider = (process.env.DATABASE_PROVIDER || "mysql").toLowerCase();
 
 if (!["postgresql", "mysql"].includes(provider)) {
   console.error("DATABASE_PROVIDER must be postgresql or mysql");
@@ -16,6 +16,7 @@ if (!["postgresql", "mysql"].includes(provider)) {
 }
 
 const schemaPath = join(__dirname, "../packages/db/prisma/schema.prisma");
+const lockPath = join(__dirname, "../packages/db/prisma/migrations/migration_lock.toml");
 try {
   let schema = readFileSync(schemaPath, "utf8");
   schema = schema.replace(
@@ -23,6 +24,7 @@ try {
     `provider = "${provider}"`
   );
   writeFileSync(schemaPath, schema);
+  writeFileSync(lockPath, `provider = "${provider}"\n`);
   console.log(`Set Prisma provider to ${provider}`);
 } catch {
   console.log("packages/db not yet scaffolded — skip set-database-provider");

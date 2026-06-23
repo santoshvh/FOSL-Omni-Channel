@@ -125,4 +125,61 @@ export interface UserSession {
   activeRole: UserRole;
 }
 
+export type EmailProvider = "postmark" | "resend" | "console";
+export type FileStorageProvider = "local" | "s3";
+export type DeployStatus = "idle" | "pending" | "success" | "failed";
+
+export interface PlatformFeatureFlags {
+  marketplace: boolean;
+  referralTree: boolean;
+  leadGen: boolean;
+  bigcommerce: boolean;
+}
+
+export interface AutoDeploySettings {
+  enabled: boolean;
+  branch: string;
+  githubRepo: string;
+  webhookUrl: string;
+  deployHub: boolean;
+  deployStorefront: boolean;
+  deployAdmin: boolean;
+  lastDeployAt?: string;
+  lastDeployStatus?: DeployStatus;
+  lastDeployMessage?: string;
+}
+
+export interface FileStorageSettings {
+  provider: FileStorageProvider;
+  localUploadDir: string;
+  s3Bucket: string;
+  s3Region: string;
+  s3PublicUrlPrefix: string;
+  s3AccessKeyConfigured: boolean;
+  s3SecretConfigured: boolean;
+}
+
+export interface EmailSettings {
+  provider: EmailProvider;
+  fromAddress: string;
+  postmarkServerTokenConfigured: boolean;
+  resendApiKeyConfigured: boolean;
+}
+
+export interface StripePlatformSettings {
+  connectEnabled: boolean;
+  webhookConfigured: boolean;
+  secretKeyConfigured: boolean;
+  publishableKeyConfigured: boolean;
+}
+
+export interface PlatformSettings {
+  featureFlags: PlatformFeatureFlags;
+  autoDeploy: AutoDeploySettings;
+  fileStorage: FileStorageSettings;
+  email: EmailSettings;
+  stripe: StripePlatformSettings;
+  updatedAt?: string;
+}
+
 export * from "./schemas";

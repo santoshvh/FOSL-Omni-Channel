@@ -20,7 +20,7 @@
     "db:studio": "npm run studio -w @fosl/db",
     "db:migrate": "npm run db:sync-provider && npm run migrate:dev -w @fosl/db",
     "db:migrate:deploy": "npm run db:sync-provider && npm run migrate:deploy -w @fosl/db",
-    "db:up": "docker compose up -d postgres",
+    "db:up": "docker compose up -d mysql",
     "db:setup": "npm run db:up && npm run db:push && npm run db:seed",
     "jobs:payout-commissions": "node scripts/payout-commissions.mjs",
     "test:e2e": "playwright test --config e2e/playwright.config.ts",

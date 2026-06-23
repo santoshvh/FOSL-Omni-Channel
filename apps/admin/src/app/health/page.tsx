@@ -18,7 +18,7 @@ export default function AdminHealthPage() {
           <h2 className="font-semibold">Services</h2>
           <ul className="mt-4 space-y-2 text-sm">
             <li className="flex justify-between">
-              <span>PostgreSQL</span>
+              <span>MySQL 8</span>
               <span className="text-green-600">Healthy</span>
             </li>
             <li className="flex justify-between">

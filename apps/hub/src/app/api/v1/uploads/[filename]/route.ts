@@ -1,8 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
-
-const UPLOAD_DIR = path.join(process.cwd(), "uploads");
+import { getUploadDir } from "@/lib/uploads";
 
 const mimeByExt: Record<string, string> = {
   jpg: "image/jpeg",
@@ -22,7 +21,7 @@ export async function GET(
   }
 
   try {
-    const buffer = await readFile(path.join(UPLOAD_DIR, filename));
+    const buffer = await readFile(path.join(getUploadDir(), filename));
     const ext = filename.split(".").pop()?.toLowerCase() ?? "jpg";
     return new NextResponse(buffer, {
       headers: { "Content-Type": mimeByExt[ext] ?? "application/octet-stream" },

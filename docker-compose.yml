@@ -1,18 +1,20 @@
 version: "3.9"
 
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: fosl-postgres
+  mysql:
+    image: mysql:8
+    container_name: fosl-mysql
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "3306:3306"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: fosl_dev
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: fosl_dev
+      MYSQL_USER: fosl
+      MYSQL_PASSWORD: fosl
     volumes:
-      - fosl_pg_data:/var/lib/postgresql/data
+      - fosl_mysql_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 
 volumes:
-  fosl_pg_data:
+  fosl_mysql_data:
