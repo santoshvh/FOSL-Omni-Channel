@@ -173,13 +173,63 @@ export interface StripePlatformSettings {
   publishableKeyConfigured: boolean;
 }
 
+export interface DatabaseSettings {
+  provider: "mysql";
+  host: string;
+  port: number;
+  database: string;
+  username: string;
+  passwordConfigured: boolean;
+}
+
+export interface AppUrlSettings {
+  hub: string;
+  storefront: string;
+  admin: string;
+}
+
+export interface AuthSettings {
+  enabled: boolean;
+  authUrl: string;
+  secretConfigured: boolean;
+}
+
+export interface ApiMockingSettings {
+  enabled: boolean;
+}
+
+export interface StorefrontSettings {
+  subscriptionState: SubscriptionState;
+}
+
+export interface JobsSettings {
+  payoutJobSecretConfigured: boolean;
+}
+
 export interface PlatformSettings {
+  database: DatabaseSettings;
+  appUrls: AppUrlSettings;
+  auth: AuthSettings;
+  apiMocking: ApiMockingSettings;
+  storefront: StorefrontSettings;
+  jobs: JobsSettings;
   featureFlags: PlatformFeatureFlags;
   autoDeploy: AutoDeploySettings;
   fileStorage: FileStorageSettings;
   email: EmailSettings;
   stripe: StripePlatformSettings;
   updatedAt?: string;
+}
+
+/** Public subset exposed to apps at runtime (no secret values). */
+export interface PublicPlatformConfig {
+  appUrls: AppUrlSettings;
+  auth: Pick<AuthSettings, "enabled" | "authUrl">;
+  apiMocking: ApiMockingSettings;
+  storefront: StorefrontSettings;
+  featureFlags: PlatformFeatureFlags;
+  stripePublishableKey: string | null;
+  emailProvider: EmailProvider;
 }
 
 export * from "./schemas";

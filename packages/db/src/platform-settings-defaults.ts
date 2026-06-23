@@ -1,6 +1,33 @@
 import type { PlatformSettings } from "@fosl/contracts";
 
 export const defaultPlatformSettings: PlatformSettings = {
+  database: {
+    provider: "mysql",
+    host: "localhost",
+    port: 3306,
+    database: "fosl_dev",
+    username: "fosl",
+    passwordConfigured: false,
+  },
+  appUrls: {
+    hub: "http://localhost:3000",
+    storefront: "http://localhost:3001",
+    admin: "http://localhost:3002",
+  },
+  auth: {
+    enabled: false,
+    authUrl: "http://localhost:3000",
+    secretConfigured: false,
+  },
+  apiMocking: {
+    enabled: true,
+  },
+  storefront: {
+    subscriptionState: "active",
+  },
+  jobs: {
+    payoutJobSecretConfigured: false,
+  },
   featureFlags: {
     marketplace: true,
     referralTree: true,

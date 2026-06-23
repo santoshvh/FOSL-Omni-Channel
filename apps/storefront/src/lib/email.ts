@@ -1,3 +1,5 @@
+import { sendPlatformEmail } from "@fosl/db";
+
 type OrderConfirmationEmail = {
   to: string;
   orderNumber: string;
@@ -29,40 +31,12 @@ function buildOrderConfirmationHtml(email: OrderConfirmationEmail) {
 }
 
 export async function sendOrderConfirmationEmail(email: OrderConfirmationEmail) {
-  const from = process.env.EMAIL_FROM?.trim() ?? "FOSLOne <orders@demo.foslone.com>";
   const subject = `Order confirmed — ${email.orderNumber}`;
   const html = buildOrderConfirmationHtml(email);
-  const resendKey = process.env.RESEND_API_KEY?.trim();
 
-  if (resendKey) {
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${resendKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from,
-        to: email.to,
-        subject,
-        html,
-      }),
-    });
-
-    if (!response.ok) {
-      const body = await response.text();
-      throw new Error(`Resend error (${response.status}): ${body}`);
-    }
-
-    return { sent: true, provider: "resend" as const };
-  }
-
-  console.info("[email] order confirmation", {
+  return sendPlatformEmail({
     to: email.to,
-    orderNumber: email.orderNumber,
-    orderId: email.orderId,
-    totalCents: email.totalCents,
+    subject,
+    html,
   });
-
-  return { sent: false, provider: "console" as const };
 }

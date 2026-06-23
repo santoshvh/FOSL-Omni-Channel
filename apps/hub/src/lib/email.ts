@@ -1,3 +1,5 @@
+import { sendPlatformEmail } from "@fosl/db";
+
 type TransactionalEmail = {
   to: string;
   subject: string;
@@ -5,39 +7,7 @@ type TransactionalEmail = {
 };
 
 export async function sendTransactionalEmail(email: TransactionalEmail) {
-  const from = process.env.EMAIL_FROM?.trim() ?? "FOSL Hub <hub@demo.foslone.com>";
-  const resendKey = process.env.RESEND_API_KEY?.trim();
-
-  if (resendKey) {
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${resendKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from,
-        to: email.to,
-        subject: email.subject,
-        html: email.html,
-      }),
-    });
-
-    if (!response.ok) {
-      const body = await response.text();
-      throw new Error(`Resend error (${response.status}): ${body}`);
-    }
-
-    return { sent: true, provider: "resend" as const };
-  }
-
-  console.info("[email]", {
-    to: email.to,
-    subject: email.subject,
-    html: email.html,
-  });
-
-  return { sent: false, provider: "console" as const };
+  return sendPlatformEmail(email);
 }
 
 export async function sendPasswordResetEmail(params: { to: string; resetUrl: string }) {

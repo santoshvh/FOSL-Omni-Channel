@@ -4,7 +4,7 @@ dist
 .turbo
 .env
 .env.local
-.env*.local
+.fosl-runtime.json
 /uploads
 *.log
 .DS_Store

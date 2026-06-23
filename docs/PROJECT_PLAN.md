@@ -1,7 +1,7 @@
 # FOSL Omni-Channel — Project Plan
 
 Living document for scope, progress, changelog, and next steps.  
-**Current release:** `v0.18` (MySQL 8, Admin platform settings) · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
+**Current release:** `v0.19` (Admin settings as config source of truth) · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
 
 | App | Port | Command |
 |-----|------|---------|
@@ -116,7 +116,7 @@ Use `[x]` for done, `[ ]` for open. Screen-level detail remains in [WIREFRAME_IN
 - [x] **GitHub Actions CI** — build, TypeScript lint, Playwright E2E on PR/push
 - [x] **Playwright checkout test** — digital product happy path against production server
 - [x] **`mapDbProduct`** — Prisma → `@fosl/contracts` mapper
-- [x] **Docker Compose** — optional local MySQL 8 (`docker compose up -d mysql`)
+- [x] **Docker Compose** — optional local MySQL 8 (removed in v0.19 — configure via Admin Settings)
 - [x] **Root `.env` loading** — `scripts/load-root-env.mjs` in Hub + Storefront next.config
 
 ### 2.10 Phase B — orders & fulfillment (v0.16)
@@ -127,7 +127,7 @@ Use `[x]` for done, `[ ]` for open. Screen-level detail remains in [WIREFRAME_IN
 - [x] **Vendor fulfillment UI** — mark shipped/delivered + tracking on order lines
 - [x] **Multi-vendor Stripe** — `multi_vendor` settlement metadata + transfer job on webhook
 - [x] **Image uploads** — `POST /api/v1/uploads` (hub) with local `uploads/` storage in dev
-- [x] **Subscription banner** — storefront operator subscription state via env
+- [x] **Subscription banner** — storefront operator subscription state via platform config
 - [x] **Hub legal pages** — `/legal/terms`, `/legal/privacy` + sidebar links
 - [x] **E2E expansion** — physical checkout, referral attribution, hub role switcher
 
@@ -138,10 +138,19 @@ Use `[x]` for done, `[ ]` for open. Screen-level detail remains in [WIREFRAME_IN
 
 ### 2.12 Phase B — MySQL & Admin settings (v0.18)
 
-- [x] **MySQL 8 default** — Docker Compose, Prisma provider, migration regenerated
+- [x] **MySQL 8 default** — Prisma provider, migration regenerated; local MySQL on port 3306
 - [x] **Local uploads** — repo-root `uploads/` via `UPLOAD_DIR` and Hub `getUploadDir()`
 - [x] **Admin platform settings** — auto deploy, file storage, Postmark/Resend, Stripe status, feature flags
 - [x] **`platform_config` table** — persisted settings API (`GET/PATCH /api/v1/settings`, deploy trigger)
+
+### 2.13 Phase B — Admin as config source of truth (v0.19)
+
+- [x] **Remove Docker** — `docker-compose.yml` deleted; `db:setup` = push + seed
+- [x] **Admin Settings expanded** — database, app URLs, auth, API mocking, storefront subscription, jobs, Stripe secrets
+- [x] **`.fosl-runtime.json`** — written on Admin save; loaded by `load-root-env.mjs`
+- [x] **`GET /api/v1/platform-config`** — public config on admin, hub, storefront
+- [x] **Runtime consumers** — subscription banner, MSW, Stripe publishable key, email, uploads, auth
+- [x] **Postmark email** — `sendPlatformEmail` in `@fosl/db`
 
 ---
 
@@ -167,8 +176,19 @@ Chronological summary of meaningful changes (commits and session work).
 | v0.16 | `df86c62` | Orders API, fulfillment, multi-vendor Stripe, uploads, E2E expansion |
 | v0.17 | `00fc766` | MSW production guard, marketplace orders API, upload routes fix |
 | v0.18 | `047705c` | MySQL 8 default, Admin platform settings, local upload dir |
+| v0.19 | TBD | Admin settings as config source of truth, remove Docker |
 
-### v0.16 detail (latest)
+### v0.19 detail (latest)
+
+| Area | Change |
+|------|--------|
+| **Config** | Admin Settings single source of truth; `.fosl-runtime.json` on save |
+| **API** | `GET /api/v1/platform-config` on all apps |
+| **Storefront** | Subscription, MSW, Stripe key from platform config |
+| **Hub** | Auth enabled flag, upload dir, Postmark/Resend via `sendPlatformEmail` |
+| **Dev** | No Docker; slim `.env.example` bootstrap only |
+
+### v0.16 detail
 
 | Area | Change |
 |------|--------|
@@ -285,8 +305,8 @@ Chronological summary of meaningful changes (commits and session work).
 ### Short term (Phase B) — **next up**
 
 5. ~~**Prisma schema**~~ — done (`packages/db/prisma/schema.prisma`)
-6. **Run database locally** — `cp .env.example .env`, then either `npm run db:setup` (Docker) or install Postgres and run `npm run db:push && npm run db:seed`
-7. ~~**Auth.js**~~ — Hub sign-in + middleware when `AUTH_SECRET` set
+6. **Run database locally** — configure MySQL in Admin → http://localhost:3002/settings, or bootstrap with `DATABASE_URL` in `.env`, then `npm run db:setup`
+7. ~~**Auth.js**~~ — Hub sign-in + middleware when auth enabled in Admin Settings
 8. ~~**Stripe test mode**~~ — Payment Element + `POST /api/v1/checkout/payment-intent` (mock without keys)
 9. **Quality** — CI + E2E done; **next:** production deploy (ICDSoft), MSW off in production, S3 uploads in prod
 
@@ -309,4 +329,4 @@ When shipping a milestone:
 
 ---
 
-*Maintainer note: This plan reflects repo state through v0.18 (`047705c`) on `master`.*
+*Maintainer note: This plan reflects repo state through v0.19 on `master`.*

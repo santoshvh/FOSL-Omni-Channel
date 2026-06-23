@@ -12,16 +12,26 @@ import { CartDrawer } from "./cart-drawer";
 import { MobileBottomNav } from "./mobile-bottom-nav";
 import { SubscriptionBanner } from "./subscription-banner";
 import { MswInit } from "./msw-init";
+import { usePlatformConfig } from "@/lib/use-platform-config";
 
 export function AppChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isMarketplace = pathname.startsWith("/marketplace");
+  const { config, loading } = usePlatformConfig();
+
+  const subscriptionState =
+    config?.storefront.subscriptionState ??
+    (process.env.NEXT_PUBLIC_STOREFRONT_SUBSCRIPTION_STATE as
+      | "active"
+      | "grace_period"
+      | "suspended"
+      | undefined);
 
   return (
     <CartProvider mode={isMarketplace ? "marketplace" : "storefront"}>
-      <MswInit />
+      <MswInit apiMockingEnabled={loading ? null : config?.apiMocking.enabled} />
       <div className="flex min-h-screen flex-col pb-16 md:pb-0">
-        <SubscriptionBanner state={process.env.NEXT_PUBLIC_STOREFRONT_SUBSCRIPTION_STATE as "active" | "grace_period" | "suspended" | undefined} />
+        <SubscriptionBanner state={subscriptionState} />
         {isMarketplace ? <MarketplaceHeader /> : <StorefrontHeader />}
         <main className="flex-1">{children}</main>
         <FosloneFooter />

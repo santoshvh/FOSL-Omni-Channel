@@ -15,6 +15,8 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { FoslLogo, cn } from "@fosl/ui";
+import { MswInit } from "@/components/msw-init";
+import { usePlatformConfig } from "@/lib/use-platform-config";
 
 const nav = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -29,9 +31,11 @@ const nav = [
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { config, loading } = usePlatformConfig();
 
   return (
     <div className="flex min-h-screen bg-surface">
+      <MswInit apiMockingEnabled={loading ? null : config?.apiMocking.enabled} />
       <aside className="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-ink text-white shadow-xl">
         <div className="flex h-16 items-center border-b border-white/10 px-5">
           <Link href="/" className="rounded-lg bg-white px-2 py-1.5">

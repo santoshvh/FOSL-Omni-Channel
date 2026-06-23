@@ -3,6 +3,7 @@ import { products } from "./fixtures";
 import { mockOrders, getOrderById } from "./hub-data";
 import {
   getMockPlatformSettings,
+  getMockPublicPlatformConfig,
   triggerMockDeploy,
   updateMockPlatformSettings,
 } from "./platform-settings";
@@ -81,6 +82,9 @@ export const foslApiHandlers = [
   }),
   http.post("/api/v1/checkout/sessions", async () =>
     HttpResponse.json({ data: { sessionId: "cs_test_mock", url: "/checkout/confirmation?type=mixed" } })
+  ),
+  http.get("/api/v1/platform-config", () =>
+    HttpResponse.json({ data: getMockPublicPlatformConfig(), source: "mock" })
   ),
   http.get("/api/v1/settings", () =>
     HttpResponse.json({ data: getMockPlatformSettings(), source: "mock" })

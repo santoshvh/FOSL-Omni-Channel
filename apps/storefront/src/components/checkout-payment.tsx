@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { AlertBanner, Button } from "@fosl/ui";
-
-const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim();
+import { usePlatformConfig } from "@/lib/use-platform-config";
 
 type PaymentIntentResponse = {
   mode: "mock" | "stripe";
@@ -169,6 +168,10 @@ export function CheckoutPayment({
   onSuccess,
   onBack,
 }: CheckoutPaymentProps) {
+  const { config } = usePlatformConfig();
+  const publishableKey =
+    config?.stripePublishableKey?.trim() ??
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [intent, setIntent] = useState<PaymentIntentResponse | null>(null);

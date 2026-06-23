@@ -28,11 +28,21 @@ export { computeVendorSettlementShares } from "./settlement";
 export type { VendorSettlementShare } from "./settlement";
 export {
   getPlatformSettingsFromDb,
+  getPlatformSecretsFromDb,
+  getPublicPlatformConfigFromDb,
   updatePlatformSettingsInDb,
   recordDeployInDb,
 } from "./platform-settings";
 export type { SettingsPatch } from "./platform-settings";
 export { defaultPlatformSettings } from "./platform-settings-defaults";
+export {
+  buildDatabaseUrl,
+  buildRuntimeEnv,
+  writeRuntimeConfigFile,
+} from "./runtime-config";
+export type { PlatformSecrets } from "./runtime-config";
+export { resolvePublicPlatformConfig } from "./resolve-public-platform-config";
+export { sendPlatformEmail } from "./send-platform-email";
 export { PrismaClient } from "@prisma/client";
 export type {
   User,

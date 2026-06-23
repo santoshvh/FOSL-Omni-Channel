@@ -100,6 +100,38 @@ export const updateOrderSchema = z.object({
 const secretField = z.string().optional();
 
 export const platformSettingsPatchSchema = z.object({
+  database: z
+    .object({
+      host: z.string().min(1).optional(),
+      port: z.number().int().positive().optional(),
+      database: z.string().min(1).optional(),
+      username: z.string().min(1).optional(),
+      password: secretField,
+    })
+    .optional(),
+  appUrls: z
+    .object({
+      hub: z.string().url().optional(),
+      storefront: z.string().url().optional(),
+      admin: z.string().url().optional(),
+    })
+    .optional(),
+  auth: z
+    .object({
+      enabled: z.boolean().optional(),
+      authUrl: z.string().url().optional(),
+      authSecret: secretField,
+    })
+    .optional(),
+  apiMocking: z.object({ enabled: z.boolean().optional() }).optional(),
+  storefront: z
+    .object({
+      subscriptionState: z
+        .enum(["trial", "active", "past_due", "grace_period", "suspended", "cancelled", "enterprise"])
+        .optional(),
+    })
+    .optional(),
+  jobs: z.object({ payoutJobSecret: secretField }).optional(),
   featureFlags: z
     .object({
       marketplace: z.boolean().optional(),
@@ -142,6 +174,9 @@ export const platformSettingsPatchSchema = z.object({
   stripe: z
     .object({
       connectEnabled: z.boolean().optional(),
+      secretKey: secretField,
+      publishableKey: secretField,
+      webhookSecret: secretField,
     })
     .optional(),
 });

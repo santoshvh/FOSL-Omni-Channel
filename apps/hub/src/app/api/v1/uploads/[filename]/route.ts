@@ -21,7 +21,7 @@ export async function GET(
   }
 
   try {
-    const buffer = await readFile(path.join(getUploadDir(), filename));
+    const buffer = await readFile(path.join(await getUploadDir(), filename));
     const ext = filename.split(".").pop()?.toLowerCase() ?? "jpg";
     return new NextResponse(buffer, {
       headers: { "Content-Type": mimeByExt[ext] ?? "application/octet-stream" },

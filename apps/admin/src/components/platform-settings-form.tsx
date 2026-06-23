@@ -15,19 +15,31 @@ import {
 import { Loader2, Rocket, Save } from "lucide-react";
 
 type SecretFields = {
+  databasePassword: string;
+  authSecret: string;
+  payoutJobSecret: string;
   postmarkServerToken: string;
   resendApiKey: string;
   s3AccessKey: string;
   s3SecretKey: string;
   webhookSecret: string;
+  stripeSecretKey: string;
+  stripePublishableKey: string;
+  stripeWebhookSecret: string;
 };
 
 const emptySecrets: SecretFields = {
+  databasePassword: "",
+  authSecret: "",
+  payoutJobSecret: "",
   postmarkServerToken: "",
   resendApiKey: "",
   s3AccessKey: "",
   s3SecretKey: "",
   webhookSecret: "",
+  stripeSecretKey: "",
+  stripePublishableKey: "",
+  stripeWebhookSecret: "",
 };
 
 export function PlatformSettingsForm() {
@@ -67,6 +79,20 @@ export function PlatformSettingsForm() {
     setError(null);
     try {
       const payload = {
+        database: {
+          ...settings.database,
+          password: secrets.databasePassword || undefined,
+        },
+        appUrls: settings.appUrls,
+        auth: {
+          ...settings.auth,
+          authSecret: secrets.authSecret || undefined,
+        },
+        apiMocking: settings.apiMocking,
+        storefront: settings.storefront,
+        jobs: {
+          payoutJobSecret: secrets.payoutJobSecret || undefined,
+        },
         featureFlags: settings.featureFlags,
         autoDeploy: {
           ...settings.autoDeploy,
@@ -82,7 +108,12 @@ export function PlatformSettingsForm() {
           postmarkServerToken: secrets.postmarkServerToken || undefined,
           resendApiKey: secrets.resendApiKey || undefined,
         },
-        stripe: settings.stripe,
+        stripe: {
+          ...settings.stripe,
+          secretKey: secrets.stripeSecretKey || undefined,
+          publishableKey: secrets.stripePublishableKey || undefined,
+          webhookSecret: secrets.stripeWebhookSecret || undefined,
+        },
       };
 
       const res = await fetch("/api/v1/settings", {
@@ -90,12 +121,17 @@ export function PlatformSettingsForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const json = (await res.json()) as { data?: PlatformSettings; source?: string; error?: string };
+      const json = (await res.json()) as {
+        data?: PlatformSettings;
+        source?: string;
+        message?: string;
+        error?: string;
+      };
       if (!res.ok) throw new Error(json.error ?? "Save failed.");
       setSettings(json.data ?? null);
       setSource(json.source ?? null);
       setSecrets(emptySecrets);
-      setMessage("Settings saved.");
+      setMessage(json.message ?? "Settings saved.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed.");
     } finally {
@@ -133,7 +169,9 @@ export function PlatformSettingsForm() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Platform settings</h1>
-          <p className="text-slate-600">Auto deploy, storage, email, and feature flags</p>
+          <p className="text-slate-600">
+            Single source of truth for database, URLs, auth, payments, and feature flags
+          </p>
           {source && <p className="mt-1 text-xs text-slate-400">Data source: {source}</p>}
         </div>
         <Button onClick={() => void handleSave()} disabled={saving}>
@@ -144,6 +182,250 @@ export function PlatformSettingsForm() {
 
       {message && <AlertBanner variant="success" title="Saved">{message}</AlertBanner>}
       {error && <AlertBanner variant="error" title="Error">{error}</AlertBanner>}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Database</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="db-host">MySQL host</Label>
+              <Input
+                id="db-host"
+                className="mt-1"
+                value={settings.database.host}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    database: { ...settings.database, host: e.target.value },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="db-port">Port</Label>
+              <Input
+                id="db-port"
+                type="number"
+                className="mt-1"
+                value={settings.database.port}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    database: { ...settings.database, port: Number(e.target.value) || 3306 },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="db-name">Database</Label>
+              <Input
+                id="db-name"
+                className="mt-1"
+                value={settings.database.database}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    database: { ...settings.database, database: e.target.value },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="db-user">Username</Label>
+              <Input
+                id="db-user"
+                className="mt-1"
+                value={settings.database.username}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    database: { ...settings.database, username: e.target.value },
+                  })
+                }
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <Label htmlFor="db-password">
+                Password {settings.database.passwordConfigured && "(configured)"}
+              </Label>
+              <Input
+                id="db-password"
+                type="password"
+                className="mt-1"
+                placeholder="Leave blank to keep current"
+                value={secrets.databasePassword}
+                onChange={(e) => setSecrets({ ...secrets, databasePassword: e.target.value })}
+              />
+              <p className="mt-1 text-xs text-slate-500">
+                Saved to `.fosl-runtime.json` as `DATABASE_URL` on save. Restart dev servers after saving.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>App URLs</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 sm:grid-cols-3">
+          {(
+            [
+              ["hub", "Hub URL"],
+              ["storefront", "Storefront URL"],
+              ["admin", "Admin URL"],
+            ] as const
+          ).map(([key, label]) => (
+            <div key={key}>
+              <Label htmlFor={`url-${key}`}>{label}</Label>
+              <Input
+                id={`url-${key}`}
+                className="mt-1"
+                value={settings.appUrls[key]}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    appUrls: { ...settings.appUrls, [key]: e.target.value },
+                  })
+                }
+              />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Auth</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={settings.auth.enabled}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  auth: { ...settings.auth, enabled: e.target.checked },
+                })
+              }
+            />
+            Enable Hub route protection (Auth.js)
+          </label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="auth-url">Auth URL (Hub base)</Label>
+              <Input
+                id="auth-url"
+                className="mt-1"
+                value={settings.auth.authUrl}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    auth: { ...settings.auth, authUrl: e.target.value },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="auth-secret">
+                Auth secret {settings.auth.secretConfigured && "(configured)"}
+              </Label>
+              <Input
+                id="auth-secret"
+                type="password"
+                className="mt-1"
+                placeholder="Leave blank to keep current"
+                value={secrets.authSecret}
+                onChange={(e) => setSecrets({ ...secrets, authSecret: e.target.value })}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>API mocking</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={settings.apiMocking.enabled}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  apiMocking: { enabled: e.target.checked },
+                })
+              }
+            />
+            Enable MSW browser mocking in development (storefront, hub, admin)
+          </label>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Storefront</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div>
+            <Label htmlFor="subscription-state">Operator subscription state</Label>
+            <select
+              id="subscription-state"
+              className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2 text-sm sm:max-w-xs"
+              value={settings.storefront.subscriptionState}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  storefront: {
+                    ...settings.storefront,
+                    subscriptionState: e.target.value as PlatformSettings["storefront"]["subscriptionState"],
+                  },
+                })
+              }
+            >
+              {(
+                ["trial", "active", "past_due", "grace_period", "suspended", "cancelled", "enterprise"] as const
+              ).map((state) => (
+                <option key={state} value={state}>
+                  {state}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-slate-500">
+              Controls the subscription banner on the storefront.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Jobs</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div>
+            <Label htmlFor="payout-secret">
+              Payout job secret {settings.jobs.payoutJobSecretConfigured && "(configured)"}
+            </Label>
+            <Input
+              id="payout-secret"
+              type="password"
+              className="mt-1 sm:max-w-md"
+              placeholder="Leave blank to keep current"
+              value={secrets.payoutJobSecret}
+              onChange={(e) => setSecrets({ ...secrets, payoutJobSecret: e.target.value })}
+            />
+            <p className="mt-1 text-xs text-slate-500">
+              Required for `POST /api/v1/payouts/commissions` in production.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -303,9 +585,7 @@ export function PlatformSettingsForm() {
                   })
                 }
               />
-              <p className="mt-1 text-xs text-slate-500">
-                Relative to Hub app cwd, or set `UPLOAD_DIR` in `.env`.
-              </p>
+              <p className="mt-1 text-xs text-slate-500">Relative to Hub app cwd.</p>
             </div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">
@@ -452,9 +732,6 @@ export function PlatformSettingsForm() {
               />
             </div>
           )}
-          <p className="text-xs text-slate-500">
-            Order confirmations, password reset, and payout notices use this provider. Env vars override when set.
-          </p>
         </CardContent>
       </Card>
 
@@ -462,7 +739,7 @@ export function PlatformSettingsForm() {
         <CardHeader>
           <CardTitle>Stripe</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm">
+        <CardContent className="space-y-4 text-sm">
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -476,14 +753,47 @@ export function PlatformSettingsForm() {
             />
             Stripe Connect enabled for vendor payouts
           </label>
-          <ul className="space-y-1 text-slate-600">
-            <li>Secret key: {settings.stripe.secretKeyConfigured ? "Configured" : "Not set"}</li>
-            <li>Publishable key: {settings.stripe.publishableKeyConfigured ? "Configured" : "Not set"}</li>
-            <li>Webhook secret: {settings.stripe.webhookConfigured ? "Configured" : "Not set"}</li>
-          </ul>
-          <p className="text-xs text-slate-500">
-            Set `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, and `STRIPE_WEBHOOK_SECRET` in `.env`.
-          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="stripe-secret">
+                Secret key {settings.stripe.secretKeyConfigured && "(configured)"}
+              </Label>
+              <Input
+                id="stripe-secret"
+                type="password"
+                className="mt-1"
+                placeholder="sk_test_…"
+                value={secrets.stripeSecretKey}
+                onChange={(e) => setSecrets({ ...secrets, stripeSecretKey: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="stripe-publishable">
+                Publishable key {settings.stripe.publishableKeyConfigured && "(configured)"}
+              </Label>
+              <Input
+                id="stripe-publishable"
+                type="password"
+                className="mt-1"
+                placeholder="pk_test_…"
+                value={secrets.stripePublishableKey}
+                onChange={(e) => setSecrets({ ...secrets, stripePublishableKey: e.target.value })}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <Label htmlFor="stripe-webhook">
+                Webhook secret {settings.stripe.webhookConfigured && "(configured)"}
+              </Label>
+              <Input
+                id="stripe-webhook"
+                type="password"
+                className="mt-1"
+                placeholder="whsec_…"
+                value={secrets.stripeWebhookSecret}
+                onChange={(e) => setSecrets({ ...secrets, stripeWebhookSecret: e.target.value })}
+              />
+            </div>
+          </div>
         </CardContent>
       </Card>
 

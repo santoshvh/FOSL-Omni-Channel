@@ -57,6 +57,8 @@ export { foslApiHandlers } from "./msw-handlers";
 export {
   defaultPlatformSettings,
   getMockPlatformSettings,
+  getMockPlatformSecrets,
+  getMockPublicPlatformConfig,
   updateMockPlatformSettings,
   triggerMockDeploy,
 } from "./platform-settings";

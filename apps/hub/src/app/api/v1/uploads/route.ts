@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Image must be under 5 MB." }, { status: 400 });
   }
 
-  const uploadDir = getUploadDir();
+  const uploadDir = await getUploadDir();
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
   const filename = `${randomUUID()}.${ext}`;
   await mkdir(uploadDir, { recursive: true });

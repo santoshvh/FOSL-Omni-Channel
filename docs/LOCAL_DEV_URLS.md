@@ -16,21 +16,22 @@ Use **three terminals** (one per app). Always prefix with `npm run` — e.g. `np
 
 ## Database (Phase B)
 
+Configure MySQL in **Admin → Settings** (http://localhost:3002/settings): host, port, database, user, password. Saving writes `.fosl-runtime.json` at the repo root — **restart all dev servers** after saving.
+
+For first-time setup before Admin is configured, you may set `DATABASE_URL` in `.env`:
+
 ```powershell
 cp .env.example .env
-# Option A — Docker MySQL 8 (if installed)
 npm run db:setup
+```
 
-# Option B — local MySQL 8 on port 3306
-npm run db:push
-npm run db:seed
-
+```powershell
 # Production / shared environments — versioned migrations
 npm run db:migrate:deploy
 npm run db:seed
 ```
 
-Set `AUTH_SECRET` in `.env` to enable Hub route protection. Hub loads root `.env` via `dotenv-cli` — **restart `dev:hub` after changing `.env`**.
+Hub auth, Stripe, email, API mocking, and storefront subscription state are also managed in Admin Settings (not `.env`).
 
 Demo logins (password `demo123`):
 
@@ -41,23 +42,23 @@ Demo logins (password `demo123`):
 | `creator@demo.fosl` | creator |
 | `operator@demo.fosl` | operator |
 
-Password reset (Hub): http://localhost:3000/auth/forgot-password — emails log to the Hub server console unless `RESEND_API_KEY` is set.
+Password reset (Hub): http://localhost:3000/auth/forgot-password — emails use the provider configured in Admin Settings (console in dev by default).
 
 Verify Prisma products: `GET http://localhost:3001/api/v1/products` → `"source": "database"` when DB is up.
 
 ### Image uploads (Hub)
 
-Product images upload to repo-root `uploads/` (configure via `UPLOAD_DIR` in `.env`). Served from Hub at `http://localhost:3000/api/v1/uploads/<filename>`.
+Product images upload to repo-root `uploads/` (path configured in Admin Settings). Served from Hub at `http://localhost:3000/api/v1/uploads/<filename>`.
 
 ### Stripe webhooks (optional)
 
-With `STRIPE_SECRET_KEY` and [Stripe CLI](https://stripe.com/docs/stripe-cli) installed:
+With Stripe keys configured in Admin Settings and [Stripe CLI](https://stripe.com/docs/stripe-cli) installed:
 
 ```powershell
 stripe listen --forward-to localhost:3001/api/webhooks/stripe
 ```
 
-Copy the `whsec_...` signing secret into `.env` as `STRIPE_WEBHOOK_SECRET`, then restart `dev:storefront`.
+Copy the `whsec_...` signing secret into Admin Settings → Stripe webhook secret, save, and restart `dev:storefront`.
 
 ### Creator attribution (optional)
 
@@ -75,9 +76,9 @@ After a referred checkout, commissions move to `CLEARED`. Run the payout job:
 npm run jobs:payout-commissions
 ```
 
-Set `PAYOUT_JOB_SECRET` in `.env` for production; locally the job works without it when `NODE_ENV` is not `production`.
+Set the payout job secret in Admin Settings for production; locally the job works without it when `NODE_ENV` is not `production`.
 
-Order confirmation emails log to the server console unless `RESEND_API_KEY` is set.
+Order confirmation emails use the provider configured in Admin Settings.
 
 ### E2E tests (Playwright)
 
@@ -247,7 +248,7 @@ Use the **role switcher** in the header to move between Vendor, Creator, and Ope
 | Subscription plans | http://localhost:3002/subscription-plans |
 | Health | http://localhost:3002/health |
 
-Platform **Settings** covers auto deploy, file storage (local/S3), Postmark/Resend email, Stripe status, and feature flags. Persists to `platform_config` when MySQL is up; otherwise uses MSW mock storage.
+Platform **Settings** (http://localhost:3002/settings) is the single source of truth for database, app URLs, auth, API mocking, file storage, email, Stripe, jobs, and feature flags. Saves write `.fosl-runtime.json` — restart dev servers after saving. Persists to `platform_config` when MySQL is up; otherwise uses MSW mock storage.
 
 ---
 
@@ -273,18 +274,7 @@ Then restart the dev servers.
 
 ### Cross-app links
 
-Storefront login points to the hub sign-in page. Optional env vars:
-
-**`apps/storefront/.env.local`**
-```
-NEXT_PUBLIC_HUB_URL=http://localhost:3000
-```
-
-**`apps/hub/.env.local`**
-```
-NEXT_PUBLIC_STOREFRONT_URL=http://localhost:3001
-NEXT_PUBLIC_ADMIN_URL=http://localhost:3002
-```
+Storefront login points to the hub sign-in page. App URLs are configured in Admin Settings and exposed via `GET /api/v1/platform-config` on each app.
 
 ---
 
