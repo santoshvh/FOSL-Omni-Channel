@@ -39,6 +39,16 @@ Demo logins (password `demo123`):
 
 Verify Prisma products: `GET http://localhost:3001/api/v1/products` → `"source": "database"` when DB is up.
 
+### Stripe webhooks (optional)
+
+With `STRIPE_SECRET_KEY` and [Stripe CLI](https://stripe.com/docs/stripe-cli) installed:
+
+```powershell
+stripe listen --forward-to localhost:3001/api/webhooks/stripe
+```
+
+Copy the `whsec_...` signing secret into `.env` as `STRIPE_WEBHOOK_SECRET`, then restart `dev:storefront`.
+
 ## Base URLs
 
 | App | Local | Purpose |

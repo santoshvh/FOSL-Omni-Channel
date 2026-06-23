@@ -392,6 +392,10 @@ export default function CheckoutPage() {
               totalCents={total}
               email={form.email.trim()}
               termsAccepted={termsAccepted}
+              lines={lines.map((line) => ({
+                productId: line.productId,
+                quantity: line.quantity,
+              }))}
               onSuccess={completeOrder}
               onBack={() => setStep(1)}
             />

@@ -107,6 +107,7 @@ async function main() {
         tagline: mv.tagline,
         logoUrl: mv.logoUrl,
         bannerUrl: mv.bannerUrl,
+        ...(mv.id === "ven_1" ? { stripeAccountId: "acct_demo_acme_audio" } : {}),
       },
       create: {
         id: mv.id,
@@ -115,6 +116,7 @@ async function main() {
         tagline: mv.tagline,
         logoUrl: mv.logoUrl,
         bannerUrl: mv.bannerUrl,
+        ...(mv.id === "ven_1" ? { stripeAccountId: "acct_demo_acme_audio" } : {}),
       },
     });
 

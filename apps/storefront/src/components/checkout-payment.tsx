@@ -11,12 +11,14 @@ type PaymentIntentResponse = {
   mode: "mock" | "stripe";
   clientSecret?: string | null;
   paymentIntentId: string;
+  settlement?: "destination" | "platform";
 };
 
 type CheckoutPaymentProps = {
   totalCents: number;
   email: string;
   termsAccepted: boolean;
+  lines: { productId: string; quantity: number }[];
   onSuccess: (paymentIntentId: string) => Promise<void>;
   onBack: () => void;
 };
@@ -163,6 +165,7 @@ export function CheckoutPayment({
   totalCents,
   email,
   termsAccepted,
+  lines,
   onSuccess,
   onBack,
 }: CheckoutPaymentProps) {
@@ -174,6 +177,8 @@ export function CheckoutPayment({
     currency: "USD",
   }).format(totalCents / 100);
 
+  const linesKey = lines.map((line) => `${line.productId}:${line.quantity}`).join("|");
+
   useEffect(() => {
     let cancelled = false;
 
@@ -184,7 +189,7 @@ export function CheckoutPayment({
         const res = await fetch("/api/v1/checkout/payment-intent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amountCents: totalCents, email }),
+          body: JSON.stringify({ amountCents: totalCents, email, lines }),
         });
         const json = (await res.json()) as { data?: PaymentIntentResponse; error?: string };
         if (!res.ok) throw new Error(json.error ?? "Unable to start payment.");
@@ -202,7 +207,7 @@ export function CheckoutPayment({
     return () => {
       cancelled = true;
     };
-  }, [totalCents, email]);
+  }, [totalCents, email, linesKey]);
 
   if (loading) {
     return <p className="text-sm text-slate-500">Loading secure payment…</p>;

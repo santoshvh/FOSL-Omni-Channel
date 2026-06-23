@@ -38,7 +38,9 @@ export const foslApiHandlers = [
       return HttpResponse.json({ error: "Invalid payment amount." }, { status: 400 });
     }
     const paymentIntentId = `pi_mock_${Date.now()}`;
-    return HttpResponse.json({ data: { mode: "mock", paymentIntentId } });
+    return HttpResponse.json({
+      data: { mode: "mock", paymentIntentId, settlement: "platform" },
+    });
   }),
   http.post("/api/v1/orders", async ({ request }) => {
     const body = (await request.json()) as { email?: string; lines?: unknown[] };
