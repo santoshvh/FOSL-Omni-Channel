@@ -18,8 +18,8 @@ See also: [WIREFRAME_INVENTORY.md](./WIREFRAME_INVENTORY.md) (screen list), [LOC
 | Phase | Goal | Status |
 |-------|------|--------|
 | **A — UI prototype** | High-fidelity wireframes, mocks, FOSLOne branding, cart/checkout UX | **Complete** (v0.8) |
-| **B — Backend** | Prisma schema, Auth.js, Stripe live, real APIs replacing MSW | **In progress** (Auth + products API landed) |
-| **C — Production** | ICDSoft deploy, legal review, monitoring, vendor onboarding | **Not started** |
+| **B — Backend** | Prisma schema, Auth.js, Stripe live, real APIs replacing MSW | **Mostly complete** (core APIs + auth landed) |
+| **C — Production** | ICDSoft deploy, legal review, monitoring, vendor onboarding | **Started** (CI + E2E) |
 
 ---
 
@@ -139,7 +139,7 @@ Chronological summary of meaningful changes (commits and session work).
 | v0.12 | `c4dd5d1` | Creator attribution cookies + commission ledger on checkout |
 | v0.13 | `d61d43d` | Commission Connect payouts, order confirmation email |
 | v0.14 | `0b751da` | Hub password reset email + Prisma migrations workflow |
-| v0.15 | (pending) | GitHub Actions CI + Playwright checkout E2E |
+| v0.15 | `521f12c` | GitHub Actions CI + Playwright checkout E2E |
 
 ### v0.10 detail (latest)
 
@@ -215,13 +215,10 @@ Chronological summary of meaningful changes (commits and session work).
 - [x] Auth.js (Hub sign-in, roles: vendor / creator / operator / admin)
 - [ ] Stripe: Connect multi-vendor settlement, Tax, transfer reconciliation
 - [x] Stripe: Payment Element, webhooks, single-vendor Connect destination charges, creator commission transfers
-- [ ] REST or tRPC API replacing MSW (`/api/v1/*`) — products route done
-- [ ] Order persistence, inventory, webhooks for fulfillment
+- [ ] REST or tRPC API replacing MSW (`/api/v1/*`) — partial (products, orders, contact, payouts)
+- [ ] Order fulfillment webhooks (inventory sync beyond checkout decrement)
 - [x] Creator attribution cookies + commission ledger (checkout)
 - [ ] File storage for product images (S3 or equivalent)
-- [ ] Email transactional (password reset)
-- [x] Order confirmation email (Resend / console fallback)
-- [x] Password reset email (Hub)
 
 ### 5.3 Phase C — production
 
@@ -229,9 +226,6 @@ Chronological summary of meaningful changes (commits and session work).
 - [ ] Environment secrets (Stripe, DB, auth)
 - [ ] Domain + SSL (foslone.com / operator custom domains)
 - [ ] Error monitoring (Sentry or similar)
-- [ ] CI: lint, build, test on PR
-- [x] CI: GitHub Actions — build, TypeScript, Playwright E2E
-- [x] E2E tests (Playwright) for checkout happy path
 
 ### 5.4 Explicitly out of scope (for now)
 
@@ -277,4 +271,4 @@ When shipping a milestone:
 
 ---
 
-*Maintainer note: This plan reflects repo state through v0.14 (uncommitted) on `master`.*
+*Maintainer note: This plan reflects repo state through v0.15 (`521f12c`) on `master`.*
