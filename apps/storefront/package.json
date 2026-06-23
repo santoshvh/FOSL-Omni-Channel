@@ -6,7 +6,7 @@
     "dev": "dotenv -e ../../.env -- next dev --port 3001",
     "build": "next build",
     "start": "dotenv -e ../../.env -- next start --port 3001",
-    "lint": "next lint"
+    "lint": "tsc --noEmit"
   },
   "dependencies": {
     "@fosl/contracts": "*",

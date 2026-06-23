@@ -22,15 +22,19 @@
     "db:migrate:deploy": "npm run db:sync-provider && npm run migrate:deploy -w @fosl/db",
     "db:up": "docker compose up -d postgres",
     "db:setup": "npm run db:up && npm run db:push && npm run db:seed",
-    "jobs:payout-commissions": "node scripts/payout-commissions.mjs"
+    "jobs:payout-commissions": "node scripts/payout-commissions.mjs",
+    "test:e2e": "playwright test --config e2e/playwright.config.ts",
+    "test:e2e:install": "playwright install chromium --with-deps"
   },
   "devDependencies": {
+    "@playwright/test": "^1.53.2",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   },
   "engines": {
     "node": ">=22"
   },
+  "packageManager": "npm@10.9.2",
   "msw": {
     "workerDirectory": [
       "apps\\storefront\\public",

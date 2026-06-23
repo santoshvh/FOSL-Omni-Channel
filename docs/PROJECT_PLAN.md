@@ -1,7 +1,7 @@
 # FOSL Omni-Channel — Project Plan
 
 Living document for scope, progress, changelog, and next steps.  
-**Current release:** `v0.14` (Phase B — Password reset + migrations) · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
+**Current release:** `v0.15` (Phase C — CI + E2E) · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
 
 | App | Port | Command |
 |-----|------|---------|
@@ -110,6 +110,11 @@ Use `[x]` for done, `[ ]` for open. Screen-level detail remains in [WIREFRAME_IN
 - [x] **Order confirmation email** — Resend when configured; console fallback in dev
 - [x] **Password reset email** — Hub forgot/reset flow with hashed tokens
 - [x] **Prisma migrations** — initial migration + `db:migrate:deploy` for production
+
+### 2.9 Phase C — CI & quality (v0.15)
+
+- [x] **GitHub Actions CI** — build, TypeScript lint, Playwright E2E on PR/push
+- [x] **Playwright checkout test** — digital product happy path against production server
 - [x] **`mapDbProduct`** — Prisma → `@fosl/contracts` mapper
 - [x] **Docker Compose** — optional local Postgres (`docker compose up -d postgres`)
 - [x] **Root `.env` loading** — `scripts/load-root-env.mjs` in Hub + Storefront next.config
@@ -133,7 +138,8 @@ Chronological summary of meaningful changes (commits and session work).
 | v0.11 | `855513f` | Stripe webhooks, Connect destination charges on payment intent |
 | v0.12 | `c4dd5d1` | Creator attribution cookies + commission ledger on checkout |
 | v0.13 | `d61d43d` | Commission Connect payouts, order confirmation email |
-| v0.14 | (pending) | Hub password reset email + Prisma migrations workflow |
+| v0.14 | `0b751da` | Hub password reset email + Prisma migrations workflow |
+| v0.15 | (pending) | GitHub Actions CI + Playwright checkout E2E |
 
 ### v0.10 detail (latest)
 
@@ -224,7 +230,8 @@ Chronological summary of meaningful changes (commits and session work).
 - [ ] Domain + SSL (foslone.com / operator custom domains)
 - [ ] Error monitoring (Sentry or similar)
 - [ ] CI: lint, build, test on PR
-- [ ] E2E tests (Playwright) for checkout happy path
+- [x] CI: GitHub Actions — build, TypeScript, Playwright E2E
+- [x] E2E tests (Playwright) for checkout happy path
 
 ### 5.4 Explicitly out of scope (for now)
 
@@ -249,7 +256,7 @@ Chronological summary of meaningful changes (commits and session work).
 6. **Run database locally** — `cp .env.example .env`, then either `npm run db:setup` (Docker) or install Postgres and run `npm run db:push && npm run db:seed`
 7. ~~**Auth.js**~~ — Hub sign-in + middleware when `AUTH_SECRET` set
 8. ~~**Stripe test mode**~~ — Payment Element + `POST /api/v1/checkout/payment-intent` (mock without keys)
-9. **API vertical slice** — complete for prototype; **next:** CI pipeline, E2E checkout tests
+9. **Quality** — CI + E2E done; **next:** production deploy (ICDSoft), MSW off in production
 
 ### Before go-live
 

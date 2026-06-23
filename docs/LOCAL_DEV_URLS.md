@@ -75,6 +75,15 @@ Set `PAYOUT_JOB_SECRET` in `.env` for production; locally the job works without 
 
 Order confirmation emails log to the server console unless `RESEND_API_KEY` is set.
 
+### E2E tests (Playwright)
+
+```powershell
+npm run build -w @fosl/storefront
+npm run test:e2e
+```
+
+Install browsers once: `npm run test:e2e:install`
+
 ## Base URLs
 
 | App | Local | Purpose |
