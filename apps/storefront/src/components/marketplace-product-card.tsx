@@ -2,12 +2,14 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Product } from "@fosl/contracts";
 import { ProductTypeBadge, formatCurrency } from "@fosl/ui";
-import { CreatorEarnButton } from "@/components/creator-earn-button";
+import { ProductCardActions } from "@/components/product-card-actions";
 
 export function MarketplaceProductCard({ product }: { product: Product }) {
+  const productHref = `/marketplace/products/${product.id}`;
+
   return (
     <article className="ecom-card group flex flex-col">
-      <Link href={`/marketplace/products/${product.id}`} className="block">
+      <Link href={productHref} className="block">
         <div className="relative aspect-[4/5] overflow-hidden bg-slate-50">
           <Image
             src={product.imageUrl}
@@ -28,14 +30,7 @@ export function MarketplaceProductCard({ product }: { product: Product }) {
           </p>
         </div>
       </Link>
-      <div className="mt-auto border-t border-slate-100 p-3">
-        <CreatorEarnButton
-          productId={product.id}
-          productTitle={product.title}
-          variant="outline"
-          className="w-full"
-        />
-      </div>
+      <ProductCardActions product={product} productHref={productHref} />
     </article>
   );
 }

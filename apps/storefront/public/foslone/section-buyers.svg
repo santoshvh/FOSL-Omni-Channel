@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 960" fill="none">
+  <circle cx="475" cy="480" r="420" fill="#FFF8B8"/>
+  <path
+    d="M260 360h430l-38 360H298L260 360z"
+    fill="#43D7F9"
+    stroke="#0B1C82"
+    stroke-width="18"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M340 360c0-74 60-134 135-134s135 60 135 134"
+    stroke="#0B1C82"
+    stroke-width="18"
+    stroke-linecap="round"
+  />
+  <circle cx="360" cy="700" r="34" fill="#FFFFFF" stroke="#0B1C82" stroke-width="16"/>
+  <circle cx="590" cy="700" r="34" fill="#FFFFFF" stroke="#0B1C82" stroke-width="16"/>
+  <path
+    d="M620 250l88 52-28 48-88-52 28-48z"
+    fill="#FFFFFF"
+    stroke="#0B1C82"
+    stroke-width="16"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M708 302l52 30"
+    stroke="#0B1C82"
+    stroke-width="16"
+    stroke-linecap="round"
+  />
+</svg>

@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Button } from "@fosl/ui";
+import { legalPageHref } from "@/lib/legal";
 
 const STORAGE_KEY = "fosl_cookie_consent";
 
@@ -36,7 +38,10 @@ export function CookieConsent() {
           </h2>
           <p className="mt-1 text-sm text-slate-600">
             We use necessary cookies for checkout and security. Analytics and marketing are
-            optional (domain-scoped, GDPR-compliant).
+            optional (domain-scoped, GDPR-compliant).{" "}
+            <Link href={legalPageHref("cookies")} className="font-medium text-ink underline">
+              Cookie Policy
+            </Link>
           </p>
           <div className="mt-3 space-y-2 text-sm">
             <label className="flex items-center gap-2 text-slate-500">

@@ -150,6 +150,20 @@ export default function MarketplaceCheckoutPage() {
                 <dd>{formatCurrency(total)}</dd>
               </div>
             </dl>
+            <label className="flex items-start gap-2 text-sm text-slate-600">
+              <input type="checkbox" className="mt-1" required />
+              <span>
+                I agree to the{" "}
+                <Link href="/legal/terms" className="font-medium text-ink underline">
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link href="/legal/privacy" className="font-medium text-ink underline">
+                  Privacy Policy
+                </Link>
+                .
+              </span>
+            </label>
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setStep(1)}>
                 Back

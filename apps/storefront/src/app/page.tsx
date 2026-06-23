@@ -2,30 +2,43 @@ import Link from "next/link";
 import Image from "next/image";
 import { products } from "@fosl/mocks";
 import { Button } from "@fosl/ui";
-import { creatorHighlights, externalLinks, featuredBlogPosts } from "@/lib/foslone";
+import {
+  creatorHighlights,
+  externalLinks,
+  featuredBlogPosts,
+  fosloneImages,
+  homeAudienceCards,
+  teamMembers,
+} from "@/lib/foslone";
 import { ProductCatalogCard } from "@/components/product-catalog-card";
-import { Users, Store, ShoppingBag, Sparkles, ArrowRight, Truck } from "lucide-react";
+import { Sparkles, ArrowRight, Truck } from "lucide-react";
 
 export default function HomePage() {
-  const heroProduct = products[0];
-
   return (
     <div>
-      {/* Hero — ecommerce kit style */}
-      <section className="relative overflow-hidden bg-surface">
-        <div className="ecom-container grid items-center gap-10 py-12 lg:grid-cols-2 lg:py-20">
-          <div>
+      {/* Hero — full-bleed background */}
+      <section className="relative isolate min-h-[min(88vh,720px)] overflow-hidden">
+        <Image
+          src={fosloneImages.heroMain}
+          alt="Woman shopping online at home with laptop and credit card"
+          fill
+          priority
+          className="object-cover object-[65%_center] sm:object-[72%_center] lg:object-right lg:object-center"
+          sizes="100vw"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-surface from-35% via-surface/90 via-50% to-surface/10 lg:from-30% lg:via-45%"
+          aria-hidden
+        />
+        <div className="ecom-container relative z-10 flex min-h-[min(88vh,720px)] items-center py-14 lg:py-20">
+          <div className="max-w-xl">
             <span className="ecom-pill">Incubated by AIOne</span>
             <h1 className="mt-5 font-display text-4xl font-extrabold leading-tight tracking-tight text-ink sm:text-5xl lg:text-6xl">
-              Social eCommerce for communities that{" "}
-              <span className="relative">
-                <span className="relative z-10">grow together</span>
-                <span className="absolute bottom-1 left-0 z-0 h-3 w-full bg-primary/60" />
-              </span>
+              Our business is to support communities with a social eCommerce solution
             </h1>
             <p className="mt-5 max-w-lg text-lg leading-relaxed text-slate-600">
-              Shop physical, digital, and lead-gen products from incubated sellers — or promote
-              as a Creator and earn on every sale.
+              By incubating startup companies — shop, sell, or promote as a Creator and earn on
+              every sale across the FOSLOne network.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
@@ -49,71 +62,34 @@ export default function HomePage() {
               </span>
             </div>
           </div>
-          {heroProduct && (
-            <div className="relative">
-              <div className="absolute -right-6 -top-6 h-64 w-64 rounded-full bg-primary/30 blur-3xl" />
-              <div className="ecom-card relative overflow-hidden">
-                <div className="relative aspect-[4/5] bg-slate-100">
-                  <Image
-                    src={heroProduct.imageUrl}
-                    alt={heroProduct.title}
-                    fill
-                    className="object-cover"
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-ink/80 to-transparent p-6 text-white">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-                    Featured
-                  </p>
-                  <p className="mt-1 text-lg font-bold">{heroProduct.title}</p>
-                  <Button asChild size="sm" className="mt-3">
-                    <Link href={`/products/${heroProduct.id}`}>View product</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </section>
 
-      {/* Category cards */}
+      {/* Audience cards — site section art */}
       <section className="ecom-container py-14">
         <div className="grid gap-6 md:grid-cols-3">
-          {[
-            {
-              href: "/creator-support",
-              icon: Users,
-              title: "Creator",
-              desc: "Earn commissions promoting seller products across our eCommerce communities.",
-            },
-            {
-              href: "/incubations",
-              icon: Store,
-              title: "Seller focused",
-              desc: "Incubated startups list products and grow sales through the Creator network.",
-            },
-            {
-              href: "/products",
-              icon: ShoppingBag,
-              title: "Buyers",
-              desc: "Shop physical, digital, and lead-gen products from trusted vendors.",
-            },
-          ].map((card) => (
+          {homeAudienceCards.map((card) => (
             <Link
               key={card.href}
               href={card.href}
-              className="group rounded-2xl border border-slate-100 bg-white p-6 shadow-card transition hover:-translate-y-0.5 hover:border-primary hover:shadow-soft"
+              className="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card transition hover:-translate-y-0.5 hover:border-primary hover:shadow-soft"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-muted">
-                <card.icon className="h-6 w-6 text-ink" />
+              <div className="relative h-40 bg-primary-muted">
+                <Image
+                  src={card.image}
+                  alt={card.imageAlt}
+                  fill
+                  className="object-contain p-4 transition group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
               </div>
-              <h2 className="mt-4 text-xl font-bold text-ink">{card.title}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">{card.desc}</p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-ink group-hover:text-primary-dark">
-                Read more <ArrowRight className="h-3.5 w-3.5" />
-              </span>
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-ink">{card.title}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">{card.desc}</p>
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-ink group-hover:text-primary-dark">
+                  Read more <ArrowRight className="h-3.5 w-3.5" />
+                </span>
+              </div>
             </Link>
           ))}
         </div>
@@ -135,90 +111,128 @@ export default function HomePage() {
 
       {/* Prosperity */}
       <section className="ecom-container py-14">
-        <h2 className="ecom-section-title">More sales, employment &amp; prosperity</h2>
-        <p className="mt-4 max-w-3xl text-slate-600 leading-relaxed">
-          We provide opportunities for people to sell products and services in the many eCommerce
-          communities we continue to build. Anyone can become a Creator to earn sales commissions
-          on seller products they promote.
-        </p>
+        <div className="grid items-center gap-10 lg:grid-cols-2">
+          <div>
+            <h2 className="ecom-section-title">More sales, employment &amp; prosperity</h2>
+            <p className="mt-4 text-slate-600 leading-relaxed">
+              We provide opportunities for people to sell products and services in the many
+              eCommerce communities we continue to build. Anyone can become a Creator to earn sales
+              commissions on seller products they promote.
+            </p>
+            <p className="mt-4 text-slate-600 leading-relaxed">
+              As Creators help Sellers with new sales, more Sellers join the network — a flywheel
+              of growth for Sellers and Creators alike.
+            </p>
+          </div>
+          <div className="relative mx-auto aspect-square w-full max-w-md">
+            <Image
+              src={fosloneImages.sectionSales}
+              alt="Sales growth illustration"
+              fill
+              className="object-contain"
+              sizes="400px"
+            />
+          </div>
+        </div>
       </section>
 
       {/* Creator program */}
       <section className="border-y border-slate-100 bg-surface px-4 py-14">
-        <div className="ecom-container">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
-              <Sparkles className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <div>
-              <h2 className="ecom-section-title">Creator program</h2>
-              <p className="text-slate-600">Promote products. Earn commissions. Grow communities.</p>
-            </div>
-          </div>
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-            {creatorHighlights.map((item) => (
-              <li
-                key={item}
-                className="flex gap-2 rounded-xl border border-slate-100 bg-white px-4 py-3 text-sm text-slate-700 shadow-card"
-              >
-                <span className="font-bold text-primary-dark">✓</span>
-                {item}
-              </li>
-            ))}
-          </ul>
-          <Button asChild className="mt-6">
-            <a href={externalLinks.signupCreator} target="_blank" rel="noopener noreferrer">
-              Sign up as a Creator
-            </a>
-          </Button>
-        </div>
-      </section>
-
-      {/* Team */}
-      <section className="ecom-container py-14">
-        <div className="grid gap-10 lg:grid-cols-2">
+        <div className="ecom-container grid gap-10 lg:grid-cols-2 lg:items-center">
           <div>
-            <h2 className="text-xl font-bold text-ink">Our AIOne Team</h2>
-            <ul className="mt-4 space-y-3">
-              {[
-                { name: "Shiva Balivada", role: "CEO" },
-                { name: "Dave Sackett", role: "CFO" },
-              ].map((person) => (
-                <li key={person.name} className="rounded-xl border border-slate-100 bg-white p-4 shadow-card">
-                  <p className="font-semibold text-ink">{person.name}</p>
-                  <p className="text-sm text-slate-500">{person.role}</p>
+            <h2 className="ecom-section-title">Creator program</h2>
+            <p className="mt-2 text-slate-600">
+              Welcome the largest workforce in the making. Creators use social media content to
+              naturally influence sales.
+            </p>
+            <ul className="mt-6 grid gap-3 sm:grid-cols-1">
+              {creatorHighlights.map((item) => (
+                <li
+                  key={item}
+                  className="flex gap-2 rounded-xl border border-slate-100 bg-white px-4 py-3 text-sm text-slate-700 shadow-card"
+                >
+                  <span className="font-bold text-primary-dark">✓</span>
+                  {item}
                 </li>
               ))}
             </ul>
+            <p className="mt-4 text-sm italic text-slate-500">
+              &ldquo;Power to All&rdquo; — industry leaders on the Creator economy
+            </p>
+            <Button asChild className="mt-6">
+              <a href={externalLinks.signupCreator} target="_blank" rel="noopener noreferrer">
+                Sign up as a Creator
+              </a>
+            </Button>
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-ink">The FOSLOne Team</h2>
-            <ul className="mt-4 space-y-3">
-              <li className="rounded-xl border border-slate-100 bg-white p-4 shadow-card">
-                <p className="font-semibold text-ink">Scott Livingston</p>
-                <p className="text-sm text-slate-500">Principal Advisor</p>
-              </li>
-            </ul>
+          <div className="relative mx-auto aspect-square w-full max-w-lg">
+            <Image
+              src={fosloneImages.sectionCreator}
+              alt="Creator network illustration"
+              fill
+              className="object-contain"
+              sizes="500px"
+            />
           </div>
+        </div>
+      </section>
+
+      {/* Team — 2/3 AIOne + 1/3 FOSLOne, equal card sizes */}
+      <section className="ecom-container py-14">
+        <div className="grid gap-6 lg:grid-cols-3">
+          <h2 className="ecom-section-title text-center lg:col-span-2 lg:text-left">
+            Our AIOne Team
+          </h2>
+          <h2 className="ecom-section-title text-center lg:text-left">The FOSLOne Team</h2>
+        </div>
+        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[...teamMembers.aione, ...teamMembers.foslone].map((person) => (
+            <article key={person.name} className="ecom-card flex h-full flex-col overflow-hidden">
+              <div className="relative aspect-square bg-slate-50">
+                <Image
+                  src={person.image}
+                  alt={person.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                />
+              </div>
+              <div className="flex flex-1 flex-col justify-center p-5 text-center">
+                <h3 className="text-lg font-bold text-ink">{person.name}</h3>
+                <p className="mt-1 text-sm font-medium text-slate-500">{person.role}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
       {/* Blog */}
       <section className="bg-surface px-4 py-14">
         <div className="ecom-container">
-          <h2 className="ecom-section-title">From the blog</h2>
+          <h2 className="ecom-section-title">Featured product blog</h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {featuredBlogPosts.map((post) => (
-              <article key={post.title} className="ecom-card p-5">
-                <h3 className="font-semibold text-ink">{post.title}</h3>
-                <p className="mt-1 text-xs text-slate-500">{post.date} · Blog</p>
-                <p className="mt-2 text-sm text-slate-600">{post.excerpt}</p>
-                <Link
-                  href="/marketplace"
-                  className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-ink hover:text-primary-dark"
-                >
-                  Read more <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
+              <article key={post.title} className="ecom-card overflow-hidden">
+                <div className="relative aspect-square bg-slate-50">
+                  <Image
+                    src={post.image}
+                    alt={post.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="font-semibold text-ink">{post.title}</h3>
+                  <p className="mt-1 text-xs text-slate-500">{post.date} · Blog</p>
+                  <p className="mt-2 text-sm text-slate-600">{post.excerpt}</p>
+                  <Link
+                    href="/marketplace"
+                    className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-ink hover:text-primary-dark"
+                  >
+                    Read more <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
               </article>
             ))}
           </div>

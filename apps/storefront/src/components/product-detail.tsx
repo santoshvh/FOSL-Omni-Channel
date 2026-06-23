@@ -312,7 +312,13 @@ function DigitalPurchaseSummary({ product }: { product: Product }) {
       </div>
       <label className="mt-6 flex items-start gap-2 text-sm text-slate-600">
         <input type="checkbox" className="mt-1" checked={licenseAccepted} onChange={(e) => setLicenseAccepted(e.target.checked)} />
-        I agree to the digital license terms (personal use, no redistribution) *
+        <span>
+          I agree to the{" "}
+          <Link href="/legal/terms#digital" className="font-medium text-ink underline">
+            digital license terms
+          </Link>{" "}
+          (personal use, no redistribution) *
+        </span>
       </label>
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <QuantityStepper

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button, Input, Label, Textarea } from "@fosl/ui";
 
 export default function ContactPage() {
@@ -39,7 +40,11 @@ export default function ContactPage() {
           Submit
         </Button>
         <p className="text-center text-xs text-slate-500">
-          Prototype form — submissions are not sent in wireframe mode.
+          Prototype form — submissions are not sent in wireframe mode. See our{" "}
+          <Link href="/legal/privacy" className="underline">
+            Privacy Policy
+          </Link>
+          .
         </p>
       </form>
     </div>
