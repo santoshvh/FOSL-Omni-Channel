@@ -188,7 +188,7 @@ async function main() {
     }
   }
 
-  await prisma.creatorProfile.upsert({
+  const creatorProfile = await prisma.creatorProfile.upsert({
     where: { userId: demoUser.id },
     update: {},
     create: {
@@ -198,6 +198,39 @@ async function main() {
       payoutEmail: demoUser.email,
     },
   });
+
+  await prisma.creatorLink.upsert({
+    where: {
+      creatorId_slug: { creatorId: creatorProfile.id, slug: "CREATOR_ALEX" },
+    },
+    update: { active: true, operatorId: operator.id },
+    create: {
+      creatorId: creatorProfile.id,
+      operatorId: operator.id,
+      slug: "CREATOR_ALEX",
+      label: "Alex Rivera — storefront referral",
+      cookieDays: 30,
+      active: true,
+    },
+  });
+
+  for (const product of products.slice(0, 3)) {
+    await prisma.creatorLink.upsert({
+      where: {
+        creatorId_slug: { creatorId: creatorProfile.id, slug: `ALEX_${product.id}` },
+      },
+      update: { productId: product.id, active: true },
+      create: {
+        creatorId: creatorProfile.id,
+        operatorId: operator.id,
+        productId: product.id,
+        slug: `ALEX_${product.id}`,
+        label: product.title,
+        cookieDays: 30,
+        active: true,
+      },
+    });
+  }
 
   console.log("Seed complete.", { admin: admin.email, operator: operator.slug });
 }

@@ -32,6 +32,9 @@ export const foslApiHandlers = [
     const body = await request.json();
     return HttpResponse.json({ data: { id: "lead_1", status: "received", ...body as object } }, { status: 201 });
   }),
+  http.post("/api/v1/referral/click", async () =>
+    HttpResponse.json({ data: { tracked: true, source: "mock" } })
+  ),
   http.post("/api/v1/checkout/payment-intent", async ({ request }) => {
     const body = (await request.json()) as { amountCents?: number };
     if (!body.amountCents || body.amountCents < 50) {

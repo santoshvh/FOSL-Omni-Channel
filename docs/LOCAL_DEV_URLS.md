@@ -49,6 +49,14 @@ stripe listen --forward-to localhost:3001/api/webhooks/stripe
 
 Copy the `whsec_...` signing secret into `.env` as `STRIPE_WEBHOOK_SECRET`, then restart `dev:storefront`.
 
+### Creator attribution (optional)
+
+1. Open http://localhost:3001/products/prod_1 and accept **Marketing** cookies in the banner.
+2. Visit a referral URL, e.g. http://localhost:3001/products/prod_1?ref=CREATOR_ALEX
+3. Add to cart and complete checkout — `POST /api/v1/orders` returns `"attributed": true` and `commissionCount` when DB is up.
+
+Re-seed after pulling: `npm run db:seed` (creates `CREATOR_ALEX` link for Alex Rivera).
+
 ## Base URLs
 
 | App | Local | Purpose |

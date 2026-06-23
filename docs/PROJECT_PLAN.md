@@ -1,7 +1,7 @@
 # FOSL Omni-Channel — Project Plan
 
 Living document for scope, progress, changelog, and next steps.  
-**Current release:** `v0.11` (Phase B — Stripe webhooks + Connect) · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
+**Current release:** `v0.12` (Phase B — Creator attribution) · **Last updated:** June 23, 2026 · **Repo:** [FOSL-Omni-Channel](https://github.com/santoshvh/FOSL-Omni-Channel)
 
 | App | Port | Command |
 |-----|------|---------|
@@ -105,6 +105,7 @@ Use `[x]` for done, `[ ]` for open. Screen-level detail remains in [WIREFRAME_IN
 - [x] **`POST /api/v1/orders`** — checkout creates Order + OrderLine; inventory decrement
 - [x] **Stripe webhooks** — `POST /api/webhooks/stripe` (payment success/fail, refunds)
 - [x] **Connect destination charges** — single-vendor carts route to vendor `stripeAccountId`
+- [x] **Creator attribution** — `?ref=` cookie (marketing consent), commission ledger on order
 - [x] **`mapDbProduct`** — Prisma → `@fosl/contracts` mapper
 - [x] **Docker Compose** — optional local Postgres (`docker compose up -d postgres`)
 - [x] **Root `.env` loading** — `scripts/load-root-env.mjs` in Hub + Storefront next.config
@@ -125,7 +126,8 @@ Chronological summary of meaningful changes (commits and session work).
 | v0.9 | `59e731f` | `@fosl/db` Prisma schema + seed |
 | docs | `a3f5e7c` | PROJECT_PLAN.md roadmap and changelog |
 | v0.10 | `f3b0a6a` | Auth.js Hub sign-in, Prisma products API, docker-compose, root env loading |
-| v0.11 | (pending) | Stripe webhooks, Connect destination charges on payment intent |
+| v0.11 | `855513f` | Stripe webhooks, Connect destination charges on payment intent |
+| v0.12 | (pending) | Creator attribution cookies + commission ledger on checkout |
 
 ### v0.10 detail (latest)
 
@@ -203,7 +205,7 @@ Chronological summary of meaningful changes (commits and session work).
 - [x] Stripe: Payment Element, webhooks, single-vendor Connect destination charges
 - [ ] REST or tRPC API replacing MSW (`/api/v1/*`) — products route done
 - [ ] Order persistence, inventory, webhooks for fulfillment
-- [ ] Creator attribution cookies + commission ledger
+- [x] Creator attribution cookies + commission ledger (checkout)
 - [ ] File storage for product images (S3 or equivalent)
 - [ ] Email transactional (order confirm, password reset)
 
@@ -239,7 +241,7 @@ Chronological summary of meaningful changes (commits and session work).
 6. **Run database locally** — `cp .env.example .env`, then either `npm run db:setup` (Docker) or install Postgres and run `npm run db:push && npm run db:seed`
 7. ~~**Auth.js**~~ — Hub sign-in + middleware when `AUTH_SECRET` set
 8. ~~**Stripe test mode**~~ — Payment Element + `POST /api/v1/checkout/payment-intent` (mock without keys)
-9. **API vertical slice** — orders + payment intent + webhooks done; **next:** creator attribution cookies, commission ledger
+9. **API vertical slice** — attribution + commissions done; **next:** commission payout transfers (Stripe Connect), email transactional
 
 ### Before go-live
 
@@ -260,4 +262,4 @@ When shipping a milestone:
 
 ---
 
-*Maintainer note: This plan reflects repo state through v0.11 (uncommitted) on `master`.*
+*Maintainer note: This plan reflects repo state through v0.12 (uncommitted) on `master`.*

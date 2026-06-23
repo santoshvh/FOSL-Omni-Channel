@@ -1,9 +1,11 @@
 "use client";
 
+import { Suspense } from "react";
 import { usePathname } from "next/navigation";
 import { StorefrontHeader } from "./storefront-header";
 import { MarketplaceHeader } from "./marketplace-header";
 import { CookieConsent } from "./cookie-consent";
+import { ReferralAttribution } from "./referral-attribution";
 import { FosloneFooter } from "./foslone-footer";
 import { CartProvider } from "@/lib/cart-context";
 import { CartDrawer } from "./cart-drawer";
@@ -24,6 +26,9 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
         <MobileBottomNav />
         <CartDrawer />
         <CookieConsent />
+        <Suspense fallback={null}>
+          <ReferralAttribution />
+        </Suspense>
       </div>
     </CartProvider>
   );

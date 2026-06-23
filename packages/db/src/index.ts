@@ -1,5 +1,6 @@
 export { prisma } from "./client";
 export { mapDbProduct } from "./mappers";
+export { createCommissionsForOrder } from "./commissions";
 export { PrismaClient } from "@prisma/client";
 export type {
   User,

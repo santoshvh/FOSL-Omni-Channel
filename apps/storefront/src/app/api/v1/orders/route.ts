@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { createOrderSchema } from "@fosl/contracts";
-import { prisma } from "@fosl/db";
+import { prisma, createCommissionsForOrder } from "@fosl/db";
 import type { ProductType as DbProductType } from "@prisma/client";
+import {
+  ATTRIBUTION_COOKIE,
+  isAttributionValid,
+  parseAttributionCookieValue,
+} from "@/lib/attribution";
 
 function orderNumber() {
   return `FOSL-${Date.now().toString(36).toUpperCase()}`;
@@ -86,6 +92,32 @@ export async function POST(request: Request) {
       ? await prisma.storefront.findUnique({ where: { path: storefrontPath } })
       : await prisma.storefront.findFirst({ where: { isDefault: true } });
 
+    const cookieStore = await cookies();
+    const attributionRaw = cookieStore.get(ATTRIBUTION_COOKIE)?.value;
+    const attribution = attributionRaw ? parseAttributionCookieValue(attributionRaw) : null;
+
+    let creatorLink = null;
+    if (attribution) {
+      creatorLink = await prisma.creatorLink.findFirst({
+        where: {
+          slug: attribution.slug,
+          active: true,
+          ...(storefront?.operatorId
+            ? {
+                OR: [{ operatorId: storefront.operatorId }, { operatorId: null }],
+              }
+            : {}),
+        },
+        include: { creator: { select: { id: true, userId: true } } },
+      });
+
+      if (creatorLink && !isAttributionValid(attribution, creatorLink.cookieDays)) {
+        creatorLink = null;
+      }
+    }
+
+    let commissionCount = 0;
+
     const order = await prisma.$transaction(async (tx) => {
       const created = await tx.order.create({
         data: {
@@ -93,6 +125,7 @@ export async function POST(request: Request) {
           customerEmail: email,
           storefrontId: storefront?.id,
           operatorId: storefront?.operatorId,
+          attributedCreatorLinkId: creatorLink?.id ?? null,
           status: "PROCESSING",
           subtotalCents,
           shippingCents,
@@ -120,6 +153,11 @@ export async function POST(request: Request) {
         });
       }
 
+      if (creatorLink) {
+        const commissions = await createCommissionsForOrder(tx, created, creatorLink, email);
+        commissionCount = commissions.length;
+      }
+
       return created;
     });
 
@@ -131,6 +169,8 @@ export async function POST(request: Request) {
           status: order.status.toLowerCase(),
           totalCents: order.totalCents,
           source: "database",
+          attributed: Boolean(creatorLink),
+          commissionCount,
         },
       },
       { status: 201 }
