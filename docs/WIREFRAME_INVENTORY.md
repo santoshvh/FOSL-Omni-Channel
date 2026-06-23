@@ -8,7 +8,9 @@ High-fidelity Next.js prototype screens.
 | Storefront | http://localhost:3001 |
 | Admin | http://localhost:3002 |
 
-**Status: v0.6 — cart drawer, MSW, PDP types, field-level polish**
+**Status: v0.7 — FOSLOne imagery, legal policies, hero background, product card actions**
+
+> Full roadmap, changelog, and next steps: [PROJECT_PLAN.md](./PROJECT_PLAN.md)
 
 ---
 
@@ -158,7 +160,15 @@ High-fidelity Next.js prototype screens.
 - Field-level wireframe specs document (routes implemented with inline validation)
 - Phase B backend (Prisma, Auth.js, Stripe live API)
 
-## Phase A polish (v0.6)
+## Phase A polish
+
+### v0.7
+- FOSLOne.com image assets + stock hero background
+- Legal pages (`/legal/*`) and footer/checkout compliance links
+- Product card Buy now / View product actions
+- Team section layout (equal cards, 2/3 + 1/3)
+
+### v0.6
 
 - Cart drawer + mobile bottom nav
 - Product search autocomplete
