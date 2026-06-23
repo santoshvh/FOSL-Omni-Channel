@@ -32,7 +32,7 @@ export function ShippingMethodSelector({
           className={cn(
             "flex cursor-pointer items-center justify-between rounded-md border p-3 transition-colors",
             selectedId === method.id
-              ? "border-[#2E75B6] bg-blue-50"
+              ? "border-primary bg-primary-muted"
               : "border-slate-200 hover:bg-slate-50"
           )}
         >
@@ -43,7 +43,7 @@ export function ShippingMethodSelector({
               value={method.id}
               checked={selectedId === method.id}
               onChange={() => onSelect(method.id)}
-              className="h-4 w-4 text-[#2E75B6]"
+              className="h-4 w-4 text-primary-dark"
             />
             <div>
               <p className="text-sm font-medium">{method.name}</p>

@@ -15,7 +15,7 @@ export default async function OrderDetailPage({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <Link href="/orders" className="text-sm text-[#2E75B6] hover:underline">
+      <Link href="/orders" className="text-sm text-primary-dark hover:underline">
         ← Back to orders
       </Link>
 
@@ -62,14 +62,14 @@ export default async function OrderDetailPage({
           </li>
           {order.status !== "pending" && (
             <li className="mb-4">
-              <span className="absolute -left-[9px] mt-1.5 h-4 w-4 rounded-full bg-[#2E75B6] ring-4 ring-white" />
+              <span className="absolute -left-[9px] mt-1.5 h-4 w-4 rounded-full bg-primary ring-4 ring-white" />
               <p className="text-sm font-medium capitalize">{order.status.replace("_", " ")}</p>
               <p className="text-xs text-slate-500">Payment confirmed</p>
             </li>
           )}
           {order.trackingNumber && (
             <li className="mb-4">
-              <span className="absolute -left-[9px] mt-1.5 h-4 w-4 rounded-full bg-[#2E75B6] ring-4 ring-white" />
+              <span className="absolute -left-[9px] mt-1.5 h-4 w-4 rounded-full bg-primary ring-4 ring-white" />
               <p className="text-sm font-medium">Shipped</p>
               <p className="text-xs text-slate-500">Tracking {order.trackingNumber}</p>
             </li>
@@ -88,7 +88,7 @@ export default async function OrderDetailPage({
 
         {order.trackingNumber && (
           <div className="flex items-start gap-3 rounded-lg border border-slate-200 p-4">
-            <Truck className="h-5 w-5 shrink-0 text-[#2E75B6]" />
+            <Truck className="h-5 w-5 shrink-0 text-primary-dark" />
             <div>
               <p className="font-medium">Shipment tracking</p>
               <p className="mt-1 font-mono text-sm">{order.trackingNumber}</p>

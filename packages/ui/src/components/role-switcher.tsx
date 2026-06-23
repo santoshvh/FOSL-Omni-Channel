@@ -22,7 +22,7 @@ export function RoleSwitcher({
     <div className={cn("relative inline-block", className)}>
       <label className="sr-only">Active role</label>
       <div className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm">
-        <Users className="h-4 w-4 text-[#2E75B6]" aria-hidden />
+        <Users className="h-4 w-4 text-primary-dark" aria-hidden />
         <select
           value={activeRole}
           onChange={(e) => onRoleChange(e.target.value as UserRole)}

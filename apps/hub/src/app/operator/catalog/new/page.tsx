@@ -12,7 +12,7 @@ export default function OperatorProductNewPage() {
   return (
     <HubShell>
       <div className="mx-auto max-w-2xl space-y-6">
-        <Link href="/operator/catalog" className="text-sm text-[#2E75B6] hover:underline">
+        <Link href="/operator/catalog" className="text-sm text-primary-dark hover:underline">
           ← Catalog
         </Link>
         <div>
@@ -31,7 +31,7 @@ export default function OperatorProductNewPage() {
                 type="button"
                 onClick={() => setType(t)}
                 className={`rounded-md border px-3 py-1.5 text-sm capitalize ${
-                  type === t ? "border-[#2E75B6] bg-blue-50" : "border-slate-200"
+                  type === t ? "border-primary bg-primary-muted" : "border-slate-200"
                 }`}
               >
                 {t.replace("_", " ")}

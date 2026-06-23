@@ -31,7 +31,7 @@ export default function SyncHistoryPage() {
                   <td className="px-4 py-3 whitespace-nowrap">
                     <Link
                       href={`/vendor/integrations/history/${job.id}`}
-                      className="text-[#2E75B6] hover:underline"
+                      className="text-primary-dark hover:underline"
                     >
                       {new Date(job.startedAt).toLocaleString()}
                     </Link>

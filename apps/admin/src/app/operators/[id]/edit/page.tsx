@@ -14,7 +14,7 @@ export default async function AdminOperatorEditPage({
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
-      <Link href={`/operators/${id}`} className="text-sm text-[#2E75B6] hover:underline">
+      <Link href={`/operators/${id}`} className="text-sm text-primary-dark hover:underline">
         ← {op.name}
       </Link>
 

@@ -1,15 +1,14 @@
 import type { Config } from "tailwindcss";
+import { foslTailwindPreset } from "../../packages/ui/tailwind.preset";
 
 const config: Config = {
+  presets: [foslTailwindPreset],
   content: [
     "./src/**/*.{js,ts,jsx,tsx}",
     "../../packages/ui/src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {
-      colors: { primary: "#2E75B6" },
-      fontFamily: { sans: ["Inter", "system-ui", "sans-serif"] },
-    },
+    extend: {},
   },
   plugins: [],
 };

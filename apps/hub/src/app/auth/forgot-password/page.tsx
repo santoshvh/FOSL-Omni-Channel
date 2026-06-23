@@ -16,7 +16,7 @@ export default function ForgotPasswordPage() {
           </div>
           <Button className="w-full">Send reset link</Button>
           <p className="text-center text-sm">
-            <Link href="/auth/sign-in" className="text-[#2E75B6] hover:underline">
+            <Link href="/auth/sign-in" className="text-primary-dark hover:underline">
               ← Back to sign in
             </Link>
           </p>

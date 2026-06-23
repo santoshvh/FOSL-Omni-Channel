@@ -53,7 +53,7 @@ export default function NewProductPage() {
               <label
                 key={pt.value}
                 className={`flex cursor-pointer gap-3 rounded-md border p-4 ${
-                  type === pt.value ? "border-[#2E75B6] bg-blue-50" : "border-slate-200"
+                  type === pt.value ? "border-primary bg-primary-muted" : "border-slate-200"
                 }`}
               >
                 <input
@@ -94,12 +94,21 @@ export default function NewProductPage() {
               <div>
                 <Label htmlFor="price">Price (USD) *</Label>
                 <Input id="price" type="number" step="0.01" placeholder="89.99" className="mt-1" />
+                <p className="mt-1 text-xs text-slate-500">Stored in cents on the ledger.</p>
               </div>
               <div>
-                <Label htmlFor="inventory">Inventory *</Label>
-                <Input id="inventory" type="number" placeholder="100" className="mt-1" />
+                <Label htmlFor="inventory">{type === "digital" ? "License seats" : "Inventory"} *</Label>
+                <Input id="inventory" type="number" placeholder={type === "digital" ? "9999" : "100"} className="mt-1" />
               </div>
             </div>
+            <div>
+              <Label htmlFor="category">Category *</Label>
+              <Input id="category" placeholder="e.g. Electronics" className="mt-1" />
+            </div>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" defaultChecked />
+              Publish to operator storefronts immediately
+            </label>
           </CardContent>
         </Card>
 
@@ -121,7 +130,7 @@ export default function NewProductPage() {
               </div>
               <p className="text-sm text-slate-500">
                 Configure shipping zones after saving, or{" "}
-                <Link href="/vendor/shipping" className="text-[#2E75B6] hover:underline">
+                <Link href="/vendor/shipping" className="text-primary-dark hover:underline">
                   set up shipping now
                 </Link>
                 .

@@ -47,7 +47,7 @@ export default function VendorCampaignsPage() {
         </div>
 
         <p className="text-sm text-slate-500">
-          <Link href="/vendor/coupons" className="text-[#2E75B6] hover:underline">
+          <Link href="/vendor/coupons" className="text-primary-dark hover:underline">
             Manage coupons
           </Link>{" "}
           for discount-based promotions.

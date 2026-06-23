@@ -22,7 +22,7 @@ export default async function MarketplaceCategoryPage({
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <nav className="mb-6 text-sm text-slate-500">
-        <Link href="/marketplace" className="hover:text-[#2E75B6]">
+        <Link href="/marketplace" className="hover:text-primary-dark">
           Marketplace
         </Link>
         {" / "}
@@ -49,7 +49,7 @@ export default async function MarketplaceCategoryPage({
                   href={`/marketplace/category/${c.slug}`}
                   className={
                     c.slug === slug
-                      ? "font-medium text-[#2E75B6]"
+                      ? "font-medium text-primary-dark"
                       : "text-slate-600 hover:text-slate-900"
                   }
                 >

@@ -30,8 +30,8 @@ export default function OperatorStorefrontPage() {
               <div>
                 <Label>Primary color</Label>
                 <div className="mt-1 flex gap-2">
-                  <Input defaultValue="#2E75B6" className="font-mono" />
-                  <div className="h-10 w-10 shrink-0 rounded-md bg-[#2E75B6]" />
+                  <Input defaultValue="#FED318" className="font-mono" />
+                  <div className="h-10 w-10 shrink-0 rounded-md bg-primary" />
                 </div>
               </div>
               <div>
@@ -61,7 +61,7 @@ export default function OperatorStorefrontPage() {
         <div className="rounded-lg border-2 border-dashed border-slate-200 bg-slate-50 p-4">
           <p className="mb-3 text-xs font-medium uppercase text-slate-500">Live preview</p>
           <div className="overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
-            <div className="bg-[#2E75B6] px-4 py-3 text-white font-bold">Demo Store</div>
+            <div className="bg-primary px-4 py-3 text-white font-bold">Demo Store</div>
             <div className="p-6 text-center">
               <h2 className="text-lg font-semibold">Discover products from trusted vendors</h2>
               <Button className="mt-4" size="sm">

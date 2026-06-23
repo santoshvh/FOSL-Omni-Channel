@@ -3,12 +3,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { getProductById, getMarketplaceVendorById } from "@fosl/mocks";
 import {
-  Button,
   ProductTypeBadge,
   formatCurrency,
 } from "@fosl/ui";
 import { CreatorEarnButton } from "@/components/creator-earn-button";
 import { MarketplaceProductCard } from "@/components/marketplace-product-card";
+import { AddToCartButton } from "@/components/add-to-cart-button";
 import { getProductsByVendorId } from "@fosl/mocks";
 
 export default async function MarketplaceProductPage({
@@ -28,11 +28,11 @@ export default async function MarketplaceProductPage({
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <nav className="mb-6 text-sm text-slate-500">
-        <Link href="/marketplace" className="hover:text-[#2E75B6]">
+        <Link href="/marketplace" className="hover:text-primary-dark">
           Marketplace
         </Link>
         {" / "}
-        <Link href={`/marketplace/category/electronics`} className="hover:text-[#2E75B6]">
+        <Link href={`/marketplace/category/electronics`} className="hover:text-primary-dark">
           {product.category}
         </Link>
         {" / "}
@@ -81,9 +81,9 @@ export default async function MarketplaceProductPage({
           <p className="mt-4 text-slate-600">{product.description}</p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild size="lg">
-              <Link href="/marketplace/cart">Add to marketplace cart</Link>
-            </Button>
+            <AddToCartButton productId={product.id}>
+              Add to marketplace cart
+            </AddToCartButton>
             <CreatorEarnButton
               productId={product.id}
               productTitle={product.title}

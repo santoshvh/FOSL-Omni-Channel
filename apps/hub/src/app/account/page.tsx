@@ -19,7 +19,7 @@ export default function AccountPage() {
 
         <div className="rounded-lg border border-slate-200 bg-white p-6">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#2E75B6] text-xl font-bold text-white">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-xl font-bold text-white">
               {demoSession.name.charAt(0)}
             </div>
             <div>

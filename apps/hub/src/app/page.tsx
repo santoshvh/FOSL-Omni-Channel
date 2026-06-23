@@ -16,7 +16,7 @@ export default function HomePage() {
         <div className="grid gap-4 sm:grid-cols-3">
           <Card>
             <CardHeader>
-              <Package className="h-8 w-8 text-[#2E75B6]" />
+              <Package className="h-8 w-8 text-primary-dark" />
               <CardTitle className="mt-2">Vendor</CardTitle>
               <CardDescription>
                 Native catalog, Shopify/WooCommerce sync, shipping rates
@@ -30,7 +30,7 @@ export default function HomePage() {
           </Card>
           <Card>
             <CardHeader>
-              <Link2 className="h-8 w-8 text-[#2E75B6]" />
+              <Link2 className="h-8 w-8 text-primary-dark" />
               <CardTitle className="mt-2">Creator</CardTitle>
               <CardDescription>
                 Referral links, collections, earnings analytics
@@ -44,7 +44,7 @@ export default function HomePage() {
           </Card>
           <Card>
             <CardHeader>
-              <Store className="h-8 w-8 text-[#2E75B6]" />
+              <Store className="h-8 w-8 text-primary-dark" />
               <CardTitle className="mt-2">Operator</CardTitle>
               <CardDescription>
                 Storefront curation, commissions, subscription

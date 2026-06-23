@@ -3,7 +3,7 @@ import { Button } from "@fosl/ui";
 import { externalLinks, hubLoginUrl } from "@/lib/foslone";
 
 const linkClass =
-  "whitespace-nowrap text-slate-600 hover:text-[#2E75B6] transition-colors";
+  "whitespace-nowrap font-medium text-slate-600 transition-colors hover:text-ink";
 
 export function FosloneNavLinks({ className = "" }: { className?: string }) {
   return (

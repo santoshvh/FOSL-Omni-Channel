@@ -52,7 +52,6 @@ export {
 } from "./hub-data";
 
 export { foslApiHandlers } from "./msw-handlers";
-export type { FoslApiHandler } from "./msw-handlers";
 export type {
   MockOrder,
   MockCollection,

@@ -34,7 +34,7 @@ export default function CreatorCollectionsPage() {
               <div className="p-4">
                 <h3 className="font-semibold">{c.name}</h3>
                 <p className="mt-1 text-sm text-slate-500">{c.productCount} products</p>
-                <p className="mt-2 text-sm font-medium text-[#2E75B6]">
+                <p className="mt-2 text-sm font-medium text-primary-dark">
                   {formatCurrency(c.earningsCents)} earned
                 </p>
               </div>

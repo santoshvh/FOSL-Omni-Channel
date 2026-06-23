@@ -7,7 +7,7 @@ import { ProductTypeBadge } from "@fosl/ui";
 import { formatCurrency } from "@fosl/ui";
 
 const statusColors: Record<string, string> = {
-  processing: "bg-blue-100 text-blue-800",
+  processing: "bg-primary-muted text-ink",
   delivered: "bg-green-100 text-green-800",
   lead_received: "bg-amber-100 text-amber-800",
   pending: "bg-slate-100 text-slate-600",
@@ -40,7 +40,7 @@ export default function OrdersPage() {
             onClick={() => setTypeFilter(f.value)}
             className={`rounded-full px-3 py-1 text-sm font-medium ${
               typeFilter === f.value
-                ? "bg-[#2E75B6] text-white"
+                ? "bg-primary text-primary-foreground"
                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
           >

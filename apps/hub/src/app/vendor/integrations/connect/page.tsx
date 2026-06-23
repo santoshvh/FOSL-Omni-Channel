@@ -22,7 +22,7 @@ export default function ConnectIntegrationPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <button
               onClick={() => setPlatform("shopify")}
-              className="rounded-lg border-2 border-slate-200 p-6 text-left transition-colors hover:border-[#2E75B6] hover:bg-blue-50"
+              className="rounded-lg border-2 border-slate-200 p-6 text-left transition-colors hover:border-primary hover:bg-blue-50"
             >
               <p className="text-lg font-semibold">Shopify</p>
               <p className="mt-2 text-sm text-slate-500">
@@ -31,7 +31,7 @@ export default function ConnectIntegrationPage() {
             </button>
             <button
               onClick={() => setPlatform("woocommerce")}
-              className="rounded-lg border-2 border-slate-200 p-6 text-left transition-colors hover:border-[#2E75B6] hover:bg-blue-50"
+              className="rounded-lg border-2 border-slate-200 p-6 text-left transition-colors hover:border-primary hover:bg-blue-50"
             >
               <p className="text-lg font-semibold">WooCommerce</p>
               <p className="mt-2 text-sm text-slate-500">

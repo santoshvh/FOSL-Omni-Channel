@@ -6,7 +6,7 @@ export default function CreatorCouponNewPage() {
   return (
     <HubShell>
       <div className="mx-auto max-w-xl space-y-6">
-        <Link href="/creator/coupons" className="text-sm text-[#2E75B6] hover:underline">
+        <Link href="/creator/coupons" className="text-sm text-primary-dark hover:underline">
           ← Coupons
         </Link>
         <div>

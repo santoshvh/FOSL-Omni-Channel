@@ -3,17 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button, Input, Label, ShippingMethodSelector, formatCurrency } from "@fosl/ui";
-import { getShippingForVendor, getMarketplaceCartProducts } from "@fosl/mocks";
+import { getShippingForVendor } from "@fosl/mocks";
+import { useCart } from "@/lib/cart-context";
 
 const steps = ["Contact", "Shipping", "Payment"] as const;
 
 export default function MarketplaceCheckoutPage() {
   const [step, setStep] = useState(0);
-  const cartItems = getMarketplaceCartProducts();
-  const subtotal = cartItems.reduce((s, p) => s + p.priceCents, 0);
+  const { lines, subtotalCents } = useCart();
+  const subtotal = subtotalCents;
 
   const physicalVendors = [
-    ...new Set(cartItems.filter((p) => p.type === "physical").map((p) => p.vendorId)),
+    ...new Set(lines.filter((l) => l.product.type === "physical").map((l) => l.product.vendorId)),
   ];
 
   const [shippingSelections, setShippingSelections] = useState<Record<string, string>>({
@@ -32,7 +33,7 @@ export default function MarketplaceCheckoutPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/marketplace/cart" className="text-sm text-[#2E75B6] hover:underline">
+      <Link href="/marketplace/cart" className="text-sm text-primary-dark hover:underline">
         ← Cart
       </Link>
       <h1 className="mt-4 text-2xl font-bold">Marketplace checkout</h1>
@@ -44,9 +45,9 @@ export default function MarketplaceCheckoutPage() {
             key={s}
             className={`flex-1 rounded-md py-2 text-center text-sm font-medium ${
               i === step
-                ? "bg-[#2E75B6] text-white"
+                ? "bg-primary text-primary-foreground"
                 : i < step
-                  ? "bg-blue-100 text-blue-800"
+                  ? "bg-primary-muted text-ink"
                   : "bg-slate-100 text-slate-500"
             }`}
           >

@@ -19,7 +19,7 @@ export function ProductMiniCard({ product }: { product: Product }) {
         </div>
         <div className="p-3">
           <ProductTypeBadge type={product.type} />
-          <h3 className="mt-1 line-clamp-2 text-sm font-medium group-hover:text-[#2E75B6]">
+          <h3 className="mt-1 line-clamp-2 text-sm font-medium group-hover:text-primary-dark">
             {product.title}
           </h3>
           <p className="mt-1 text-sm font-semibold">

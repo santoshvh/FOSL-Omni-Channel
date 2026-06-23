@@ -1,11 +1,38 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-body { @apply bg-white text-slate-900 antialiased; }
+
+:root {
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+body {
+  @apply bg-white font-sans text-ink antialiased;
+}
+
+@layer components {
+  .ecom-container {
+    @apply mx-auto max-w-7xl px-4 sm:px-6;
+  }
+
+  .ecom-section-title {
+    @apply font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl;
+  }
+
+  .ecom-card {
+    @apply overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card transition hover:shadow-soft;
+  }
+
+  .ecom-pill {
+    @apply inline-flex items-center rounded-full bg-primary px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary-foreground;
+  }
+}
 
 .product-description h3 {
-  @apply mt-6 mb-2 text-lg font-semibold text-slate-900;
+  @apply mb-2 mt-6 text-lg font-semibold text-ink;
 }
 .product-description p {
   @apply mb-4 leading-relaxed text-slate-600;
@@ -21,5 +48,5 @@ body { @apply bg-white text-slate-900 antialiased; }
   @apply leading-relaxed;
 }
 .product-description em {
-  @apply text-slate-500 not-italic;
+  @apply not-italic text-slate-500;
 }

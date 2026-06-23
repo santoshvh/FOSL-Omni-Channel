@@ -3,7 +3,7 @@ import { cn } from "../lib/utils";
 
 const statusStyles: Record<IntegrationStatus, string> = {
   connected: "bg-green-100 text-green-800",
-  syncing: "bg-blue-100 text-blue-800",
+  syncing: "bg-primary-muted text-ink",
   error: "bg-red-100 text-red-800",
   disconnected: "bg-slate-100 text-slate-600",
 };

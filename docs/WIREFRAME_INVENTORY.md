@@ -8,7 +8,7 @@ High-fidelity Next.js prototype screens.
 | Storefront | http://localhost:3001 |
 | Admin | http://localhost:3002 |
 
-**Status: v0.5 — gap fill: auth landing, operator CRUD routes, sync drill-down, storefront polish**
+**Status: v0.6 — cart drawer, MSW, PDP types, field-level polish**
 
 ---
 
@@ -155,9 +155,16 @@ High-fidelity Next.js prototype screens.
 ## Out of scope (deferred)
 
 - Storybook component catalog
-- Field-level wireframe specs (route checklist only for Phase A)
+- Field-level wireframe specs document (routes implemented with inline validation)
 - Phase B backend (Prisma, Auth.js, Stripe live API)
-- MSW runtime wiring (handler stubs exported from `@fosl/mocks`)
+
+## Phase A polish (v0.6)
+
+- Cart drawer + mobile bottom nav
+- Product search autocomplete
+- MSW wired in dev (`/api/v1/*`)
+- PDP split: physical / digital / lead-gen
+- Checkout, vendor product create, operator commissions field-level pass
 
 ---
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { products } from "@fosl/mocks";
 import { ProductCatalogCard } from "@/components/product-catalog-card";
 import { EmptyState } from "@fosl/ui";
@@ -11,11 +12,21 @@ import { LayoutGrid, List } from "lucide-react";
 const vendors = [...new Set(products.map((p) => p.vendorName))];
 
 export function ProductsListing() {
+  const searchParams = useSearchParams();
+  const vendorFromUrl = searchParams.get("vendor");
+  const vendorNameFromUrl = vendorFromUrl
+    ? products.find((p) => p.vendorId === vendorFromUrl)?.vendorName
+    : null;
+
   const [typeFilter, setTypeFilter] = useState<string[]>(["physical", "digital", "lead_gen"]);
   const [vendorFilter, setVendorFilter] = useState<string>("all");
   const [inStockOnly, setInStockOnly] = useState(false);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [sort, setSort] = useState("featured");
+
+  useEffect(() => {
+    if (vendorNameFromUrl) setVendorFilter(vendorNameFromUrl);
+  }, [vendorNameFromUrl]);
 
   let filtered = products.filter((p) => typeFilter.includes(p.type));
   if (vendorFilter !== "all") filtered = filtered.filter((p) => p.vendorName === vendorFilter);
@@ -91,7 +102,7 @@ export function ProductsListing() {
               <button
                 type="button"
                 onClick={() => setView("grid")}
-                className={`rounded p-2 ${view === "grid" ? "bg-blue-50 text-[#2E75B6]" : "text-slate-400"}`}
+                className={`rounded p-2 ${view === "grid" ? "bg-primary-muted text-ink" : "text-slate-400"}`}
                 aria-label="Grid view"
               >
                 <LayoutGrid className="h-4 w-4" />
@@ -99,7 +110,7 @@ export function ProductsListing() {
               <button
                 type="button"
                 onClick={() => setView("list")}
-                className={`rounded p-2 ${view === "list" ? "bg-blue-50 text-[#2E75B6]" : "text-slate-400"}`}
+                className={`rounded p-2 ${view === "list" ? "bg-primary-muted text-ink" : "text-slate-400"}`}
                 aria-label="List view"
               >
                 <List className="h-4 w-4" />

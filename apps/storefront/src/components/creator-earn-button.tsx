@@ -96,7 +96,7 @@ export function CreatorEarnButton({
 
             <div className="mt-4">
               <p className="text-xs font-medium text-slate-500">Referral code</p>
-              <p className="mt-0.5 font-mono text-sm font-semibold text-[#2E75B6]">{link.code}</p>
+              <p className="mt-0.5 font-mono text-sm font-semibold text-primary-dark">{link.code}</p>
             </div>
 
             <div className="mt-4 flex gap-2">

@@ -16,7 +16,7 @@ export default async function SyncJobDetailPage({
   return (
     <HubShell>
       <div className="mx-auto max-w-2xl space-y-6">
-        <Link href="/vendor/integrations/history" className="text-sm text-[#2E75B6] hover:underline">
+        <Link href="/vendor/integrations/history" className="text-sm text-primary-dark hover:underline">
           ← Sync history
         </Link>
 

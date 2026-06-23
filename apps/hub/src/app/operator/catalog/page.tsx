@@ -43,7 +43,7 @@ export default function OperatorCatalogPage() {
               {listed.map((p) => (
                 <tr key={p.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-medium">
-                    <Link href={`/operator/catalog/${p.id}`} className="text-[#2E75B6] hover:underline">
+                    <Link href={`/operator/catalog/${p.id}`} className="text-primary-dark hover:underline">
                       {p.title}
                     </Link>
                   </td>

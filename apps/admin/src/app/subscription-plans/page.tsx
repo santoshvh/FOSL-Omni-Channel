@@ -35,7 +35,7 @@ export default function SubscriptionPlansPage() {
           <div
             key={plan.name}
             className={`rounded-lg border p-6 ${
-              plan.highlighted ? "border-[#2E75B6] ring-2 ring-[#2E75B6]/20" : "border-slate-200 bg-white"
+              plan.highlighted ? "border-primary ring-2 ring-primary/20" : "border-slate-200 bg-white"
             }`}
           >
             <h2 className="text-lg font-bold">{plan.name}</h2>

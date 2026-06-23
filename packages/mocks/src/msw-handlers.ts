@@ -1,40 +1,28 @@
-import { products, mockOrders, getOrderById } from "@fosl/mocks";
+import { http, HttpResponse } from "msw";
+import { products } from "./fixtures";
+import { mockOrders, getOrderById } from "./hub-data";
 
-/** MSW handlers for Phase A prototype — wire up with setupServer in dev when backend is ready. */
 export const foslApiHandlers = [
-  {
-    method: "GET" as const,
-    path: "/api/v1/products",
-    handler: () => Response.json({ data: products }),
-  },
-  {
-    method: "GET" as const,
-    path: "/api/v1/products/:id",
-    handler: (params: { id: string }) => {
-      const product = products.find((p) => p.id === params.id);
-      if (!product) return new Response(null, { status: 404 });
-      return Response.json({ data: product });
-    },
-  },
-  {
-    method: "GET" as const,
-    path: "/api/v1/orders",
-    handler: () => Response.json({ data: mockOrders }),
-  },
-  {
-    method: "GET" as const,
-    path: "/api/v1/orders/:id",
-    handler: (params: { id: string }) => {
-      const order = getOrderById(params.id);
-      if (!order) return new Response(null, { status: 404 });
-      return Response.json({ data: order });
-    },
-  },
-  {
-    method: "GET" as const,
-    path: "/api/v1/health",
-    handler: () => Response.json({ status: "ok", phase: "A-prototype" }),
-  },
+  http.get("/api/v1/health", () =>
+    HttpResponse.json({ status: "ok", phase: "A-prototype", mocked: true })
+  ),
+  http.get("/api/v1/products", () => HttpResponse.json({ data: products })),
+  http.get("/api/v1/products/:id", ({ params }) => {
+    const product = products.find((p) => p.id === params.id);
+    if (!product) return new HttpResponse(null, { status: 404 });
+    return HttpResponse.json({ data: product });
+  }),
+  http.get("/api/v1/orders", () => HttpResponse.json({ data: mockOrders })),
+  http.get("/api/v1/orders/:id", ({ params }) => {
+    const order = getOrderById(params.id as string);
+    if (!order) return new HttpResponse(null, { status: 404 });
+    return HttpResponse.json({ data: order });
+  }),
+  http.post("/api/v1/leads", async ({ request }) => {
+    const body = await request.json();
+    return HttpResponse.json({ data: { id: "lead_1", status: "received", ...body as object } }, { status: 201 });
+  }),
+  http.post("/api/v1/checkout/sessions", async () =>
+    HttpResponse.json({ data: { sessionId: "cs_test_mock", url: "/checkout/confirmation?type=mixed" } })
+  ),
 ];
-
-export type FoslApiHandler = (typeof foslApiHandlers)[number];

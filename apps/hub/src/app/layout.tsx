@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { MswInit } from "@/components/msw-init";
 
 export const metadata: Metadata = {
   title: "FOSL Hub",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <MswInit />
+        {children}
+      </body>
     </html>
   );
 }

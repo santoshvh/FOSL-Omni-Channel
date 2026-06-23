@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import type { UserRole } from "@fosl/contracts";
 import { demoSession } from "@fosl/mocks";
-import { RoleSwitcher } from "@fosl/ui";
+import { RoleSwitcher, FoslLogo, cn } from "@fosl/ui";
 import {
   LayoutDashboard,
   Package,
@@ -21,7 +21,6 @@ import {
   BarChart3,
   Wallet,
 } from "lucide-react";
-import { cn } from "@fosl/ui";
 
 const vendorNav = [
   { href: "/vendor", label: "Dashboard", icon: LayoutDashboard },
@@ -95,9 +94,9 @@ export function HubShell({ children }: { children: React.ReactNode }) {
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex h-14 items-center border-b border-slate-200 px-4">
-          <Link href="/" className="text-lg font-bold text-[#2E75B6]">
-            FOSLOne Hub
+        <div className="flex h-16 items-center border-b border-slate-100 px-4">
+          <Link href="/" className="shrink-0">
+            <FoslLogo height={30} />
           </Link>
           <button
             className="ml-auto lg:hidden"
@@ -121,8 +120,8 @@ export function HubShell({ children }: { children: React.ReactNode }) {
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   active
-                    ? "bg-blue-50 text-[#2E75B6]"
-                    : "text-slate-600 hover:bg-slate-50"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-slate-600 hover:bg-primary-muted hover:text-ink"
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -132,11 +131,11 @@ export function HubShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
         <div className="border-t border-slate-200 p-3 text-xs text-slate-500">
-          <Link href="/account" className="block font-medium text-slate-700 hover:text-[#2E75B6]">
+          <Link href="/account" className="block font-medium text-ink hover:text-primary-dark">
             {session.name}
           </Link>
           <p>{session.email}</p>
-          <Link href="/auth/sign-in" className="mt-2 block text-[#2E75B6] hover:underline">
+          <Link href="/auth/sign-in" className="mt-2 block font-medium text-primary-dark hover:underline">
             Sign out
           </Link>
         </div>
@@ -154,7 +153,7 @@ export function HubShell({ children }: { children: React.ReactNode }) {
           <div className="flex-1" />
           <a
             href={process.env.NEXT_PUBLIC_STOREFRONT_URL ?? "http://localhost:3001"}
-            className="hidden text-sm text-slate-600 hover:text-[#2E75B6] sm:inline"
+            className="hidden text-sm font-medium text-slate-600 hover:text-ink sm:inline"
           >
             Storefront
           </a>

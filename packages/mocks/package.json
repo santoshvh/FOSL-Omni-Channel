@@ -9,7 +9,12 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@fosl/contracts": "*"
+    "@fosl/contracts": "*",
+    "msw": "^2.8.4"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./msw/browser": "./src/msw/browser.ts"
   },
   "devDependencies": {
     "typescript": "^5.8.3"

@@ -15,29 +15,36 @@ export function ProductCatalogCard({
 }) {
   if (layout === "grid") {
     return (
-      <article className="flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:shadow-md">
-        <Link href={`/products/${product.id}`} className="group block">
-          <div className="relative aspect-square bg-slate-100">
+      <article className="ecom-card group flex flex-col">
+        <Link href={`/products/${product.id}`} className="block">
+          <div className="relative aspect-[4/5] overflow-hidden bg-slate-50">
             <Image
               src={product.imageUrl}
               alt={product.title}
               fill
-              className="object-cover transition group-hover:scale-105"
+              className="object-cover transition duration-500 group-hover:scale-105"
               sizes="(max-width: 768px) 50vw, 25vw"
             />
+            {product.inventory === 0 && product.type === "physical" && (
+              <span className="absolute left-3 top-3 rounded-full bg-ink/80 px-2.5 py-1 text-xs font-semibold text-white">
+                Sold out
+              </span>
+            )}
           </div>
           <div className="p-4">
             <ProductTypeBadge type={product.type} />
-            <h3 className="mt-2 font-medium line-clamp-2">{product.title}</h3>
-            <p className="text-sm text-slate-500">{product.vendorName}</p>
-            <p className="mt-2 font-semibold">
-              {product.priceCents > 0 ? formatCurrency(product.priceCents) : "Request info"}
-            </p>
-            {product.type === "physical" && (
-              <p className="mt-1 text-xs text-slate-400">
-                {product.inventory > 0 ? `${product.inventory} in stock` : "Out of stock"}
+            <h3 className="mt-2 font-semibold leading-snug text-ink line-clamp-2 group-hover:underline">
+              {product.title}
+            </h3>
+            <p className="mt-1 text-sm text-slate-500">{product.vendorName}</p>
+            <div className="mt-3 flex items-baseline gap-2">
+              <p className="text-lg font-bold text-ink">
+                {product.priceCents > 0 ? formatCurrency(product.priceCents) : "Request info"}
               </p>
-            )}
+              {product.rating != null && (
+                <span className="text-xs text-amber-500">★ {product.rating}</span>
+              )}
+            </div>
           </div>
         </Link>
         <div className="mt-auto border-t border-slate-100 p-3">
@@ -53,22 +60,22 @@ export function ProductCatalogCard({
   }
 
   return (
-    <article className="flex flex-col rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:gap-4">
+    <article className="flex flex-col rounded-2xl border border-slate-100 bg-white p-4 shadow-card transition hover:shadow-soft sm:flex-row sm:gap-4">
       <Link href={`/products/${product.id}`} className="flex min-w-0 flex-1 gap-4">
-        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md bg-slate-100">
+        <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-xl bg-slate-50">
           <Image
             src={product.imageUrl}
             alt={product.title}
             fill
             className="object-cover"
-            sizes="96px"
+            sizes="112px"
           />
         </div>
         <div className="min-w-0 flex-1">
           <ProductTypeBadge type={product.type} />
-          <h3 className="mt-1 font-medium">{product.title}</h3>
+          <h3 className="mt-1 font-semibold text-ink">{product.title}</h3>
           <p className="text-sm text-slate-500">{product.vendorName}</p>
-          <p className="mt-1 font-semibold">
+          <p className="mt-2 text-lg font-bold text-ink">
             {product.priceCents > 0 ? formatCurrency(product.priceCents) : "Request info"}
           </p>
         </div>

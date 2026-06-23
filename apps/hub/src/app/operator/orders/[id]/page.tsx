@@ -16,7 +16,7 @@ export default async function OperatorOrderDetailPage({
   return (
     <HubShell>
       <div className="space-y-6">
-        <Link href="/operator/orders" className="text-sm text-[#2E75B6] hover:underline">
+        <Link href="/operator/orders" className="text-sm text-primary-dark hover:underline">
           ← Orders
         </Link>
 

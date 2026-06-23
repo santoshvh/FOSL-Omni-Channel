@@ -14,7 +14,7 @@ export default async function AdminDisputeDetailPage({
 
   return (
     <div className="space-y-6">
-      <Link href="/disputes" className="text-sm text-[#2E75B6] hover:underline">
+      <Link href="/disputes" className="text-sm text-primary-dark hover:underline">
         ← Disputes
       </Link>
 

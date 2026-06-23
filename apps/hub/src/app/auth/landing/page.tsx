@@ -52,7 +52,7 @@ export default function AuthLandingPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 p-4">
       <div className="w-full max-w-4xl space-y-8">
         <div className="text-center">
-          <Link href="/" className="text-2xl font-bold text-[#2E75B6]">
+          <Link href="/" className="text-2xl font-bold text-primary-dark">
             FOSLOne Hub
           </Link>
           <h1 className="mt-4 text-3xl font-bold">Choose your workspace</h1>
@@ -65,14 +65,14 @@ export default function AuthLandingPage() {
           {roles.map((role) => {
             const Icon = role.icon;
             const inner = (
-              <Card className="h-full transition hover:border-[#2E75B6] hover:shadow-md">
+              <Card className="h-full transition hover:border-primary hover:shadow-md">
                 <CardHeader>
-                  <Icon className="h-8 w-8 text-[#2E75B6]" />
+                  <Icon className="h-8 w-8 text-primary-dark" />
                   <CardTitle className="mt-2 text-lg">{role.title}</CardTitle>
                   <CardDescription>{role.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <span className="text-sm font-medium text-[#2E75B6]">Open →</span>
+                  <span className="text-sm font-medium text-primary-dark">Open →</span>
                 </CardContent>
               </Card>
             );

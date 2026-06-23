@@ -11,7 +11,7 @@ export default function CreatorPublicProfilePage() {
         <div className="rounded-lg border border-slate-200 bg-white p-6">
           <p className="text-xs font-medium uppercase text-slate-500">Public profile preview</p>
           <div className="mt-4 flex flex-wrap items-start gap-6">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#2E75B6] text-2xl font-bold text-white">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary text-2xl font-bold text-white">
               AR
             </div>
             <div>
@@ -19,7 +19,7 @@ export default function CreatorPublicProfilePage() {
               <p className="mt-1 text-slate-600">
                 Audio enthusiast &amp; course creator. Curated picks for your setup.
               </p>
-              <p className="mt-2 text-sm text-[#2E75B6]">/creator/alex</p>
+              <p className="mt-2 text-sm text-primary-dark">/creator/alex</p>
             </div>
           </div>
         </div>

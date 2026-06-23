@@ -15,7 +15,7 @@ export default async function MarketplaceOrderDetailPage({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <Link href="/marketplace/orders" className="text-sm text-[#2E75B6] hover:underline">
+      <Link href="/marketplace/orders" className="text-sm text-primary-dark hover:underline">
         ← Marketplace orders
       </Link>
 
@@ -37,7 +37,7 @@ export default async function MarketplaceOrderDetailPage({
           <div key={i} className="rounded-lg border border-slate-200 p-4">
             <div className="flex items-start gap-3">
               {f.status === "shipped" ? (
-                <Truck className="h-5 w-5 shrink-0 text-[#2E75B6]" />
+                <Truck className="h-5 w-5 shrink-0 text-primary-dark" />
               ) : f.items.some((item) => item.includes("Course")) ? (
                 <Download className="h-5 w-5 shrink-0 text-purple-600" />
               ) : (

@@ -37,7 +37,7 @@ export default function VendorOrdersPage() {
                   <td className="px-4 py-3">
                     <Link
                       href={`/vendor/orders/${order.id}`}
-                      className="font-mono text-xs text-[#2E75B6] hover:underline"
+                      className="font-mono text-xs text-primary-dark hover:underline"
                     >
                       {order.number}
                     </Link>

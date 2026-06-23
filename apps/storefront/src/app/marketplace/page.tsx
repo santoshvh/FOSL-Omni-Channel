@@ -15,12 +15,12 @@ export default function MarketplaceHomePage() {
 
   return (
     <div>
-      <section className="bg-gradient-to-br from-[#2E75B6] to-blue-800 px-4 py-16 text-white">
-        <div className="mx-auto max-w-6xl text-center">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+      <section className="bg-gradient-to-br from-primary via-primary-dark to-ink px-4 py-16 text-primary-foreground">
+        <div className="ecom-container text-center">
+          <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
             Shop the FOSL network
           </h1>
-          <p className="mt-4 text-lg text-blue-100">
+          <p className="mt-4 text-lg text-primary-foreground/80">
             One search across every operator storefront — physical, digital, and lead-gen products
           </p>
           <form action="/marketplace/search" className="mx-auto mt-8 flex max-w-xl gap-2">
@@ -88,7 +88,7 @@ export default function MarketplaceHomePage() {
       <section className="mx-auto max-w-6xl px-4 py-12">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">Best sellers</h2>
-          <Link href="/marketplace/search" className="text-sm text-[#2E75B6] hover:underline">
+          <Link href="/marketplace/search" className="text-sm text-primary-dark hover:underline">
             View all
           </Link>
         </div>

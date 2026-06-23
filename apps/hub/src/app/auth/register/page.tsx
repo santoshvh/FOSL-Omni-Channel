@@ -6,7 +6,7 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <Link href="/" className="text-xl font-bold text-[#2E75B6]">
+          <Link href="/" className="text-xl font-bold text-primary-dark">
             FOSL Hub
           </Link>
           <CardTitle className="mt-4">Create account</CardTitle>
@@ -40,7 +40,7 @@ export default function RegisterPage() {
           </Button>
           <p className="text-center text-sm text-slate-500">
             Already have an account?{" "}
-            <Link href="/auth/sign-in" className="text-[#2E75B6] hover:underline">
+            <Link href="/auth/sign-in" className="text-primary-dark hover:underline">
               Sign in
             </Link>
           </p>

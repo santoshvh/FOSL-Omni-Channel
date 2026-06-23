@@ -15,9 +15,9 @@ export default function CatalogSourcePage() {
         </div>
 
         <div className="grid gap-4">
-          <Card className="border-2 border-[#2E75B6]">
+          <Card className="border-2 border-primary">
             <CardHeader>
-              <Package className="h-8 w-8 text-[#2E75B6]" />
+              <Package className="h-8 w-8 text-primary-dark" />
               <CardTitle>Native catalog</CardTitle>
               <CardDescription>
                 No external shop? Create products here with images, pricing, inventory, and shipping rules.

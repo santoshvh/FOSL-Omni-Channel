@@ -74,7 +74,7 @@ export default async function MarketplaceSearchPage({
           {results.length === 0 ? (
             <p className="rounded-lg border border-dashed border-slate-200 p-12 text-center text-slate-500">
               No products match your search.{" "}
-              <Link href="/marketplace" className="text-[#2E75B6] hover:underline">
+              <Link href="/marketplace" className="text-primary-dark hover:underline">
                 Browse home
               </Link>
             </p>

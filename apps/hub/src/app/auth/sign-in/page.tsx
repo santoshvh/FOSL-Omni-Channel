@@ -6,7 +6,7 @@ export default function SignInPage() {
     <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <Link href="/" className="text-xl font-bold text-[#2E75B6]">
+          <Link href="/" className="text-xl font-bold text-primary-dark">
             FOSL Hub
           </Link>
           <CardTitle className="mt-4">Sign in</CardTitle>
@@ -22,7 +22,7 @@ export default function SignInPage() {
             <Input id="password" type="password" className="mt-1" />
           </div>
           <div className="flex justify-end">
-            <Link href="/auth/forgot-password" className="text-sm text-[#2E75B6] hover:underline">
+            <Link href="/auth/forgot-password" className="text-sm text-primary-dark hover:underline">
               Forgot password?
             </Link>
           </div>
@@ -31,7 +31,7 @@ export default function SignInPage() {
           </Button>
           <p className="text-center text-sm text-slate-500">
             No account?{" "}
-            <Link href="/auth/register" className="text-[#2E75B6] hover:underline">
+            <Link href="/auth/register" className="text-primary-dark hover:underline">
               Register
             </Link>
           </p>
