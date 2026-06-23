@@ -39,3 +39,19 @@ export const couponSchema = z.object({
 export const roleSwitchSchema = z.object({
   role: z.enum(["operator", "vendor", "creator"]),
 });
+
+export const createOrderLineSchema = z.object({
+  productId: z.string().min(1),
+  quantity: z.number().int().positive(),
+  shippingMethodId: z.string().optional(),
+});
+
+export const createOrderSchema = z.object({
+  email: z.string().email("Enter a valid email address"),
+  lines: z.array(createOrderLineSchema).min(1, "Cart is empty"),
+  shippingCents: z.number().int().nonnegative().default(0),
+  taxCents: z.number().int().nonnegative().default(0),
+  shipping: shippingAddressSchema.optional(),
+  storefrontPath: z.string().optional(),
+  stripePaymentIntentId: z.string().optional(),
+});

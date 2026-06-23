@@ -1,8 +1,14 @@
 import { PrismaClient, ProductType, CatalogSource, SubscriptionState } from "@prisma/client";
+import { hash } from "bcryptjs";
 import { products, getShippingForVendor } from "@fosl/mocks";
 import { marketplaceVendors, platformOperators } from "@fosl/mocks";
 
 const prisma = new PrismaClient();
+const DEMO_PASSWORD = "demo123";
+
+async function passwordHash() {
+  return hash(DEMO_PASSWORD, 10);
+}
 
 function mapProductType(t: string): ProductType {
   if (t === "digital") return ProductType.DIGITAL;
@@ -18,23 +24,26 @@ function mapCatalogSource(s: string): CatalogSource {
 
 async function main() {
   console.log("Seeding FOSL database…");
+  const hashed = await passwordHash();
 
   const admin = await prisma.user.upsert({
     where: { email: "admin@foslone.com" },
-    update: {},
+    update: { passwordHash: hashed },
     create: {
       email: "admin@foslone.com",
       name: "Platform Admin",
+      passwordHash: hashed,
       roleAssignments: { create: { role: "ADMIN" } },
     },
   });
 
   const demoUser = await prisma.user.upsert({
     where: { email: "alex@acmecatalog.com" },
-    update: {},
+    update: { passwordHash: hashed },
     create: {
       email: "alex@acmecatalog.com",
       name: "Alex Rivera",
+      passwordHash: hashed,
       roleAssignments: {
         createMany: {
           data: [{ role: "VENDOR" }, { role: "CREATOR" }, { role: "OPERATOR" }],
@@ -42,6 +51,27 @@ async function main() {
       },
     },
   });
+
+  const demoAccounts = [
+    { email: "vendor@demo.fosl", name: "Demo Vendor", roles: ["VENDOR"] as const },
+    { email: "creator@demo.fosl", name: "Demo Creator", roles: ["CREATOR"] as const },
+    { email: "operator@demo.fosl", name: "Demo Operator", roles: ["OPERATOR"] as const },
+  ];
+
+  for (const account of demoAccounts) {
+    await prisma.user.upsert({
+      where: { email: account.email },
+      update: { passwordHash: hashed },
+      create: {
+        email: account.email,
+        name: account.name,
+        passwordHash: hashed,
+        roleAssignments: {
+          createMany: { data: account.roles.map((role) => ({ role })) },
+        },
+      },
+    });
+  }
 
   const operator = await prisma.operator.upsert({
     where: { slug: "demo-storefront" },

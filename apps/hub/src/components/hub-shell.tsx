@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
-import type { UserRole } from "@fosl/contracts";
+import { usePathname, useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
+import { signOut, useSession } from "next-auth/react";
+import type { UserRole, UserSession } from "@fosl/contracts";
 import { demoSession } from "@fosl/mocks";
 import { RoleSwitcher, FoslLogo, cn } from "@fosl/ui";
+import { useHubRole } from "@/components/hub-role-context";
 import {
   LayoutDashboard,
   Package,
@@ -70,13 +72,38 @@ const navByRole: Record<string, typeof vendorNav> = {
 
 export function HubShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [session, setSession] = useState(demoSession);
+  const router = useRouter();
+  const { data: authSession, status } = useSession();
+  const { activeRole, setActiveRole, roles } = useHubRole();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const session: UserSession = useMemo(() => {
+    if (authSession?.user?.email) {
+      return {
+        userId: authSession.user.id,
+        email: authSession.user.email,
+        name: authSession.user.name ?? authSession.user.email,
+        roles,
+        activeRole,
+      };
+    }
+    return { ...demoSession, roles, activeRole };
+  }, [authSession, activeRole, roles]);
 
   const nav = navByRole[session.activeRole] ?? vendorNav;
 
   function handleRoleChange(role: UserRole) {
-    setSession((s) => ({ ...s, activeRole: role }));
+    if (!session.roles.includes(role)) return;
+    setActiveRole(role);
+    router.push(`/${role}`);
+  }
+
+  async function handleSignOut() {
+    if (authSession) {
+      await signOut({ callbackUrl: "/auth/sign-in" });
+      return;
+    }
+    window.location.href = "/auth/sign-in";
   }
 
   return (
@@ -135,9 +162,17 @@ export function HubShell({ children }: { children: React.ReactNode }) {
             {session.name}
           </Link>
           <p>{session.email}</p>
-          <Link href="/auth/sign-in" className="mt-2 block font-medium text-primary-dark hover:underline">
-            Sign out
-          </Link>
+          {status === "loading" ? (
+            <p className="mt-2 text-slate-400">Loading session…</p>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="mt-2 block font-medium text-primary-dark hover:underline"
+            >
+              Sign out
+            </button>
+          )}
         </div>
       </aside>
 

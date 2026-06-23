@@ -7,9 +7,9 @@ type ConfirmType = "physical" | "digital" | "lead_gen" | "mixed";
 export default async function ConfirmationPage({
   searchParams,
 }: {
-  searchParams: Promise<{ type?: string }>;
+  searchParams: Promise<{ type?: string; orderId?: string }>;
 }) {
-  const { type: rawType } = await searchParams;
+  const { type: rawType, orderId } = await searchParams;
   const type: ConfirmType =
     rawType === "digital" || rawType === "lead_gen" || rawType === "physical"
       ? rawType
@@ -19,7 +19,9 @@ export default async function ConfirmationPage({
     <div className="mx-auto max-w-lg px-4 py-16 text-center">
       <CheckCircle className="mx-auto h-16 w-16 text-green-600" />
       <h1 className="mt-4 text-2xl font-bold">Order confirmed</h1>
-      <p className="mt-2 text-slate-600">Order #ORD-1043</p>
+      <p className="mt-2 text-slate-600">
+        Order {orderId ? `#${orderId}` : "#ORD-1043"}
+      </p>
 
       <div className="mt-8 space-y-4 rounded-lg border border-slate-200 p-6 text-left text-sm">
         {(type === "mixed" || type === "physical") && (

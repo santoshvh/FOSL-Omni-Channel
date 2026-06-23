@@ -18,7 +18,9 @@
     "db:push": "npm run db:sync-provider && npm run push -w @fosl/db",
     "db:seed": "npm run seed -w @fosl/db",
     "db:studio": "npm run studio -w @fosl/db",
-    "db:migrate": "npm run db:sync-provider && npm run migrate:dev -w @fosl/db"
+    "db:migrate": "npm run db:sync-provider && npm run migrate:dev -w @fosl/db",
+    "db:up": "docker compose up -d postgres",
+    "db:setup": "npm run db:up && npm run db:push && npm run db:seed"
   },
   "devDependencies": {
     "turbo": "^2.5.4",

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { MswInit } from "@/components/msw-init";
+import { HubProviders } from "@/components/hub-providers";
 
 export const metadata: Metadata = {
   title: "FOSL Hub",
@@ -15,8 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <MswInit />
-        {children}
+        <HubProviders>
+          <MswInit />
+          {children}
+        </HubProviders>
       </body>
     </html>
   );

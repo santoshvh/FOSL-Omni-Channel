@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button, Input, Label, ShippingMethodSelector, AlertBanner } from "@fosl/ui";
 import { formatCurrency } from "@fosl/ui";
 import { getShippingForVendor } from "@fosl/mocks";
 import { useCart } from "@/lib/cart-context";
 import { CheckoutStepSkeleton } from "@/components/checkout-step-skeleton";
+import { CheckoutPayment } from "@/components/checkout-payment";
 
 const steps = ["Contact", "Shipping", "Payment"] as const;
 
@@ -44,8 +46,12 @@ function FieldError({ message }: { message?: string }) {
 }
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const [ready, setReady] = useState(false);
   const [step, setStep] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [payError, setPayError] = useState<string | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const { lines, subtotalCents, isHydrated } = useCart();
   const [form, setForm] = useState<FormData>(initialForm);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
@@ -90,6 +96,50 @@ export default function CheckoutPage() {
     if (!form.country.trim()) next.country = "Country is required.";
     setErrors(next);
     return Object.keys(next).length === 0;
+  }
+
+  async function completeOrder(paymentIntentId: string) {
+    setPayError(null);
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/v1/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email.trim(),
+          stripePaymentIntentId: paymentIntentId,
+          lines: lines.map((line) => ({
+            productId: line.productId,
+            quantity: line.quantity,
+            shippingMethodId:
+              line.product.type === "physical"
+                ? shippingSelections[line.product.vendorId]
+                : undefined,
+          })),
+          shippingCents: shipping,
+          taxCents: tax,
+          shipping: {
+            fullName: form.name.trim(),
+            line1: form.line1.trim(),
+            line2: form.line2.trim() || undefined,
+            city: form.city.trim(),
+            state: form.state.trim(),
+            postalCode: form.postal.trim(),
+            country: form.country.trim(),
+          },
+        }),
+      });
+      const json = (await res.json()) as { data?: { id: string }; error?: string };
+      if (!res.ok) {
+        throw new Error(json.error ?? "Payment could not be completed.");
+      }
+      const orderId = json.data?.id ?? "unknown";
+      router.push(`/checkout/confirmation?orderId=${encodeURIComponent(orderId)}&type=mixed`);
+    } catch (err) {
+      setPayError(err instanceof Error ? err.message : "Payment could not be completed.");
+      setSubmitting(false);
+      throw err;
+    }
   }
 
   return (
@@ -293,25 +343,6 @@ export default function CheckoutPage() {
 
         {step === 2 && (
           <div className="space-y-6 rounded-lg border border-slate-200 p-6">
-            <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-6">
-              <p className="font-medium">Stripe Payment Element</p>
-              <div className="mt-4 space-y-3">
-                <div className="h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-400">
-                  4242 4242 4242 4242
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-400">
-                    MM / YY
-                  </div>
-                  <div className="h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-400">
-                    CVC
-                  </div>
-                </div>
-              </div>
-              <p className="mt-3 text-xs text-slate-500">
-                Card · Apple Pay · Google Pay (test mode appearance)
-              </p>
-            </div>
             <dl className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <dt>Subtotal</dt>
@@ -334,7 +365,12 @@ export default function CheckoutPage() {
               Shipping to {form.name || "—"}, {form.city || "—"} {form.postal || "—"}
             </p>
             <label className="flex items-start gap-2 text-sm text-slate-600">
-              <input type="checkbox" className="mt-1" required />
+              <input
+                type="checkbox"
+                className="mt-1"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+              />
               <span>
                 I agree to the{" "}
                 <Link href="/legal/terms" className="font-medium text-ink underline">
@@ -347,12 +383,18 @@ export default function CheckoutPage() {
                 .
               </span>
             </label>
-            <div className="flex flex-wrap gap-3">
-              <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
-              <Button asChild>
-                <Link href="/checkout/confirmation?type=mixed">Pay {formatCurrency(total)}</Link>
-              </Button>
-            </div>
+            {payError && (
+              <AlertBanner variant="error" title="Checkout failed">
+                {payError}
+              </AlertBanner>
+            )}
+            <CheckoutPayment
+              totalCents={total}
+              email={form.email.trim()}
+              termsAccepted={termsAccepted}
+              onSuccess={completeOrder}
+              onBack={() => setStep(1)}
+            />
           </div>
         )}
           </>
