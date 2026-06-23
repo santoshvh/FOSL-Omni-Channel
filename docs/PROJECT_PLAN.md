@@ -166,7 +166,7 @@ Chronological summary of meaningful changes (commits and session work).
 | v0.15 | `521f12c` | GitHub Actions CI + Playwright checkout E2E |
 | v0.16 | `df86c62` | Orders API, fulfillment, multi-vendor Stripe, uploads, E2E expansion |
 | v0.17 | `00fc766` | MSW production guard, marketplace orders API, upload routes fix |
-| v0.18 | (pending) | MySQL 8 default, Admin platform settings, local upload dir |
+| v0.18 | `047705c` | MySQL 8 default, Admin platform settings, local upload dir |
 
 ### v0.16 detail (latest)
 
@@ -309,4 +309,4 @@ When shipping a milestone:
 
 ---
 
-*Maintainer note: This plan reflects repo state through v0.18 (pending push) on `master`.*
+*Maintainer note: This plan reflects repo state through v0.18 (`047705c`) on `master`.*
