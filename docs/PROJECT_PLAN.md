@@ -157,8 +157,8 @@ Chronological summary of meaningful changes (commits and session work).
 | v0.13 | `d61d43d` | Commission Connect payouts, order confirmation email |
 | v0.14 | `0b751da` | Hub password reset email + Prisma migrations workflow |
 | v0.15 | `521f12c` | GitHub Actions CI + Playwright checkout E2E |
-| v0.16 | (pending) | Orders API, fulfillment, multi-vendor Stripe, uploads, E2E expansion |
-| v0.17 | (pending) | MSW production guard, marketplace orders wired to API |
+| v0.16 | `df86c62` | Orders API, fulfillment, multi-vendor Stripe, uploads, E2E expansion |
+| v0.17 | `00fc766` | MSW production guard, marketplace orders API, upload routes fix |
 
 ### v0.16 detail (latest)
 
@@ -233,8 +233,8 @@ Chronological summary of meaningful changes (commits and session work).
 ### 5.1 Phase A — remaining UI polish
 
 - [ ] Storybook component catalog
-- [ ] Operator subscription / plan banners on storefront
-- [ ] Hub & Admin: duplicate or link legal policies if required for logged-in flows
+- [x] Operator subscription / plan banners on storefront
+- [x] Hub & Admin: duplicate or link legal policies if required for logged-in flows
 - [ ] Replace placeholder legal address and emails with production values
 
 ### 5.2 Phase B — backend
@@ -242,12 +242,13 @@ Chronological summary of meaningful changes (commits and session work).
 - [x] Prisma schema + seed (`packages/db`)
 - [x] Prisma initial migration + `npm run db:migrate:deploy`
 - [x] Auth.js (Hub sign-in, roles: vendor / creator / operator / admin)
-- [ ] Stripe: Connect multi-vendor settlement, Tax, transfer reconciliation
+- [x] Stripe: Connect multi-vendor settlement (transfer job on webhook)
 - [x] Stripe: Payment Element, webhooks, single-vendor Connect destination charges, creator commission transfers
-- [ ] REST or tRPC API replacing MSW (`/api/v1/*`) — partial (products, orders, contact, payouts)
+- [ ] Stripe: Tax, transfer reconciliation
+- [x] REST API slice — products, orders (GET/PATCH), contact, payouts, uploads (partial vs MSW)
 - [ ] Order fulfillment webhooks (inventory sync beyond checkout decrement)
 - [x] Creator attribution cookies + commission ledger (checkout)
-- [ ] File storage for product images (S3 or equivalent)
+- [x] File storage for product images (local dev uploads; S3 for production)
 
 ### 5.3 Phase C — production
 
