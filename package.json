@@ -13,6 +13,9 @@
     "dev:admin": "npm run dev -w @fosl/admin",
     "build": "turbo build",
     "lint": "turbo lint",
+    "start:hub": "npm run start -w @fosl/hub",
+    "start:storefront": "npm run start -w @fosl/storefront",
+    "start:admin": "npm run start -w @fosl/admin",
     "db:sync-provider": "node scripts/set-database-provider.mjs",
     "db:generate": "npm run db:sync-provider && npm run generate -w @fosl/db",
     "db:push": "npm run db:sync-provider && npm run push -w @fosl/db",
@@ -27,9 +30,11 @@
     "test:e2e": "playwright test --config e2e/playwright.config.ts",
     "test:e2e:install": "playwright install chromium --with-deps"
   },
+  "dependencies": {
+    "@next/env": "^15.5.19"
+  },
   "devDependencies": {
     "@playwright/test": "^1.53.2",
-    "@next/env": "^15.5.19",
     "tsx": "^4.20.3",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"

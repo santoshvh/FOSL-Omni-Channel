@@ -3,17 +3,8 @@ import { loadRootEnv } from "../../scripts/load-root-env.mjs";
 
 loadRootEnv(import.meta.url);
 
-const authSecret =
-  process.env.AUTH_SECRET?.trim() ||
-  (process.env.NODE_ENV === "development"
-    ? "fosl-dev-auth-secret-change-before-production"
-    : undefined);
-
+/** Do not put AUTH_SECRET in `env` — it inlines at build time and breaks prod if missing during build. */
 const nextConfig: NextConfig = {
-  env: {
-    AUTH_SECRET: authSecret,
-    AUTH_URL: process.env.AUTH_URL ?? "http://localhost:3000",
-  },
   transpilePackages: ["@fosl/ui", "@fosl/contracts", "@fosl/mocks", "@fosl/db"],
 };
 

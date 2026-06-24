@@ -1,10 +1,9 @@
 import type { NextAuthConfig } from "next-auth";
 import type { UserRole } from "@fosl/contracts";
-import { getAuthSecret } from "@/lib/auth-secret";
 
 export const authConfig = {
   trustHost: true,
-  secret: getAuthSecret(),
+  secret: process.env.AUTH_SECRET,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/auth/sign-in",
