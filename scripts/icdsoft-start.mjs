@@ -23,7 +23,8 @@ const PORT_TO_APP = {
 
 const FOSL_APP = process.env.FOSL_APP?.trim().toLowerCase();
 const port = process.env.PORT?.trim() ?? "";
-const app = FOSL_APP || PORT_TO_APP[port];
+// PORT is assigned per WebApp by sureapp — prefer it over FOSL_APP (shared release dir).
+const app = PORT_TO_APP[port] || FOSL_APP;
 
 if (!app || !["hub", "storefront", "admin"].includes(app)) {
   console.error(

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Production start wrapper — loads repo `.env` + `.fosl-runtime.json`, then next start.
- * Use from apps/*/package.json so AUTH_SECRET is available without relying on sureapp env alone.
+ * Use from each app package.json start script so AUTH_SECRET is available at runtime.
  */
 import { spawn } from "node:child_process";
 import path from "node:path";
