@@ -7,8 +7,10 @@ const { loadEnvConfig } = nextEnv;
 
 /** Load monorepo root `.env` and Admin-managed `.fosl-runtime.json`. */
 export function loadRootEnv(importMetaUrl) {
-  const appDir = path.dirname(fileURLToPath(importMetaUrl));
-  const repoRoot = path.resolve(appDir, "../..");
+  const fileDir = path.dirname(fileURLToPath(importMetaUrl));
+  const repoRoot = fileDir.endsWith(`${path.sep}scripts`)
+    ? path.resolve(fileDir, "..")
+    : path.resolve(fileDir, "../..");
   loadEnvConfig(repoRoot);
 
   const runtimePath = path.join(repoRoot, ".fosl-runtime.json");
@@ -17,8 +19,8 @@ export function loadRootEnv(importMetaUrl) {
   try {
     const runtime = JSON.parse(readFileSync(runtimePath, "utf8"));
     for (const [key, value] of Object.entries(runtime)) {
-      if (value && !process.env[key]) {
-        process.env[key] = value;
+      if (value) {
+        process.env[key] = String(value);
       }
     }
   } catch {
