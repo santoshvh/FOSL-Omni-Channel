@@ -1,5 +1,4 @@
-﻿-- CreateTable
-CREATE TABLE `users` (
+﻿CREATE TABLE `users` (
     `id` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `emailVerified` DATETIME(3) NULL,
@@ -13,7 +12,6 @@ CREATE TABLE `users` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `user_role_assignments` (
     `userId` VARCHAR(191) NOT NULL,
     `role` ENUM('ADMIN', 'OPERATOR', 'VENDOR', 'CREATOR', 'CUSTOMER') NOT NULL,
@@ -21,7 +19,6 @@ CREATE TABLE `user_role_assignments` (
     PRIMARY KEY (`userId`, `role`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `accounts` (
     `id` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
@@ -40,7 +37,6 @@ CREATE TABLE `accounts` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `sessions` (
     `id` VARCHAR(191) NOT NULL,
     `sessionToken` VARCHAR(191) NOT NULL,
@@ -51,7 +47,6 @@ CREATE TABLE `sessions` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `verification_tokens` (
     `identifier` VARCHAR(191) NOT NULL,
     `token` VARCHAR(191) NOT NULL,
@@ -61,7 +56,6 @@ CREATE TABLE `verification_tokens` (
     UNIQUE INDEX `verification_tokens_identifier_token_key`(`identifier`, `token`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `operators` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
@@ -80,7 +74,6 @@ CREATE TABLE `operators` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `storefronts` (
     `id` VARCHAR(191) NOT NULL,
     `operatorId` VARCHAR(191) NOT NULL,
@@ -98,7 +91,6 @@ CREATE TABLE `storefronts` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `vendors` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
@@ -115,7 +107,6 @@ CREATE TABLE `vendors` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `vendor_members` (
     `id` VARCHAR(191) NOT NULL,
     `vendorId` VARCHAR(191) NOT NULL,
@@ -127,7 +118,6 @@ CREATE TABLE `vendor_members` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `operator_vendors` (
     `id` VARCHAR(191) NOT NULL,
     `operatorId` VARCHAR(191) NOT NULL,
@@ -143,7 +133,6 @@ CREATE TABLE `operator_vendors` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `products` (
     `id` VARCHAR(191) NOT NULL,
     `vendorId` VARCHAR(191) NOT NULL,
@@ -174,7 +163,6 @@ CREATE TABLE `products` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `shipping_methods` (
     `id` VARCHAR(191) NOT NULL,
     `vendorId` VARCHAR(191) NOT NULL,
@@ -187,7 +175,6 @@ CREATE TABLE `shipping_methods` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `vendor_integrations` (
     `id` VARCHAR(191) NOT NULL,
     `vendorId` VARCHAR(191) NOT NULL,
@@ -206,7 +193,6 @@ CREATE TABLE `vendor_integrations` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `creator_profiles` (
     `id` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
@@ -223,7 +209,6 @@ CREATE TABLE `creator_profiles` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `creator_links` (
     `id` VARCHAR(191) NOT NULL,
     `creatorId` VARCHAR(191) NOT NULL,
@@ -242,7 +227,6 @@ CREATE TABLE `creator_links` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `orders` (
     `id` VARCHAR(191) NOT NULL,
     `orderNumber` VARCHAR(191) NOT NULL,
@@ -277,7 +261,6 @@ CREATE TABLE `orders` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `order_lines` (
     `id` VARCHAR(191) NOT NULL,
     `orderId` VARCHAR(191) NOT NULL,
@@ -297,7 +280,6 @@ CREATE TABLE `order_lines` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `commissions` (
     `id` VARCHAR(191) NOT NULL,
     `orderId` VARCHAR(191) NOT NULL,
@@ -320,7 +302,6 @@ CREATE TABLE `commissions` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `disputes` (
     `id` VARCHAR(191) NOT NULL,
     `orderId` VARCHAR(191) NULL,
@@ -336,7 +317,6 @@ CREATE TABLE `disputes` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `audit_logs` (
     `id` VARCHAR(191) NOT NULL,
     `actorId` VARCHAR(191) NULL,
@@ -350,7 +330,6 @@ CREATE TABLE `audit_logs` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
 CREATE TABLE `contact_submissions` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
@@ -362,97 +341,66 @@ CREATE TABLE `contact_submissions` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- AddForeignKey
 ALTER TABLE `user_role_assignments` ADD CONSTRAINT `user_role_assignments_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `accounts` ADD CONSTRAINT `accounts_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `sessions` ADD CONSTRAINT `sessions_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `operators` ADD CONSTRAINT `operators_ownerUserId_fkey` FOREIGN KEY (`ownerUserId`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `storefronts` ADD CONSTRAINT `storefronts_operatorId_fkey` FOREIGN KEY (`operatorId`) REFERENCES `operators`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `vendor_members` ADD CONSTRAINT `vendor_members_vendorId_fkey` FOREIGN KEY (`vendorId`) REFERENCES `vendors`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `vendor_members` ADD CONSTRAINT `vendor_members_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `operator_vendors` ADD CONSTRAINT `operator_vendors_operatorId_fkey` FOREIGN KEY (`operatorId`) REFERENCES `operators`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `operator_vendors` ADD CONSTRAINT `operator_vendors_vendorId_fkey` FOREIGN KEY (`vendorId`) REFERENCES `vendors`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `products` ADD CONSTRAINT `products_vendorId_fkey` FOREIGN KEY (`vendorId`) REFERENCES `vendors`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `shipping_methods` ADD CONSTRAINT `shipping_methods_vendorId_fkey` FOREIGN KEY (`vendorId`) REFERENCES `vendors`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `vendor_integrations` ADD CONSTRAINT `vendor_integrations_vendorId_fkey` FOREIGN KEY (`vendorId`) REFERENCES `vendors`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `creator_profiles` ADD CONSTRAINT `creator_profiles_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `creator_links` ADD CONSTRAINT `creator_links_creatorId_fkey` FOREIGN KEY (`creatorId`) REFERENCES `creator_profiles`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `creator_links` ADD CONSTRAINT `creator_links_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `products`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `creator_links` ADD CONSTRAINT `creator_links_operatorId_fkey` FOREIGN KEY (`operatorId`) REFERENCES `operators`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `orders` ADD CONSTRAINT `orders_customerId_fkey` FOREIGN KEY (`customerId`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `orders` ADD CONSTRAINT `orders_storefrontId_fkey` FOREIGN KEY (`storefrontId`) REFERENCES `storefronts`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `orders` ADD CONSTRAINT `orders_operatorId_fkey` FOREIGN KEY (`operatorId`) REFERENCES `operators`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `orders` ADD CONSTRAINT `orders_attributedCreatorLinkId_fkey` FOREIGN KEY (`attributedCreatorLinkId`) REFERENCES `creator_links`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `order_lines` ADD CONSTRAINT `order_lines_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `orders`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `order_lines` ADD CONSTRAINT `order_lines_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `order_lines` ADD CONSTRAINT `order_lines_vendorId_fkey` FOREIGN KEY (`vendorId`) REFERENCES `vendors`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `commissions` ADD CONSTRAINT `commissions_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `orders`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `commissions` ADD CONSTRAINT `commissions_orderLineId_fkey` FOREIGN KEY (`orderLineId`) REFERENCES `order_lines`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `commissions` ADD CONSTRAINT `commissions_creatorId_fkey` FOREIGN KEY (`creatorId`) REFERENCES `creator_profiles`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `commissions` ADD CONSTRAINT `commissions_operatorId_fkey` FOREIGN KEY (`operatorId`) REFERENCES `operators`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `commissions` ADD CONSTRAINT `commissions_vendorId_fkey` FOREIGN KEY (`vendorId`) REFERENCES `vendors`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `commissions` ADD CONSTRAINT `commissions_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `products`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE `commissions` ADD CONSTRAINT `commissions_creatorLinkId_fkey` FOREIGN KEY (`creatorLinkId`) REFERENCES `creator_links`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
--- CreateTable
 CREATE TABLE `platform_config` (
     `id` VARCHAR(191) NOT NULL DEFAULT 'default',
     `settings` JSON NOT NULL,
