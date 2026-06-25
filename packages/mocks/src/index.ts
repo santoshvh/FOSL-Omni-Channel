@@ -53,7 +53,6 @@ export {
   vendorCampaigns,
 } from "./hub-data";
 
-export { foslApiHandlers } from "./msw-handlers";
 export {
   defaultPlatformSettings,
   getMockPlatformSettings,

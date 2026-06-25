@@ -26,12 +26,12 @@ function defaultStorefrontUrl() {
 
 /** Resolve cross-app URLs from Admin settings, runtime env, or production defaults. */
 export function resolvePlatformUrls(config?: PublicPlatformConfig | null) {
-  const platformUrl = trimUrl(config?.appUrls.hub?.trim() || defaultPlatformUrl());
+  const platformUrl = trimUrl(config?.appUrls?.hub?.trim() || defaultPlatformUrl());
   const storefrontUrl = trimUrl(
-    config?.appUrls.storefront?.trim() || defaultStorefrontUrl()
+    config?.appUrls?.storefront?.trim() || defaultStorefrontUrl()
   );
   const adminUrl = trimUrl(
-    config?.appUrls.admin?.trim() || `${platformUrl}/admin`
+    config?.appUrls?.admin?.trim() || `${platformUrl}/admin`
   );
 
   return {

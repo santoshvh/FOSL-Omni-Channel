@@ -49,7 +49,7 @@ export function MarketplaceProductListing({
         return res.json() as Promise<{ data: Product[] }>;
       })
       .then((json) => {
-        if (!cancelled) setCatalog(json.data);
+        if (!cancelled) setCatalog(Array.isArray(json.data) ? json.data : []);
       })
       .catch((err) => {
         if (!cancelled) setLoadError(err instanceof Error ? err.message : "Failed to load products.");

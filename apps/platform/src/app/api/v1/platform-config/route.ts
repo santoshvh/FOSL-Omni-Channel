@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getMockPublicPlatformConfig } from "@fosl/mocks";
+import { getMockPublicPlatformConfig } from "@fosl/mocks/platform-settings";
 import { resolvePublicPlatformConfig } from "@fosl/db";
 
 export async function GET() {
@@ -8,6 +8,9 @@ export async function GET() {
     return NextResponse.json(result);
   } catch (err) {
     console.error("[platform-config] GET failed:", err);
-    return NextResponse.json({ error: "Unable to load platform config." }, { status: 500 });
+    return NextResponse.json({
+      data: getMockPublicPlatformConfig(),
+      source: "mock",
+    });
   }
 }

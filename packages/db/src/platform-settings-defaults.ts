@@ -21,7 +21,7 @@ export const defaultPlatformSettings: PlatformSettings = {
     secretConfigured: false,
   },
   apiMocking: {
-    enabled: true,
+    enabled: false,
   },
   storefront: {
     subscriptionState: "active",
