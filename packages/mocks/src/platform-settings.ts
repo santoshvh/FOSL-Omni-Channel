@@ -12,7 +12,7 @@ export const defaultPlatformSettings: PlatformSettings = {
   appUrls: {
     hub: "http://localhost:3000",
     storefront: "http://localhost:3001",
-    admin: "http://localhost:3002",
+    admin: "http://localhost:3000/admin",
   },
   auth: {
     enabled: false,
@@ -161,7 +161,7 @@ export function triggerMockDeploy(): PlatformSettings {
     ...mockSettings.autoDeploy,
     lastDeployAt: new Date().toISOString(),
     lastDeployStatus: "success",
-    lastDeployMessage: "Deploy queued for hub, storefront, and admin (mock).",
+    lastDeployMessage: "Deploy queued for platform and storefront (mock).",
   };
   mockSettings.updatedAt = new Date().toISOString();
   return getMockPlatformSettings();

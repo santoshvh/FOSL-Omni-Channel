@@ -7,16 +7,15 @@ Quick reference for running and browsing the Phase A prototype locally.
 From the repo root (`e:\Code\MV FOSL 2`):
 
 ```powershell
-npm run dev:hub          # port 3000
+npm run dev:platform     # port 3000 (workspaces + /admin)
 npm run dev:storefront   # port 3001
-npm run dev:admin        # port 3002
 ```
 
-Use **three terminals** (one per app). Always prefix with `npm run` — e.g. `npm run dev:admin`, not `dev:admin`.
+Use **two terminals** (one per app).
 
 ## Database (Phase B)
 
-Configure MySQL in **Admin → Settings** (http://localhost:3002/settings): host, port, database, user, password. Saving writes `.fosl-runtime.json` at the repo root — **restart all dev servers** after saving.
+Configure MySQL in **Platform → Admin → Settings** (http://localhost:3000/admin/settings): host, port, database, user, password. Saving writes `.fosl-runtime.json` at the repo root — **restart both dev servers** after saving.
 
 For first-time setup before Admin is configured, you may set `DATABASE_URL` in `.env`:
 
@@ -96,9 +95,9 @@ Install browsers once: `npm run test:e2e:install`
 
 | App | Local | Purpose |
 |-----|-------|---------|
-| **Hub** | http://localhost:3000 | Vendor, Creator, Operator workspaces |
+| **Platform** | http://localhost:3000 | Vendor, Creator, Operator workspaces |
 | **Storefront** | http://localhost:3001 | Customer shop + FOSLOne home + marketplace |
-| **Admin** | http://localhost:3002 | Platform admin |
+| **Admin** | http://localhost:3000/admin | Platform admin (same app as platform) |
 
 ---
 
@@ -149,7 +148,7 @@ Install browsers once: `npm run test:e2e:install`
 
 ---
 
-## Hub — http://localhost:3000
+## Platform — http://localhost:3000
 
 Use the **role switcher** in the header to move between Vendor, Creator, and Operator.
 
@@ -235,23 +234,23 @@ Use the **role switcher** in the header to move between Vendor, Creator, and Ope
 
 ---
 
-## Admin — http://localhost:3002
+## Admin — http://localhost:3000/admin
 
 | Screen | URL |
 |--------|-----|
-| Dashboard | http://localhost:3002/ |
-| Operators | http://localhost:3002/operators |
-| Operator detail (sample) | http://localhost:3002/operators/op_1 |
-| Edit operator (sample) | http://localhost:3002/operators/op_1/edit |
-| Disputes | http://localhost:3002/disputes |
-| Dispute detail (sample) | http://localhost:3002/disputes/disp_1 |
-| Audit log | http://localhost:3002/audit |
-| Payments | http://localhost:3002/payments |
-| Settings | http://localhost:3002/settings |
-| Subscription plans | http://localhost:3002/subscription-plans |
-| Health | http://localhost:3002/health |
+| Dashboard | http://localhost:3000/admin |
+| Operators | http://localhost:3000/admin/operators |
+| Operator detail (sample) | http://localhost:3000/admin/operators/op_1 |
+| Edit operator (sample) | http://localhost:3000/admin/operators/op_1/edit |
+| Disputes | http://localhost:3000/admin/disputes |
+| Dispute detail (sample) | http://localhost:3000/admin/disputes/disp_1 |
+| Audit log | http://localhost:3000/admin/audit |
+| Payments | http://localhost:3000/admin/payments |
+| Settings | http://localhost:3000/admin/settings |
+| Subscription plans | http://localhost:3000/admin/subscription-plans |
+| Health | http://localhost:3000/admin/health |
 
-Platform **Settings** (http://localhost:3002/settings) is the single source of truth for database, app URLs, auth, API mocking, file storage, email, Stripe, jobs, and feature flags. Saves write `.fosl-runtime.json` — restart dev servers after saving. Persists to `platform_config` when MySQL is up; otherwise uses MSW mock storage.
+Platform **Settings** (http://localhost:3000/admin/settings) is the single source of truth for database, app URLs, auth, API mocking, file storage, email, Stripe, jobs, and feature flags. Saves write `.fosl-runtime.json` — restart dev servers after saving. Persists to `platform_config` when MySQL is up; otherwise uses MSW mock storage.
 
 ---
 
@@ -260,7 +259,7 @@ Platform **Settings** (http://localhost:3002/settings) is the single source of t
 ### Port already in use (`EADDRINUSE`)
 
 ```powershell
-foreach ($port in 3000,3001,3002) {
+foreach ($port in 3000,3001) {
   Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue |
     ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }
 }

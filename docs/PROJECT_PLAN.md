@@ -5,9 +5,10 @@ Living document for scope, progress, changelog, and next steps.
 
 | App | Port | Command |
 |-----|------|---------|
-| Hub | 3000 | `npm run dev:hub` |
+| Platform | 3000 | `npm run dev:platform` |
 | Storefront | 3001 | `npm run dev:storefront` |
-| Admin | 3002 | `npm run dev:admin` |
+
+Admin console lives at **http://localhost:3000/admin** (same app as platform).
 
 See also: [WIREFRAME_INVENTORY.md](./WIREFRAME_INVENTORY.md) (screen list), [LOCAL_DEV_URLS.md](./LOCAL_DEV_URLS.md) (URLs), [DEPLOYMENT-ICDSOFT.md](./DEPLOYMENT-ICDSOFT.md) (hosting).
 
@@ -29,7 +30,7 @@ Use `[x]` for done, `[ ]` for open. Screen-level detail remains in [WIREFRAME_IN
 
 ### 2.1 Foundation (v0.1) — `9394b3d`
 
-- [x] Monorepo: `apps/hub`, `apps/storefront`, `apps/admin`, shared `packages/*`
+- [x] Monorepo: `apps/platform`, `apps/storefront`, shared `packages/*`
 - [x] 85+ wireframe screens across Hub (vendor / creator / operator), Storefront, Admin
 - [x] Master marketplace routes under `/marketplace`
 - [x] Mock data in `@fosl/mocks`, shared UI in `@fosl/ui`
@@ -310,7 +311,7 @@ Chronological summary of meaningful changes (commits and session work).
 ### Short term (Phase B) — **next up**
 
 5. ~~**Prisma schema**~~ — done (`packages/db/prisma/schema.prisma`)
-6. **Run database locally** — configure MySQL in Admin → http://localhost:3002/settings, or bootstrap with `DATABASE_URL` in `.env`, then `npm run db:setup`
+6. **Run database locally** — configure MySQL in Platform → Admin → http://localhost:3000/admin/settings, or bootstrap with `DATABASE_URL` in `.env`, then `npm run db:setup`
 7. ~~**Auth.js**~~ — Hub sign-in + middleware when auth enabled in Admin Settings
 8. ~~**Stripe test mode**~~ — Payment Element + `POST /api/v1/checkout/payment-intent` (mock without keys)
 9. **Quality** — CI + E2E done; **next:** production deploy (ICDSoft), MSW off in production, S3 uploads in prod

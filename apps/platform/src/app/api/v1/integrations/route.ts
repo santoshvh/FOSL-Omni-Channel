@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
+import { requireSession } from "@/lib/api-auth";
 import { connectIntegrationSchema } from "@fosl/contracts";
 import { fetchVendorIntegrations, connectIntegration } from "@/lib/integrations-service";
 
 export async function GET(request: Request) {
+  const auth = await requireSession();
+  if (auth.error) return auth.error;
+
   const { searchParams } = new URL(request.url);
   const vendorId = searchParams.get("vendorId")?.trim() || undefined;
 
@@ -16,6 +20,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireSession();
+  if (auth.error) return auth.error;
+
   try {
     const body = await request.json();
     const parsed = connectIntegrationSchema.safeParse(body);

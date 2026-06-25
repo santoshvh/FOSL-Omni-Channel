@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 import path from "node:path";
 
 const storefrontDir = path.join(__dirname, "..", "apps", "storefront");
-const hubDir = path.join(__dirname, "..", "apps", "hub");
+const platformDir = path.join(__dirname, "..", "apps", "platform");
 
 export default defineConfig({
   testDir: path.join(__dirname),
@@ -23,7 +23,7 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
     {
-      name: "hub",
+      name: "platform",
       testMatch: /hub-/,
       use: {
         ...devices["Desktop Chrome"],
@@ -42,7 +42,7 @@ export default defineConfig({
     },
     {
       command: "npx next start --port 3000",
-      cwd: hubDir,
+      cwd: platformDir,
       url: "http://localhost:3000",
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,

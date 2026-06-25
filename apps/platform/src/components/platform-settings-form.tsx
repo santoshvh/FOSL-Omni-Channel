@@ -287,9 +287,9 @@ export function PlatformSettingsForm() {
         <CardContent className="grid gap-4 sm:grid-cols-3">
           {(
             [
-              ["hub", "Hub URL"],
+              ["hub", "Platform URL"],
               ["storefront", "Storefront URL"],
-              ["admin", "Admin URL"],
+              ["admin", "Admin URL (usually platform + /admin)"],
             ] as const
           ).map(([key, label]) => (
             <div key={key}>
@@ -381,7 +381,7 @@ export function PlatformSettingsForm() {
                 })
               }
             />
-            Enable MSW browser mocking in development (storefront, hub, admin)
+            Enable MSW browser mocking in development (storefront + platform)
           </label>
         </CardContent>
       </Card>
@@ -521,27 +521,41 @@ export function PlatformSettingsForm() {
             />
           </div>
           <div className="flex flex-wrap gap-4 text-sm">
-            {(
-              [
-                ["deployHub", "Hub"],
-                ["deployStorefront", "Storefront"],
-                ["deployAdmin", "Admin"],
-              ] as const
-            ).map(([key, label]) => (
-              <label key={key} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={settings.autoDeploy[key]}
-                  onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      autoDeploy: { ...settings.autoDeploy, [key]: e.target.checked },
-                    })
-                  }
-                />
-                {label}
-              </label>
-            ))}
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={
+                  settings.autoDeploy.deployHub && settings.autoDeploy.deployAdmin
+                }
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    autoDeploy: {
+                      ...settings.autoDeploy,
+                      deployHub: e.target.checked,
+                      deployAdmin: e.target.checked,
+                    },
+                  })
+                }
+              />
+              Platform
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={settings.autoDeploy.deployStorefront}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    autoDeploy: {
+                      ...settings.autoDeploy,
+                      deployStorefront: e.target.checked,
+                    },
+                  })
+                }
+              />
+              Storefront
+            </label>
           </div>
           <div className="flex flex-wrap items-center gap-3 border-t border-slate-100 pt-4">
             <Button type="button" variant="outline" onClick={() => void handleDeploy()} disabled={deploying}>

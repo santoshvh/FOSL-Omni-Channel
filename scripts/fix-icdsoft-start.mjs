@@ -18,16 +18,15 @@ function patchJson(relativePath, mutator) {
   console.log(`patched ${relativePath}`);
 }
 
-for (const app of ["hub", "storefront", "admin"]) {
+for (const app of ["platform", "storefront"]) {
   patchJson(`apps/${app}/package.json`, (j) => {
     j.scripts.start = startCmd;
   });
 }
 
 patchJson("package.json", (j) => {
-  j.scripts["start:hub"] = "npm run start -w @fosl/hub";
+  j.scripts["start:platform"] = "npm run start -w @fosl/platform";
   j.scripts["start:storefront"] = "npm run start -w @fosl/storefront";
-  j.scripts["start:admin"] = "npm run start -w @fosl/admin";
 });
 
 console.log("Done. Verify: grep '\"start\"' apps/*/package.json");

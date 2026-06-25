@@ -6,7 +6,7 @@ High-fidelity Next.js prototype screens.
 |-----|-----|
 | Hub | http://localhost:3000 |
 | Storefront | http://localhost:3001 |
-| Admin | http://localhost:3002 |
+| Admin | http://localhost:3000/admin |
 
 **Status: v0.21 — wireframe polish + catalog integrations (Shopify/WooCommerce)**
 

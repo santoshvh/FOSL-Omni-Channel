@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
+import { requireSession } from "@/lib/api-auth";
 import { uploadPlatformFile } from "@fosl/db";
 
 export async function POST(request: Request) {
+  const auth = await requireSession();
+  if (auth.error) return auth.error;
+
   const formData = await request.formData();
   const file = formData.get("file");
 
@@ -19,14 +23,19 @@ export async function POST(request: Request) {
 
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
-    const hubBaseUrl = process.env.NEXT_PUBLIC_HUB_URL ?? "http://localhost:3000";
+    const platformBaseUrl =
+      process.env.NEXT_PUBLIC_PLATFORM_URL ??
+      process.env.NEXT_PUBLIC_HUB_URL ??
+      (process.env.NODE_ENV === "production"
+        ? "https://hub.foslone.com"
+        : "http://localhost:3000");
     const result = await uploadPlatformFile(
       {
         buffer,
         contentType: file.type,
         originalName: file.name,
       },
-      hubBaseUrl
+      platformBaseUrl
     );
 
     return NextResponse.json(

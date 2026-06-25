@@ -45,7 +45,7 @@ export async function savePlatformSettings(patch: SettingsPatch) {
         data: settings,
         source: "database" as const,
         message:
-          "Settings saved. Restart all dev servers (hub, storefront, admin) so `.fosl-runtime.json` is loaded.",
+          "Settings saved. Restart dev servers (platform + storefront) so `.fosl-runtime.json` is loaded.",
       };
     } catch (err) {
       console.error("[platform-settings] db write failed:", err);
@@ -72,16 +72,17 @@ export async function savePlatformSettings(patch: SettingsPatch) {
     data,
     source: "mock" as const,
     message:
-      "Settings saved (mock). Restart all dev servers so `.fosl-runtime.json` is loaded.",
+      "Settings saved (mock). Restart dev servers (platform + storefront) so `.fosl-runtime.json` is loaded.",
   };
 }
 
 export async function runPlatformDeploy() {
   const targets: string[] = [];
   const { data: settings } = await fetchPlatformSettings();
-  if (settings.autoDeploy.deployHub) targets.push("hub");
+  if (settings.autoDeploy.deployHub || settings.autoDeploy.deployAdmin) {
+    targets.push("platform");
+  }
   if (settings.autoDeploy.deployStorefront) targets.push("storefront");
-  if (settings.autoDeploy.deployAdmin) targets.push("admin");
 
   const message = `Deploy queued for: ${targets.join(", ") || "no apps selected"}.`;
 

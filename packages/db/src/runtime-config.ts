@@ -30,11 +30,16 @@ export function buildRuntimeEnv(
   settings: PlatformSettings,
   secrets: PlatformSecrets
 ): Record<string, string> {
+  const platformUrl = settings.appUrls.hub.replace(/\/$/, "");
+  const adminUrl =
+    settings.appUrls.admin?.trim() || `${platformUrl}/admin`;
+
   const env: Record<string, string> = {
     DATABASE_PROVIDER: settings.database.provider,
-    NEXT_PUBLIC_HUB_URL: settings.appUrls.hub,
+    NEXT_PUBLIC_HUB_URL: platformUrl,
+    NEXT_PUBLIC_PLATFORM_URL: platformUrl,
     NEXT_PUBLIC_STOREFRONT_URL: settings.appUrls.storefront,
-    NEXT_PUBLIC_ADMIN_URL: settings.appUrls.admin,
+    NEXT_PUBLIC_ADMIN_URL: adminUrl,
     AUTH_URL: settings.auth.authUrl,
     AUTH_ENABLED: settings.auth.enabled ? "true" : "false",
     NEXT_PUBLIC_STOREFRONT_SUBSCRIPTION_STATE: settings.storefront.subscriptionState,

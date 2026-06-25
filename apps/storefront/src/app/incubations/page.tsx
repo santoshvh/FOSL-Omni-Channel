@@ -1,9 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@fosl/ui";
-import { externalLinks, fosloneImages, hubLoginUrl } from "@/lib/foslone";
+import { externalLinks, fosloneImages } from "@/lib/foslone";
+import { resolvePlatformUrls } from "@/lib/platform-urls";
 
 export default function IncubationsPage() {
+  const { hubLoginUrl } = resolvePlatformUrls();
   return (
     <div>
       <section className="relative overflow-hidden bg-surface">

@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, ShoppingBag, Store, ShoppingCart, User } from "lucide-react";
-import { hubLoginUrl } from "@/lib/foslone";
+import { usePlatformUrls } from "@/lib/platform-urls-context";
 import { useCart } from "@/lib/cart-context";
 import { cn } from "@fosl/ui";
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const { hubLoginUrl } = usePlatformUrls();
   const { mode, itemCount, openCart } = useCart();
   const isMarketplace = mode === "marketplace";
 

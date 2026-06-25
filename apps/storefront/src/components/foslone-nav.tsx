@@ -1,11 +1,16 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@fosl/ui";
-import { externalLinks, hubLoginUrl } from "@/lib/foslone";
+import { externalLinks } from "@/lib/foslone";
+import { usePlatformUrls } from "@/lib/platform-urls-context";
 
 const linkClass =
   "whitespace-nowrap font-medium text-slate-600 transition-colors hover:text-ink";
 
 export function FosloneNavLinks({ className = "" }: { className?: string }) {
+  const { hubLoginUrl } = usePlatformUrls();
+
   return (
     <nav className={`flex flex-wrap items-center gap-x-4 gap-y-2 text-sm ${className}`}>
       <Link href="/marketplace" className={linkClass}>

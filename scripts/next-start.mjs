@@ -14,7 +14,7 @@ const port = process.env.PORT?.trim() || "3000";
 const appCwd = process.cwd();
 const appName = path.basename(appCwd);
 
-if ((appName === "hub" || appName === "platform") && !process.env.AUTH_SECRET?.trim()) {
+if (appName === "platform" && !process.env.AUTH_SECRET?.trim()) {
   console.error(
     "[next-start] AUTH_SECRET is missing. Set via .env, .fosl-runtime.json, or: sureapp env set AUTH_SECRET '...'"
   );
@@ -27,6 +27,7 @@ const child = spawn("npx", ["next", "start", "-H", "0.0.0.0", "-p", port], {
   cwd: appCwd,
   stdio: "inherit",
   env: process.env,
+  shell: process.platform === "win32",
 });
 
 child.on("exit", (code, signal) => {

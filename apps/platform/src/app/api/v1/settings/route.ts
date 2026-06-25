@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { platformSettingsPatchSchema } from "@fosl/contracts";
+import { requireAdmin } from "@/lib/api-auth";
 import { fetchPlatformSettings, savePlatformSettings } from "@/lib/platform-settings-service";
 
 export async function GET() {
+  const auth = await requireAdmin();
+  if (auth.error) return auth.error;
+
   try {
     const result = await fetchPlatformSettings();
     return NextResponse.json(result);
@@ -13,6 +17,9 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
+  const auth = await requireAdmin();
+  if (auth.error) return auth.error;
+
   let body: unknown;
   try {
     body = await request.json();

@@ -1,23 +1,21 @@
 # FOSL — Multi-Operator Social Commerce Platform
 
-High-fidelity Next.js wireframe prototype for storefront, hub (vendor/creator/operator), and platform admin.
+High-fidelity Next.js wireframe prototype for storefront and platform (vendor/creator/operator workspaces + admin).
 
 ## Quick start
 
 ```bash
 npm install
-npm run dev:hub        # http://localhost:3000
-npm run dev:storefront # http://localhost:3001
-npm run dev:admin      # http://localhost:3002
+npm run dev:platform    # http://localhost:3000  (workspaces + /admin)
+npm run dev:storefront  # http://localhost:3001
 ```
 
 ## Apps
 
 | App | Port | Description |
 |-----|------|-------------|
-| `@fosl/hub` | 3000 | Vendor, Creator, Operator workspaces with role switcher |
+| `@fosl/platform` | 3000 | Vendor, Creator, Operator workspaces + `/admin` console |
 | `@fosl/storefront` | 3001 | Customer ecommerce (physical, digital, lead-gen) |
-| `@fosl/admin` | 3002 | Platform administration |
 
 ## Docs
 

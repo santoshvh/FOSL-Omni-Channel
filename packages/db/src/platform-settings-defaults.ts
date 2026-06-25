@@ -12,7 +12,7 @@ export const defaultPlatformSettings: PlatformSettings = {
   appUrls: {
     hub: "http://localhost:3000",
     storefront: "http://localhost:3001",
-    admin: "http://localhost:3002",
+    admin: "http://localhost:3000/admin",
   },
   auth: {
     enabled: false,

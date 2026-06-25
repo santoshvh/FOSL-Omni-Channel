@@ -1,6 +1,6 @@
 # Database (Phase B)
 
-Platform configuration (including database connection) is managed in **Admin → Settings** at http://localhost:3002/settings. Saving settings writes `.fosl-runtime.json` at the repo root with `DATABASE_URL` and other runtime values.
+Platform configuration (including database connection) is managed in **Platform → Admin → Settings** at http://localhost:3000/admin/settings. Saving settings writes `.fosl-runtime.json` at the repo root with `DATABASE_URL` and other runtime values.
 
 For first-time bootstrap before Admin is configured, copy `.env.example` to `.env` at the repo root:
 

@@ -3,6 +3,8 @@
 import { useState, useCallback } from "react";
 import { Button, Input } from "@fosl/ui";
 import { generateReferralLink, type ReferralLink } from "@/lib/referral";
+import { isCreatorSignedIn } from "@/lib/creator-session";
+import { CreatorSignupDialog } from "@/components/creator-signup-dialog";
 import { Link2, Copy, Check, X } from "lucide-react";
 
 export function CreatorEarnButton({
@@ -18,7 +20,8 @@ export function CreatorEarnButton({
   className?: string;
   onGenerated?: (link: ReferralLink) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [signupOpen, setSignupOpen] = useState(false);
+  const [linkOpen, setLinkOpen] = useState(false);
   const [link, setLink] = useState<ReferralLink | null>(null);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,11 +30,17 @@ export function CreatorEarnButton({
     (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
+
+      if (!isCreatorSignedIn()) {
+        setSignupOpen(true);
+        return;
+      }
+
       setLoading(true);
       window.setTimeout(() => {
         const generated = generateReferralLink(productId);
         setLink(generated);
-        setOpen(true);
+        setLinkOpen(true);
         setLoading(false);
         onGenerated?.(generated);
       }, 400);
@@ -60,13 +69,17 @@ export function CreatorEarnButton({
         {loading ? "Generating…" : "Promote and earn"}
       </Button>
 
-      {open && link && (
+      {signupOpen && (
+        <CreatorSignupDialog productTitle={productTitle} onClose={() => setSignupOpen(false)} />
+      )}
+
+      {linkOpen && link && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="creator-dialog-title"
-          onClick={() => setOpen(false)}
+          onClick={() => setLinkOpen(false)}
         >
           <div
             className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
@@ -81,7 +94,7 @@ export function CreatorEarnButton({
               </div>
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => setLinkOpen(false)}
                 className="rounded-md p-1 hover:bg-slate-100"
                 aria-label="Close"
               >
@@ -110,7 +123,7 @@ export function CreatorEarnButton({
               <Button type="button" className="flex-1" onClick={copyLink}>
                 Copy link
               </Button>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setLinkOpen(false)}>
                 Done
               </Button>
             </div>

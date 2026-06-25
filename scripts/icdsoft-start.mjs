@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 /**
- * ICDSoft runs one shared start_cmd per release directory. All three FOSL
- * WebApps use /home/foslone/private/FOSL, so start_cmd must be identical.
- * Route to the correct app via FOSL_APP (sureapp env set) or PORT from
- * `sureapp project list`.
+ * ICDSoft runs one shared start_cmd per release directory. FOSL uses two
+ * WebApps (platform + storefront) on /home/foslone/private/FOSL.
+ * Route via PORT from `sureapp project list` or FOSL_APP env.
  */
 import { spawn } from "node:child_process";
 import path from "node:path";
@@ -18,17 +17,15 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const PORT_TO_APP = {
   "26104": "platform",
   "1629": "storefront",
-  // Legacy three-app deploy (remove after migration):
-  "31035": "platform",
 };
 
 const FOSL_APP = process.env.FOSL_APP?.trim().toLowerCase();
 const port = process.env.PORT?.trim() ?? "";
-// PORT is assigned per WebApp by sureapp — prefer it over FOSL_APP (shared release dir).
-const legacyApp = FOSL_APP === "hub" || FOSL_APP === "admin" ? "platform" : FOSL_APP;
+const legacyApp =
+  FOSL_APP === "hub" || FOSL_APP === "admin" ? "platform" : FOSL_APP;
 const app = PORT_TO_APP[port] || legacyApp;
 
-if (!app || !["platform", "storefront", "hub", "admin"].includes(app)) {
+if (!app || !["platform", "storefront"].includes(app)) {
   console.error(
     [
       "Cannot determine FOSL app to start.",
@@ -41,8 +38,10 @@ if (!app || !["platform", "storefront", "hub", "admin"].includes(app)) {
   process.exit(1);
 }
 
-const workspace = `@fosl/${app === "platform" || app === "hub" || app === "admin" ? "platform" : app}`;
-console.log(`[icdsoft-start] PORT=${port} → ${workspace} AUTH_SECRET=${process.env.AUTH_SECRET ? "set" : "MISSING"}`);
+const workspace = `@fosl/${app}`;
+console.log(
+  `[icdsoft-start] PORT=${port} → ${workspace} AUTH_SECRET=${process.env.AUTH_SECRET ? "set" : "MISSING"}`
+);
 
 const child = spawn("npm", ["run", "start", "-w", workspace], {
   cwd: repoRoot,

@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
+import { requireSession } from "@/lib/api-auth";
 import { fetchOrdersList } from "@/lib/orders-service";
 
 export async function GET(request: Request) {
+  const auth = await requireSession();
+  if (auth.error) return auth.error;
+
   const { searchParams } = new URL(request.url);
   const email = searchParams.get("email")?.trim().toLowerCase() || undefined;
   const vendorId = searchParams.get("vendorId")?.trim() || undefined;

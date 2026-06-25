@@ -8,16 +8,12 @@
   ],
   "scripts": {
     "dev": "turbo dev",
-    "dev:hub": "npm run dev -w @fosl/hub",
     "dev:platform": "npm run dev -w @fosl/platform",
     "dev:storefront": "npm run dev -w @fosl/storefront",
-    "dev:admin": "npm run dev -w @fosl/admin",
     "build": "turbo build",
     "lint": "turbo lint",
-    "start:hub": "npm run start -w @fosl/hub",
     "start:platform": "npm run start -w @fosl/platform",
     "start:storefront": "npm run start -w @fosl/storefront",
-    "start:admin": "npm run start -w @fosl/admin",
     "db:sync-provider": "node scripts/set-database-provider.mjs",
     "db:generate": "npm run db:sync-provider && npm run generate -w @fosl/db",
     "db:push": "npm run db:sync-provider && npm run push -w @fosl/db",
@@ -48,9 +44,7 @@
   "msw": {
     "workerDirectory": [
       "apps\\storefront\\public",
-      "apps\\platform\\public",
-      "apps\\hub\\public",
-      "apps\\admin\\public"
+      "apps\\platform\\public"
     ]
   }
 }

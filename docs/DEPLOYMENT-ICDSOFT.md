@@ -6,12 +6,12 @@ No Docker. Deploy to ICDSoft WebApps using the **sureapp** CLI (same pattern as 
 
 | | **YooSupport** | **FOSL** |
 |---|----------------|----------|
-| Apps | 1 Next.js app (`yoosupport`) | 3 WebApps: `fosl-hub`, `Storefront`, `admin` (names from `sureapp project list`) |
+| Apps | 1 Next.js app (`yoosupport`) | **2 WebApps:** `fosl-hub` (platform), `Storefront` |
 | Repo on server | Git clone + rsync to app dir | Single monorepo at `/home/foslone/private/FOSL` |
-| Start command | `npm start` in app dir | `npm run start -w @fosl/<app>` per service |
-| Restart | `--stop` then `--start` (no `--restart`) | Same — manage **other** services from hub shell |
+| Start command | `npm start` in app dir | `node scripts/icdsoft-start.mjs` per service |
+| Restart | `--stop` then `--start` (no `--restart`) | Same |
 | Build memory | `LOW_MEMORY_BUILD`, `NODE_OPTIONS=768` | Same |
-| Bootstrap secrets | `.env`: `DATABASE_URL`, `AUTH_SECRET` | Same + optional Admin → Settings after first boot |
+| Bootstrap secrets | `.env`: `DATABASE_URL`, `AUTH_SECRET` | Same + Platform → `/admin/settings` after first boot |
 | DB on ICDSoft | MySQL / Postgres via `db:push` | MySQL `127.0.0.1:3308`, `db:push` if migrate fails |
 
 Use **absolute paths** inside `sureapp project shell` (tilde `~` can expand wrong — same as YooSupport).
@@ -27,47 +27,47 @@ Use **absolute paths** inside `sureapp project shell` (tilde `~` can expand wron
 
 | Domain | App | Purpose |
 |--------|-----|---------|
-| `https://hub.foslone.com` | Hub | Vendor, Creator, Operator sign-in and workspaces |
+| `https://hub.foslone.com` | Platform | Vendor, Creator, Operator workspaces + `/admin` settings |
 | `https://shop.foslone.com` | Storefront | Customer shop, marketplace, checkout |
-| `https://admin.foslone.com` | Admin | Platform settings, operators, deploy config |
+| `https://admin.foslone.com` | *(redirect)* | Redirects to `https://hub.foslone.com/admin` (middleware) |
 
 The apex **`https://foslone.com`** is not used for FOSL apps at this stage — keep it on the current FOSLOne marketing site. Link to the shop from there (e.g. Marketplace → `shop.foslone.com`).
 
-In **Admin → Settings → App URLs**, use exactly:
+In **Platform → Admin → Settings → App URLs**, use exactly:
 
 | Setting | URL |
 |---------|-----|
-| Hub | `https://hub.foslone.com` |
+| Platform (Hub) | `https://hub.foslone.com` |
 | Storefront | `https://shop.foslone.com` |
-| Admin | `https://admin.foslone.com` |
+| Admin | `https://hub.foslone.com/admin` |
 | Auth URL | `https://hub.foslone.com` |
 
 ## Server directories
 
 | Path | Purpose |
 |------|---------|
-| `/home/foslone/private/FOSL` | Full monorepo git clone (all three apps) |
+| `/home/foslone/private/FOSL` | Full monorepo git clone (platform + storefront) |
 | `/home/foslone/private/FOSL/uploads` | Local product images (if not using S3) |
 
-Deploy the **entire monorepo** — not a single `apps/hub` folder. Workspaces need `packages/`, root `package.json`, etc.
+Deploy the **entire monorepo** — not a single `apps/platform` folder. Workspaces need `packages/`, root `package.json`, etc.
 
-## WebApps (three services)
+## WebApps (two services)
 
-Create three ICDSoft Node.js WebApps, each with working directory `/home/foslone/private/FOSL`:
+Create **two** ICDSoft Node.js WebApps, each with working directory `/home/foslone/private/FOSL`:
 
 | Service | Start command (ICDSoft panel) |
 |---------|--------------------------------|
-| **All three** | `node scripts/icdsoft-start.mjs` |
+| **Both** | `node scripts/icdsoft-start.mjs` |
 
-All three use release directory `/home/foslone/private/FOSL`. **Do not use plain `npm start`** — the repo root has no `start` script.
+Both use release directory `/home/foslone/private/FOSL`. **Do not use plain `npm start`** — the repo root has no `start` script.
 
 ### Shared release directory (important)
 
-ICDSoft stores **one `start_cmd` per release directory**. All three WebApps share `/home/foslone/private/FOSL`, so `sureapp project modify --start-cmd` in any shell updates **all three** projects. Do not set different `npm run start -w @fosl/...` per app — the last edit wins for everyone.
+ICDSoft stores **one `start_cmd` per release directory**. Both WebApps share `/home/foslone/private/FOSL`, so `sureapp project modify --start-cmd` in any shell updates **both** projects.
 
-Use the router script `scripts/icdsoft-start.mjs` instead. It picks the app from:
+Use the router script `scripts/icdsoft-start.mjs`. It picks the app from:
 
-1. `FOSL_APP` (`hub` / `storefront` / `admin`) via `sureapp env set` in each WebApp shell, or
+1. `FOSL_APP` (`platform` / `storefront`) via `sureapp env set` in each WebApp shell, or
 2. `PORT` from `sureapp project list` (defaults baked into the script for foslone@s1282).
 
 **One-time setup** (run once from any shell):
@@ -76,28 +76,19 @@ Use the router script `scripts/icdsoft-start.mjs` instead. It picks the app from
 cd /home/foslone/private/FOSL
 sureapp project shell fosl-hub
 sureapp project modify --start-cmd "node scripts/icdsoft-start.mjs"
-exit
-```
-
-**Per-app env** (recommended — set in each project’s shell):
-
-```bash
-sureapp project shell fosl-hub
-sureapp env set FOSL_APP hub
+sureapp env set FOSL_APP platform
 exit
 
 sureapp project shell Storefront
 sureapp env set FOSL_APP storefront
 exit
-
-sureapp project shell admin
-sureapp env set FOSL_APP admin
-exit
 ```
 
 If ports change after recreating WebApps, update `PORT_TO_APP` in `scripts/icdsoft-start.mjs` to match `sureapp project list`.
 
-**Auth / DB env** (set in each WebApp shell, like YooSupport):
+**Optional — legacy `admin` WebApp:** disable or remove the third WebApp (`admin` on port 31035). Point `admin.foslone.com` at the **same** platform service as `hub.foslone.com`; middleware redirects to `/admin`.
+
+**Auth / DB env** (set in platform WebApp shell):
 
 ```bash
 sureapp env set AUTH_SECRET 'your-secret-min-32-chars'
@@ -105,17 +96,14 @@ sureapp env set AUTH_URL 'https://hub.foslone.com'
 sureapp env set DATABASE_URL 'mysql://...'
 ```
 
-Rebuild hub after setting `AUTH_SECRET`: `npm run build -w @fosl/hub`
+Rebuild platform after setting `AUTH_SECRET`: `npm run build -w @fosl/platform`
 
-Map domains in ICDSoft to each service:
+Map domains in ICDSoft:
 
 | ICDSoft service (`sureapp project list`) | Domain |
 |------------------------------------------|--------|
 | `Storefront` | `shop.foslone.com` |
-| `fosl-hub` | `hub.foslone.com` |
-| `admin` | `admin.foslone.com` |
-
-**Names are case-sensitive** and may differ from examples above — always run `sureapp project list` and use the exact **Project** column (on foslone@s1282: `Storefront`, `admin`, `fosl-hub` — not `fosl-storefront` / `fosl-admin`).
+| `fosl-hub` | `hub.foslone.com` (+ optional `admin.foslone.com` → same app) |
 
 ## First-time deploy
 
@@ -170,8 +158,7 @@ npm run build
 If memory is tight, build one app at a time:
 
 ```bash
-npm run build -w @fosl/admin
-npm run build -w @fosl/hub
+npm run build -w @fosl/platform
 npm run build -w @fosl/storefront
 ```
 
@@ -196,7 +183,7 @@ cd /home/foslone/private/FOSL
 
 # 1. Confirm bootstrap files
 test -f .env && echo ".env OK" || echo "CREATE .env FIRST"
-test -d apps/hub/.next && test -d apps/storefront/.next && test -d apps/admin/.next && echo "builds OK"
+test -d apps/platform/.next && test -d apps/storefront/.next && echo "builds OK"
 
 # 2. Start all three (from hub shell — do NOT stop admin from admin shell)
 sureapp service manage --start admin
@@ -229,9 +216,8 @@ Use this when services return **503**, **ChunkLoadError**, **MissingSecret**, **
 
 | Service | Project name | Port |
 |---------|--------------|------|
-| Hub | `fosl-hub` | **26104** |
+| Platform | `fosl-hub` | **26104** |
 | Storefront | `Storefront` | **1629** |
-| Admin | `admin` | **31035** |
 
 ### 1. SSH and enter hub shell
 
@@ -288,38 +274,33 @@ Per-app env (set once in each project shell if not already):
 
 ```bash
 # fosl-hub shell
-sureapp env set FOSL_APP hub
+sureapp env set FOSL_APP platform
 # Storefront shell
 sureapp env set FOSL_APP storefront
-# admin shell
-sureapp env set FOSL_APP admin
 ```
 
-**Verify:** start logs show `[icdsoft-start] PORT=26104 → @fosl/hub` (port varies per service).
+**Verify:** start logs show `[icdsoft-start] PORT=26104 → @fosl/platform` (port varies per service).
 
 ### 6. Kill stale processes (fixes EADDRINUSE / crash-loop ChunkLoadError)
 
 ```bash
 fuser -k 26104/tcp 2>/dev/null || true
 fuser -k 1629/tcp 2>/dev/null || true
-fuser -k 31035/tcp 2>/dev/null || true
 sleep 2
 ```
 
-**Verify:** `ss -tlnp 2>/dev/null | grep -E '26104|1629|31035'` shows nothing listening (or only after `--start` in step 7).
+**Verify:** `ss -tlnp 2>/dev/null | grep -E '26104|1629'` shows nothing listening (or only after `--start` in step 7).
 
-### 7. Stop then start all three services
+### 7. Stop then start both services
 
-Manage **admin** and **Storefront** from the **hub** shell. There is no `sureapp service manage --restart` — always `--stop` then `--start`.
+Manage **Storefront** from the **platform** shell. There is no `sureapp service manage --restart` — always `--stop` then `--start`.
 
 ```bash
-sureapp service manage --stop admin 2>/dev/null || true
 sureapp service manage --stop Storefront 2>/dev/null || true
-sureapp service manage --start admin
 sureapp service manage --start Storefront
 ```
 
-Restart **hub** from the ICDSoft control panel (WebApps → fosl-hub → Restart), or from a **Storefront/admin** shell:
+Restart **platform** from the ICDSoft control panel (WebApps → fosl-hub → Restart), or from the **Storefront** shell:
 
 ```bash
 sureapp service manage --stop fosl-hub && sureapp service manage --start fosl-hub
@@ -336,9 +317,9 @@ sureapp service manage --start fosl-hub
 ### 8. Local port smoke test
 
 ```bash
-curl -sI http://127.0.0.1:26104/auth/sign-in | head -3    # hub
+curl -sI http://127.0.0.1:26104/auth/sign-in | head -3    # platform
 curl -sI http://127.0.0.1:1629/marketplace | head -3     # storefront
-curl -sI http://127.0.0.1:31035/ | head -3                 # admin
+curl -sI http://127.0.0.1:26104/admin/settings | head -3 # admin (same app)
 ```
 
 | Result | Action |
@@ -355,7 +336,7 @@ sureapp log follow
 Look for:
 
 - `[icdsoft-start] ... AUTH_SECRET=set` (not `MISSING`)
-- `[next-start] app=hub port=26104 AUTH_SECRET=set`
+- `[next-start] app=platform port=26104 AUTH_SECRET=set`
 - No `EADDRINUSE`, no `Cannot find package '@next/env'`
 
 Ctrl+C to exit log follow.
@@ -380,7 +361,7 @@ If hub still shows **MissingSecret** after step 10, old build may have inlined a
 ```bash
 cd /home/foslone/private/FOSL
 export LOW_MEMORY_BUILD=true NODE_OPTIONS=--max-old-space-size=768 NEXT_TELEMETRY_DISABLED=1
-npm run build -w @fosl/hub
+npm run build -w @fosl/platform
 ```
 
 Restart hub (step 7), then re-check step 8–10.
@@ -528,7 +509,7 @@ curl -sI http://127.0.0.1:31035/ | head -3    # admin
 sureapp project shell fosl-hub
 cd /home/foslone/private/FOSL
 echo "PORT=$PORT"
-npm run start -w @fosl/hub
+npm run start -w @fosl/platform
 ```
 
 You must see `Local: http://0.0.0.0:26104` (port matches `sureapp project list`). Ctrl+C when done, then `sureapp service manage --start fosl-hub`.
@@ -647,12 +628,10 @@ From any shell in `/home/foslone/private/FOSL`:
 ```bash
 test -f .env && echo ".env OK" || echo ".env MISSING"
 test -d node_modules/@next/env && echo "@next/env OK" || echo "run npm ci (not --omit=dev)"
-test -d apps/admin/.next && echo "admin build OK" || echo "admin NOT built"
-test -d apps/storefront/.next && echo "storefront build OK" || echo "storefront NOT built"
-test -d apps/hub/.next && echo "hub build OK" || echo "hub NOT built"
+test -d apps/platform/.next && echo "platform build OK" || echo "platform NOT built"
 
 # Manual smoke test — use assigned PORT from sureapp project list (Ctrl+C to exit)
-PORT=31035 npm run start -w @fosl/admin
+PORT=26104 npm run start -w @fosl/platform
 ```
 
 If port is in use: `fuser -k 31035/tcp` (replace port per app). If manual start prints errors (missing `DATABASE_URL`, `Cannot find package '@next/env'`, etc.), fix those before using sureapp again. Check ICDSoft **WebApps → Logs** for each service.
@@ -691,6 +670,6 @@ After pulling the latest hub `next.config` fix, rebuild is only needed once:
 ```bash
 sureapp project shell fosl-hub
 export LOW_MEMORY_BUILD=true NODE_OPTIONS=--max-old-space-size=768
-npm run build -w @fosl/hub
+npm run build -w @fosl/platform
 exit
 ```

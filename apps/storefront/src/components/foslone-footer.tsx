@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { FoslLogo } from "@fosl/ui";
-import { externalLinks, fosloneImages, hubLoginUrl } from "@/lib/foslone";
+import { externalLinks, fosloneImages } from "@/lib/foslone";
+import { usePlatformUrls } from "@/lib/platform-urls-context";
 import { legalPageHref, legalPages } from "@/lib/legal";
 
 const footerLegalSlugs = [
@@ -13,6 +16,8 @@ const footerLegalSlugs = [
 ] as const;
 
 export function FosloneFooter() {
+  const { hubLoginUrl } = usePlatformUrls();
+
   return (
     <footer className="border-t border-slate-100 bg-ink text-white">
       <div className="ecom-container py-12">

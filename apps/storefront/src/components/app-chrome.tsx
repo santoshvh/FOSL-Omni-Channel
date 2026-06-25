@@ -6,12 +6,14 @@ import { StorefrontHeader } from "./storefront-header";
 import { MarketplaceHeader } from "./marketplace-header";
 import { CookieConsent } from "./cookie-consent";
 import { ReferralAttribution } from "./referral-attribution";
+import { CreatorAuthReturn } from "./creator-auth-return";
 import { FosloneFooter } from "./foslone-footer";
 import { CartProvider } from "@/lib/cart-context";
 import { CartDrawer } from "./cart-drawer";
 import { MobileBottomNav } from "./mobile-bottom-nav";
 import { SubscriptionBanner } from "./subscription-banner";
 import { MswInit } from "./msw-init";
+import { PlatformUrlsProvider } from "@/lib/platform-urls-context";
 import { usePlatformConfig } from "@/lib/use-platform-config";
 
 export function AppChrome({ children }: { children: React.ReactNode }) {
@@ -28,7 +30,8 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
       | undefined);
 
   return (
-    <CartProvider mode={isMarketplace ? "marketplace" : "storefront"}>
+    <PlatformUrlsProvider config={config}>
+      <CartProvider mode={isMarketplace ? "marketplace" : "storefront"}>
       <MswInit apiMockingEnabled={loading ? null : config?.apiMocking.enabled} />
       <div className="flex min-h-screen flex-col pb-16 md:pb-0">
         <SubscriptionBanner state={subscriptionState} />
@@ -40,8 +43,10 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
         <CookieConsent />
         <Suspense fallback={null}>
           <ReferralAttribution />
+          <CreatorAuthReturn />
         </Suspense>
       </div>
     </CartProvider>
+    </PlatformUrlsProvider>
   );
 }

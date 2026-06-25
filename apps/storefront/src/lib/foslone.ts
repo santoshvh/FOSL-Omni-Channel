@@ -1,13 +1,21 @@
 /** FOSLOne site content & links — aligned with https://www.foslone.com/ */
 
+export { resolvePlatformUrls, type PlatformUrls } from "@/lib/platform-urls";
+
+import { resolvePlatformUrls } from "@/lib/platform-urls";
+
 export const FOSLONE_SITE = "https://www.foslone.com";
 
-export const hubUrl =
-  process.env.NEXT_PUBLIC_HUB_URL ?? "http://localhost:3000";
+const urls = resolvePlatformUrls();
 
-export const hubLoginUrl = `${hubUrl}/auth/sign-in`;
-export const hubVendorUrl = `${hubUrl}/vendor`;
-export const hubCreatorUrl = `${hubUrl}/creator`;
+export const platformUrl = urls.platformUrl;
+/** @deprecated Use platformUrl */
+export const hubUrl = urls.hubUrl;
+export const adminUrl = urls.adminUrl;
+export const hubLoginUrl = urls.hubLoginUrl;
+export const hubVendorUrl = urls.hubVendorUrl;
+export const hubCreatorUrl = urls.hubCreatorUrl;
+export const platformAdminUrl = urls.platformAdminUrl;
 
 export const externalLinks = {
   socomOtt: "https://www.foslone.com/socomm-ott/",
@@ -17,7 +25,6 @@ export const externalLinks = {
 
 /** Brand & site images (local /public) */
 export const fosloneImages = {
-  /** Pexels #6609232 — Mikhail Nilov, woman shopping online at home */
   heroMain: "/stock/hero-online-shopping.jpg",
   heroCommunity: "/foslone/hero-community.jpeg",
   sectionSales: "/foslone/section-sales.svg",
@@ -53,23 +60,11 @@ export const homeAudienceCards = [
 
 export const teamMembers = {
   aione: [
-    {
-      name: "Shiva Balivada",
-      role: "CEO",
-      image: "/foslone/team-shiva.jpeg",
-    },
-    {
-      name: "Dave Sackett",
-      role: "CFO",
-      image: "/foslone/team-dave.jpeg",
-    },
+    { name: "Shiva Balivada", role: "CEO", image: "/foslone/team-shiva.jpeg" },
+    { name: "Dave Sackett", role: "CFO", image: "/foslone/team-dave.jpeg" },
   ],
   foslone: [
-    {
-      name: "Scott Livingston",
-      role: "Principal Advisor",
-      image: "/foslone/team-scott.jpeg",
-    },
+    { name: "Scott Livingston", role: "Principal Advisor", image: "/foslone/team-scott.jpeg" },
   ],
 } as const;
 
