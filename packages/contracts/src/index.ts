@@ -1,5 +1,8 @@
 export type UserRole = "admin" | "operator" | "vendor" | "creator" | "customer";
 
+/** Git branch used for ICDSoft production deploys (not master until two-app merge). */
+export const FOSL_DEPLOY_BRANCH = "refactor/two-app-platform";
+
 export type ProductType = "physical" | "digital" | "lead_gen";
 
 export type CatalogSource = "native" | "shopify" | "woocommerce";

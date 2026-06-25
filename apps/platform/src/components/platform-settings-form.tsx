@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { PlatformSettings } from "@fosl/contracts";
+import { FOSL_DEPLOY_BRANCH } from "@fosl/contracts";
 import {
   AlertBanner,
   Button,
@@ -469,15 +470,13 @@ export function PlatformSettingsForm() {
               <Label htmlFor="deploy-branch">Target branch</Label>
               <Input
                 id="deploy-branch"
-                className="mt-1"
-                value={settings.autoDeploy.branch}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    autoDeploy: { ...settings.autoDeploy, branch: e.target.value },
-                  })
-                }
+                className="mt-1 bg-slate-50"
+                readOnly
+                value={FOSL_DEPLOY_BRANCH}
               />
+              <p className="mt-1 text-xs text-slate-500">
+                Production deploys use this branch until the two-app refactor is merged to master.
+              </p>
             </div>
             <div>
               <Label htmlFor="github-repo">GitHub repository</Label>

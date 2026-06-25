@@ -1,4 +1,5 @@
 import type { PlatformSettings, PublicPlatformConfig } from "@fosl/contracts";
+import { FOSL_DEPLOY_BRANCH } from "@fosl/contracts";
 import { prisma } from "./client";
 import { defaultPlatformSettings } from "./platform-settings-defaults";
 import type { PlatformSecrets } from "./runtime-config";
@@ -23,7 +24,11 @@ function mergeDefaults(stored: Partial<StoredSettings> | null): StoredSettings {
     storefront: { ...defaultPlatformSettings.storefront, ...stored?.storefront },
     jobs: { ...defaultPlatformSettings.jobs, ...stored?.jobs },
     featureFlags: { ...defaultPlatformSettings.featureFlags, ...stored?.featureFlags },
-    autoDeploy: { ...defaultPlatformSettings.autoDeploy, ...stored?.autoDeploy },
+    autoDeploy: {
+      ...defaultPlatformSettings.autoDeploy,
+      ...stored?.autoDeploy,
+      branch: FOSL_DEPLOY_BRANCH,
+    },
     fileStorage: { ...defaultPlatformSettings.fileStorage, ...stored?.fileStorage },
     email: { ...defaultPlatformSettings.email, ...stored?.email },
     stripe: { ...defaultPlatformSettings.stripe, ...stored?.stripe },
@@ -172,6 +177,7 @@ export async function updatePlatformSettingsInDb(patch: SettingsPatch): Promise<
   }
 
   current.updatedAt = new Date().toISOString();
+  current.autoDeploy.branch = FOSL_DEPLOY_BRANCH;
   current.secrets = secrets;
 
   await prisma.platformConfig.upsert({

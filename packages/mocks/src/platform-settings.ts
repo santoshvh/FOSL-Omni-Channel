@@ -1,4 +1,5 @@
 import type { PlatformSettings, PublicPlatformConfig } from "@fosl/contracts";
+import { FOSL_DEPLOY_BRANCH } from "@fosl/contracts";
 
 export const defaultPlatformSettings: PlatformSettings = {
   database: {
@@ -36,7 +37,7 @@ export const defaultPlatformSettings: PlatformSettings = {
   },
   autoDeploy: {
     enabled: false,
-    branch: "master",
+    branch: FOSL_DEPLOY_BRANCH,
     githubRepo: "santoshvh/FOSL-Omni-Channel",
     webhookUrl: "",
     deployHub: true,
@@ -99,6 +100,7 @@ export function updateMockPlatformSettings(patch: Record<string, unknown>): Plat
   ) as unknown as PlatformSettings;
 
   applyMockSecrets(patch);
+  mockSettings.autoDeploy.branch = FOSL_DEPLOY_BRANCH;
   mockSettings.updatedAt = new Date().toISOString();
   return getMockPlatformSettings();
 }

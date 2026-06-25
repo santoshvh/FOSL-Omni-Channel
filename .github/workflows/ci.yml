@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [master, refactor/two-app-platform]
   pull_request:
 
 concurrency:
@@ -59,8 +59,8 @@ jobs:
       - name: Build storefront
         run: npm run build -w @fosl/storefront
 
-      - name: Build hub
-        run: npm run build -w @fosl/hub
+      - name: Build platform
+        run: npm run build -w @fosl/platform
 
       - name: E2E tests
         run: npm run test:e2e

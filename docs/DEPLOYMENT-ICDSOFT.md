@@ -16,6 +16,27 @@ No Docker. Deploy to ICDSoft WebApps using the **sureapp** CLI (same pattern as 
 
 Use **absolute paths** inside `sureapp project shell` (tilde `~` can expand wrong — same as YooSupport).
 
+## Deploy branch
+
+Production on ICDSoft runs from **`refactor/two-app-platform`** — not `master`. The two-app refactor (platform + storefront) stays on this branch until you merge it later.
+
+| Where | Branch |
+|-------|--------|
+| Server `git pull` / recovery | `refactor/two-app-platform` |
+| Platform → Admin → Settings → Auto deploy | `refactor/two-app-platform` (read-only; enforced in code) |
+| CI (`push`) | `master` and `refactor/two-app-platform` |
+
+**On the server** (after clone or for updates):
+
+```bash
+cd /home/foslone/private/FOSL
+git fetch origin refactor/two-app-platform --force
+git checkout refactor/two-app-platform
+git reset --hard origin/refactor/two-app-platform
+```
+
+Or run `bash scripts/git-deploy-pull.sh` from the repo root (same commands).
+
 ## Prerequisites
 - ICDSoft WebApps plan with Node.js LTS (22+)
 - MySQL 8 (default; ICDSoft MySQL script) or PostgreSQL
@@ -107,15 +128,17 @@ Map domains in ICDSoft:
 
 ## First-time deploy
 
-Use **any** of the three sureapp shells (`fosl-hub`, `Storefront`, or `admin`) — they share the same working directory.
+Use **either** sureapp shell (`fosl-hub` or `Storefront`) — they share the same working directory.
 
 ```bash
-sureapp project shell fosl-hub   # or: sureapp project shell Storefront / admin
+sureapp project shell fosl-hub   # or: sureapp project shell Storefront
 
 cd /home/foslone/private
 git clone https://github.com/santoshvh/FOSL-Omni-Channel.git FOSL
 cd /home/foslone/private/FOSL
-git checkout master
+git fetch origin refactor/two-app-platform --force
+git checkout refactor/two-app-platform
+git reset --hard origin/refactor/two-app-platform
 ```
 
 Bootstrap database (before Admin UI is configured). Create `/home/foslone/private/FOSL/.env` (ICDSoft env panel or file on disk):
@@ -162,13 +185,12 @@ npm run build -w @fosl/platform
 npm run build -w @fosl/storefront
 ```
 
-Start services (from **hub** shell — see troubleshooting if admin shell gives internal errors):
+Start services (from **hub** shell):
 
 ```bash
 sureapp project shell fosl-hub
 cd /home/foslone/private/FOSL
 
-sureapp service manage --start admin
 sureapp service manage --start fosl-hub
 sureapp service manage --start Storefront
 ```
@@ -185,24 +207,22 @@ cd /home/foslone/private/FOSL
 test -f .env && echo ".env OK" || echo "CREATE .env FIRST"
 test -d apps/platform/.next && test -d apps/storefront/.next && echo "builds OK"
 
-# 2. Start all three (from hub shell — do NOT stop admin from admin shell)
-sureapp service manage --start admin
+# 2. Start both services (from hub shell)
 sureapp service manage --start Storefront
 sureapp service manage --start fosl-hub
 
 # 3. Smoke test
-curl -sI https://admin.foslone.com | head -3
+curl -sI https://hub.foslone.com/admin | head -3
 curl -sI https://shop.foslone.com/marketplace | head -3
 curl -sI https://hub.foslone.com/auth/sign-in | head -3
 curl -s https://shop.foslone.com/api/v1/products | head -c 300
 ```
 
-Then open **https://admin.foslone.com/settings** → set subdomain URLs, MySQL, disable API mocking → Save.
+Then open **https://hub.foslone.com/admin/settings** → set subdomain URLs, MySQL, deploy branch (read-only), disable API mocking → Save.
 
-Restart admin + storefront from hub shell (restart hub from ICDSoft panel if needed):
+Restart storefront from hub shell (restart hub from ICDSoft panel if needed):
 
 ```bash
-sureapp service manage --stop admin && sureapp service manage --start admin
 sureapp service manage --stop Storefront && sureapp service manage --start Storefront
 ```
 
@@ -232,10 +252,10 @@ cd /home/foslone/private/FOSL
 ### 2. Pull latest code
 
 ```bash
-git fetch origin master --force && git checkout master && git reset --hard origin/master
+bash scripts/git-deploy-pull.sh
 ```
 
-**Verify:** `git log -1 --oneline` shows recent commits (e.g. `load-root-env` / `icdsoft-start` fixes).
+**Verify:** `git log -1 --oneline` shows recent commits on `refactor/two-app-platform`.
 
 ### 3. Verify bootstrap `.env`
 
@@ -258,7 +278,7 @@ Do **not** use `npm ci --omit=dev` — production start scripts import `@next/en
 
 ### 5. Confirm shared start command and per-app routing
 
-One `start_cmd` for all three WebApps (shared release dir):
+One `start_cmd` for both WebApps (shared release dir):
 
 ```bash
 sureapp meta config --json | grep -i start
@@ -368,16 +388,16 @@ Restart hub (step 7), then re-check step 8–10.
 
 ### 12. Admin settings (production URLs + DB)
 
-1. Open `https://admin.foslone.com/settings`
-2. Hub `https://hub.foslone.com`, Storefront `https://shop.foslone.com`, Admin `https://admin.foslone.com`, Auth URL `https://hub.foslone.com`
-3. MySQL connection, **disable API mocking**, Save
+1. Open `https://hub.foslone.com/admin/settings`
+2. Hub `https://hub.foslone.com`, Storefront `https://shop.foslone.com`, Admin `https://hub.foslone.com/admin`, Auth URL `https://hub.foslone.com`
+3. MySQL connection, **disable API mocking**, Save (deploy branch is fixed to `refactor/two-app-platform`)
 
-Restart all three (step 7).
+Restart both services (step 7).
 
 ### 13. Public smoke tests
 
 ```bash
-curl -sI https://admin.foslone.com/settings | head -3
+curl -sI https://hub.foslone.com/admin/settings | head -3
 curl -sI https://shop.foslone.com/marketplace | head -3
 curl -sI https://hub.foslone.com/auth/sign-in | head -3
 curl -s https://shop.foslone.com/api/v1/products | head -c 300
@@ -387,16 +407,15 @@ curl -s https://shop.foslone.com/api/v1/products | head -c 300
 
 ## Configure production (Admin)
 
-1. Open `https://admin.foslone.com/settings`
-2. Set app URLs: Hub `https://hub.foslone.com`, Storefront `https://shop.foslone.com`, Admin `https://admin.foslone.com`, Auth URL `https://hub.foslone.com`
+1. Open `https://hub.foslone.com/admin/settings`
+2. Set app URLs: Hub `https://hub.foslone.com`, Storefront `https://shop.foslone.com`, Admin `https://hub.foslone.com/admin`, Auth URL `https://hub.foslone.com`
 3. Set MySQL, Stripe, email, file storage
 4. **Disable API mocking** for production
 5. Save — writes `.fosl-runtime.json` at `/home/foslone/private/FOSL/.fosl-runtime.json`
 
-Restart all three services after saving:
+Restart both services after saving:
 
 ```bash
-sureapp service manage --stop admin && sureapp service manage --start admin
 sureapp service manage --stop fosl-hub && sureapp service manage --start fosl-hub
 sureapp service manage --stop Storefront && sureapp service manage --start Storefront
 ```
@@ -408,10 +427,10 @@ sureapp service manage --stop Storefront && sureapp service manage --start Store
 Use any sureapp shell; same shared repo path.
 
 ```bash
-sureapp project shell fosl-hub   # or: sureapp project shell Storefront / admin
+sureapp project shell fosl-hub   # or: sureapp project shell Storefront
 cd /home/foslone/private/FOSL
 
-git fetch origin master --force && git checkout master && git reset --hard origin/master
+bash scripts/git-deploy-pull.sh
 
 npm ci
 npm run db:migrate:deploy
@@ -419,9 +438,9 @@ npm run db:migrate:deploy
 export LOW_MEMORY_BUILD=true
 export NODE_OPTIONS=--max-old-space-size=768
 export NEXT_TELEMETRY_DISABLED=1
-npm run build
+npm run build -w @fosl/platform
+npm run build -w @fosl/storefront
 
-sureapp service manage --stop admin && sureapp service manage --start admin
 sureapp service manage --stop fosl-hub && sureapp service manage --start fosl-hub
 sureapp service manage --stop Storefront && sureapp service manage --start Storefront
 ```
@@ -430,7 +449,7 @@ sureapp service manage --stop Storefront && sureapp service manage --start Store
 
 | Check | URL | Expected |
 |-------|-----|----------|
-| Admin settings | `https://admin.foslone.com/settings` | Saves to database |
+| Admin settings | `https://hub.foslone.com/admin/settings` | Saves to database |
 | Hub sign-in | `https://hub.foslone.com/auth/sign-in` | Login works |
 | Storefront | `https://shop.foslone.com/marketplace` | Products load |
 | Products API | `https://shop.foslone.com/api/v1/products` | `"source": "database"` when DB is up |
@@ -482,7 +501,7 @@ npm run db:seed
 ```
 
 (`dotenv` is not on PATH on ICDSoft — use `npx dotenv`.)
-`db:push` applies the full current schema (including tables added after the initial migration). After `git pull` on latest `master`, `db:migrate:deploy` also works (comment lines removed from the migration SQL).
+`db:push` applies the full current schema (including tables added after the initial migration). After `git pull` on `refactor/two-app-platform`, `db:migrate:deploy` also works (comment lines removed from the migration SQL).
 
 ## sureapp service troubleshooting
 
@@ -493,9 +512,8 @@ npm run db:seed
 **A — Is anything listening on the assigned ports?** (from `sureapp project list`)
 
 ```bash
-curl -sI http://127.0.0.1:26104/ | head -3    # fosl-hub
+curl -sI http://127.0.0.1:26104/ | head -3    # platform (fosl-hub)
 curl -sI http://127.0.0.1:1629/ | head -3     # Storefront
-curl -sI http://127.0.0.1:31035/ | head -3    # admin
 ```
 
 | Result | Meaning |
@@ -542,7 +560,7 @@ Confirm **start-cmd** in the panel (or meta config) is exactly:
 
 | Project | Start command |
 |---------|---------------|
-| All three (shared release dir) | `node scripts/icdsoft-start.mjs` |
+| Both WebApps (shared release dir) | `node scripts/icdsoft-start.mjs` |
 
 Plus per-app `FOSL_APP` via `sureapp env set` (see **Shared release directory**). Do **not** set different `npm run start -w @fosl/...` per WebApp — the last edit wins for everyone.
 
@@ -552,9 +570,9 @@ If start-cmd is wrong:
 sureapp project modify --start-cmd "node scripts/icdsoft-start.mjs"
 ```
 
-### `ERROR: Internal error` on `--enable` or `--start` (admin / storefront)
+### `ERROR: Internal error` on `--enable` or `--start` (storefront)
 
-`sureapp service manage --start fosl-hub` works but **admin** and **storefront** return internal error → those WebApps are probably **not created yet** or use **different project names**.
+`sureapp service manage --start fosl-hub` works but **storefront** returns internal error → the WebApp is probably **not created yet** or uses a **different project name**.
 
 **Step 1 — list what actually exists:**
 
@@ -563,14 +581,13 @@ sureapp project modify --start-cmd "node scripts/icdsoft-start.mjs"
 sureapp project list
 ```
 
-You should see three Node.js projects. If you only see `fosl-hub` (and maybe `yoosupport`), create the missing apps in the **ICDSoft control panel** (WebApps → Add application):
+You should see **two** FOSL Node.js projects (`fosl-hub` and `Storefront`). If you only see `fosl-hub` (and maybe `yoosupport`), create the missing app in the **ICDSoft control panel** (WebApps → Add application):
 
 | Name | Engine | Release directory | Start command |
 |------|--------|-------------------|---------------|
 | `Storefront` | Node.js LTS | `/home/foslone/private/FOSL` | `node scripts/icdsoft-start.mjs` |
-| `admin` | Node.js LTS | `/home/foslone/private/FOSL` | `node scripts/icdsoft-start.mjs` |
 
-Then map domains: `shop.foslone.com` → storefront, `admin.foslone.com` → admin.
+Then map domain: `shop.foslone.com` → `Storefront`. Map `admin.foslone.com` to the **same** platform WebApp as `hub.foslone.com` (redirect handled in middleware).
 
 **Step 2 — enable via panel** (red circle → green) if CLI `--enable` fails.
 
@@ -582,13 +599,10 @@ sureapp service manage --start <exact-name-from-list>
 
 ### `ERROR: Internal error` when stopping a service
 
-**Fix:** manage other services from a *different* shell, or use the ICDSoft control panel.
+**Fix:** manage the other service from a *different* shell, or use the ICDSoft control panel.
 
 ```bash
-# Use the hub shell to restart admin + storefront (hub already worked for you)
 sureapp project shell fosl-hub
-
-sureapp service manage --stop admin && sureapp service manage --start admin
 sureapp service manage --stop Storefront && sureapp service manage --start Storefront
 ```
 
@@ -596,20 +610,18 @@ To restart **hub** while you are in the hub shell, use the control panel instead
 
 ### Service name mismatch
 
-WebApp names must match exactly (case-sensitive). Run `sureapp project list` — on this server: `Storefront`, `admin`, `fosl-hub`.
+WebApp names must match exactly (case-sensitive). Run `sureapp project list` — on this server: `Storefront`, `fosl-hub`.
 
 ### Port already in use (`EADDRINUSE`)
 
-Stale Node processes after a crash loop can hold ports **26104**, **1629**, **31035**:
+Stale Node processes after a crash loop can hold ports **26104** and **1629**:
 
 ```bash
 fuser -k 26104/tcp 2>/dev/null || true
 fuser -k 1629/tcp 2>/dev/null || true
-fuser -k 31035/tcp 2>/dev/null || true
 sleep 2
-sureapp service manage --start admin
 sureapp service manage --start Storefront
-# restart fosl-hub via panel or from Storefront/admin shell
+# restart fosl-hub via panel or from Storefront shell
 ```
 
 ### `--start` only (service already stopped)
@@ -617,8 +629,8 @@ sureapp service manage --start Storefront
 If a service is down, skip `--stop`:
 
 ```bash
-sureapp service manage --start admin
 sureapp service manage --start Storefront
+sureapp service manage --start fosl-hub
 ```
 
 ### App crashes on start (check logs)
@@ -634,7 +646,7 @@ test -d apps/platform/.next && echo "platform build OK" || echo "platform NOT bu
 PORT=26104 npm run start -w @fosl/platform
 ```
 
-If port is in use: `fuser -k 31035/tcp` (replace port per app). If manual start prints errors (missing `DATABASE_URL`, `Cannot find package '@next/env'`, etc.), fix those before using sureapp again. Check ICDSoft **WebApps → Logs** for each service.
+If port is in use: `fuser -k 1629/tcp` (replace port per app). If manual start prints errors (missing `DATABASE_URL`, `Cannot find package '@next/env'`, etc.), fix those before using sureapp again. Check ICDSoft **WebApps → Logs** for each service.
 
 ### Sites still broken after services start
 
