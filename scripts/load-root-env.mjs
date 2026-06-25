@@ -1,9 +1,10 @@
 import path from "node:path";
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import nextEnv from "@next/env";
+import { createRequire } from "node:module";
 
-const { loadEnvConfig } = nextEnv;
+const require = createRequire(import.meta.url);
+const { loadEnvConfig } = require("@next/env");
 
 /** Load monorepo root `.env` and Admin-managed `.fosl-runtime.json`. */
 export function loadRootEnv(importMetaUrl) {

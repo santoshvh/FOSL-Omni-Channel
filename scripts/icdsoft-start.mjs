@@ -16,30 +16,32 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 
 /** Update if ICDSoft assigns new ports — run `sureapp project list`. */
 const PORT_TO_APP = {
-  "26104": "hub",
+  "26104": "platform",
   "1629": "storefront",
-  "31035": "admin",
+  // Legacy three-app deploy (remove after migration):
+  "31035": "platform",
 };
 
 const FOSL_APP = process.env.FOSL_APP?.trim().toLowerCase();
 const port = process.env.PORT?.trim() ?? "";
 // PORT is assigned per WebApp by sureapp — prefer it over FOSL_APP (shared release dir).
-const app = PORT_TO_APP[port] || FOSL_APP;
+const legacyApp = FOSL_APP === "hub" || FOSL_APP === "admin" ? "platform" : FOSL_APP;
+const app = PORT_TO_APP[port] || legacyApp;
 
-if (!app || !["hub", "storefront", "admin"].includes(app)) {
+if (!app || !["platform", "storefront", "hub", "admin"].includes(app)) {
   console.error(
     [
       "Cannot determine FOSL app to start.",
       `PORT=${port || "(unset)"}`,
       `FOSL_APP=${FOSL_APP || "(unset)"}`,
-      "Fix: sureapp env set FOSL_APP hub|storefront|admin in each WebApp shell,",
+      "Fix: sureapp env set FOSL_APP platform|storefront in each WebApp shell,",
       "or update PORT_TO_APP in scripts/icdsoft-start.mjs to match `sureapp project list`.",
     ].join("\n")
   );
   process.exit(1);
 }
 
-const workspace = `@fosl/${app}`;
+const workspace = `@fosl/${app === "platform" || app === "hub" || app === "admin" ? "platform" : app}`;
 console.log(`[icdsoft-start] PORT=${port} → ${workspace} AUTH_SECRET=${process.env.AUTH_SECRET ? "set" : "MISSING"}`);
 
 const child = spawn("npm", ["run", "start", "-w", workspace], {
