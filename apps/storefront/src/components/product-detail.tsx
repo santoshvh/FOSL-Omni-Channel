@@ -26,24 +26,35 @@ import { QuantityStepper, quantityMaxFor } from "@/components/quantity-stepper";
 
 type TabId = "description" | "additional" | "reviews";
 
-function Breadcrumbs({ product }: { product: Product }) {
+function Breadcrumbs({
+  product,
+  homeHref = "/",
+  catalogBasePath = "/products",
+}: {
+  product: Product;
+  homeHref?: string;
+  catalogBasePath?: string;
+}) {
   return (
     <nav className="mb-6 text-sm text-slate-500" aria-label="Breadcrumb">
       <ol className="flex flex-wrap items-center gap-1">
         <li>
-          <Link href="/" className="hover:text-primary-dark">
+          <Link href={homeHref} className="hover:text-primary-dark">
             Home
           </Link>
         </li>
         <ChevronRight className="h-3.5 w-3.5" />
         <li>
-          <Link href="/products" className="hover:text-primary-dark">
+          <Link href={catalogBasePath} className="hover:text-primary-dark">
             Shop
           </Link>
         </li>
         <ChevronRight className="h-3.5 w-3.5" />
         <li>
-          <Link href={`/products?category=${product.category}`} className="hover:text-primary-dark">
+          <Link
+            href={`${catalogBasePath}?category=${product.category}`}
+            className="hover:text-primary-dark"
+          >
             {product.category}
           </Link>
         </li>
@@ -421,8 +432,18 @@ function LeadGenPurchaseSummary({ product }: { product: Product }) {
   );
 }
 
-export function ProductDetail({ product: rawProduct }: { product: Product }) {
+export function ProductDetail({
+  product: rawProduct,
+  homeHref,
+  catalogBasePath,
+}: {
+  product: Product;
+  homeHref?: string;
+  catalogBasePath?: string;
+}) {
   const product = enrichProduct(rawProduct);
+  const shopBase = catalogBasePath ?? "/products";
+  const home = homeHref ?? "/";
   const [postcode, setPostcode] = useState("");
   const shipping = product.type === "physical" ? getShippingForVendor(product.vendorId) : [];
   const related = getRelatedProducts(product);
@@ -431,7 +452,7 @@ export function ProductDetail({ product: rawProduct }: { product: Product }) {
   if (product.type === "lead_gen") {
     return (
       <div className="mx-auto max-w-6xl px-4 py-8">
-        <Breadcrumbs product={product} />
+        <Breadcrumbs product={product} homeHref={home} catalogBasePath={shopBase} />
         <div className="grid gap-10 lg:grid-cols-2">
           <ProductGallery product={product} />
           <LeadGenPurchaseSummary product={product} />
@@ -451,7 +472,7 @@ export function ProductDetail({ product: rawProduct }: { product: Product }) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <Breadcrumbs product={product} />
+      <Breadcrumbs product={product} homeHref={home} catalogBasePath={shopBase} />
 
       <div className="grid gap-10 lg:grid-cols-2">
         <ProductGallery product={product} />

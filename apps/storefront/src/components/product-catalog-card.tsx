@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { Product } from "@fosl/contracts";
 import { ProductTypeBadge, formatCurrency } from "@fosl/ui";
 import { ProductCardActions } from "@/components/product-card-actions";
+import { productHref, useStorefrontPath } from "@/lib/storefront-path-context";
 
 export function ProductCatalogCard({
   product,
@@ -13,12 +14,13 @@ export function ProductCatalogCard({
   product: Product;
   layout?: "grid" | "list";
 }) {
-  const productHref = `/products/${product.id}`;
+  const { productBasePath } = useStorefrontPath();
+  const href = productHref(product.id, productBasePath);
 
   if (layout === "grid") {
     return (
       <article className="ecom-card group flex flex-col">
-        <Link href={productHref} className="block">
+        <Link href={href} className="block">
           <div className="relative aspect-[4/5] overflow-hidden bg-slate-50">
             <Image
               src={product.imageUrl}
@@ -49,14 +51,14 @@ export function ProductCatalogCard({
             </div>
           </div>
         </Link>
-        <ProductCardActions product={product} productHref={productHref} />
+        <ProductCardActions product={product} productHref={href} />
       </article>
     );
   }
 
   return (
     <article className="flex flex-col rounded-2xl border border-slate-100 bg-white p-4 shadow-card transition hover:shadow-soft sm:flex-row sm:gap-4">
-      <Link href={productHref} className="flex min-w-0 flex-1 gap-4">
+      <Link href={href} className="flex min-w-0 flex-1 gap-4">
         <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-xl bg-slate-50">
           <Image
             src={product.imageUrl}
@@ -76,7 +78,7 @@ export function ProductCatalogCard({
         </div>
       </Link>
       <div className="mt-3 w-full shrink-0 sm:mt-0 sm:w-52">
-        <ProductCardActions product={product} productHref={productHref} />
+        <ProductCardActions product={product} productHref={href} />
       </div>
     </article>
   );

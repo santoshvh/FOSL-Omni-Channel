@@ -41,6 +41,7 @@ export {
   inviteVendorToOperator,
   updateOperatorVendorStatus,
   createCreatorLinkForProduct,
+  getStorefrontByPath,
 } from "./catalog";
 export {
   getPlatformSettingsFromDb,

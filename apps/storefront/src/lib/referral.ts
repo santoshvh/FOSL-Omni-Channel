@@ -18,11 +18,19 @@ export type ReferralLink = {
   linkId?: string;
 };
 
-export async function createReferralLink(productId: string, referralCode: string): Promise<ReferralLink> {
+export async function createReferralLink(
+  productId: string,
+  referralCode: string,
+  storefrontPath?: string | null
+): Promise<ReferralLink> {
   const res = await fetch("/api/v1/creator-links", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ productId, referralCode }),
+    body: JSON.stringify({
+      productId,
+      referralCode,
+      ...(storefrontPath ? { storefrontPath } : {}),
+    }),
   });
 
   if (!res.ok) {

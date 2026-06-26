@@ -10,6 +10,7 @@ import { useCart } from "@/lib/cart-context";
 import { CheckoutStepSkeleton } from "@/components/checkout-step-skeleton";
 import { CheckoutPayment } from "@/components/checkout-payment";
 import { setStoredOrderEmail } from "@/lib/order-email";
+import { useStorefrontPath } from "@/lib/storefront-path-context";
 
 const steps = ["Contact", "Shipping", "Payment"] as const;
 
@@ -54,6 +55,7 @@ export default function CheckoutPage() {
   const [payError, setPayError] = useState<string | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const { lines, subtotalCents, isHydrated } = useCart();
+  const { storefrontPath } = useStorefrontPath();
   const [form, setForm] = useState<FormData>(initialForm);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const physicalVendorIds = [
@@ -128,6 +130,7 @@ export default function CheckoutPage() {
             postalCode: form.postal.trim(),
             country: form.country.trim(),
           },
+          ...(storefrontPath ? { storefrontPath } : {}),
         }),
       });
       const json = (await res.json()) as { data?: { id: string }; error?: string };

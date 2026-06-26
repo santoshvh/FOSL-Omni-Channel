@@ -1,15 +1,39 @@
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { notFound } from "next/navigation";
-import { getMarketplaceVendorBySlug, getProductsByVendorId } from "@fosl/mocks";
+import { getMarketplaceVendorBySlug } from "@fosl/mocks";
 import { ProductCatalogCard } from "@/components/product-catalog-card";
+import { getProductsByVendorId } from "@fosl/mocks";
+import { OperatorStorefrontHome } from "@/components/operator-storefront-home";
 
-export default async function VendorStorePage({
+async function loadOperatorStorefront(path: string) {
+  if (!process.env.DATABASE_URL?.trim()) return null;
+  try {
+    const { getStorefrontByPath } = await import("@fosl/db");
+    return getStorefrontByPath(path);
+  } catch {
+    return null;
+  }
+}
+
+export default async function StorePathPage({
   params,
 }: {
   params: Promise<{ store: string }>;
 }) {
   const { store } = await params;
+
+  const operatorStore = await loadOperatorStorefront(store);
+  if (operatorStore) {
+    return (
+      <OperatorStorefrontHome
+        storefrontPath={operatorStore.path}
+        name={operatorStore.name}
+        operatorName={operatorStore.operator.name}
+      />
+    );
+  }
+
   const vendor = getMarketplaceVendorBySlug(store);
   if (!vendor) notFound();
 

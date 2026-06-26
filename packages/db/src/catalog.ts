@@ -199,10 +199,20 @@ export async function updateOperatorVendorStatus(id: string, status: ApprovalSta
   });
 }
 
+export async function getStorefrontByPath(path: string) {
+  return prisma.storefront.findUnique({
+    where: { path },
+    include: {
+      operator: { select: { id: true, name: true, slug: true } },
+    },
+  });
+}
+
 export async function createCreatorLinkForProduct(params: {
   referralCode: string;
   productId: string;
   storefrontBaseUrl: string;
+  storefrontPath?: string | null;
   operatorId?: string | null;
 }) {
   const product = await getNetworkProduct(params.productId);
@@ -213,6 +223,19 @@ export async function createCreatorLinkForProduct(params: {
   });
   if (!creator) return null;
 
+  let operatorId = params.operatorId ?? null;
+  let storefrontPath = params.storefrontPath?.trim() || null;
+
+  if (storefrontPath && !operatorId) {
+    const storefront = await getStorefrontByPath(storefrontPath);
+    operatorId = storefront?.operatorId ?? null;
+  }
+
+  if (operatorId) {
+    const visible = await getOperatorProduct(operatorId, params.productId);
+    if (!visible) return null;
+  }
+
   const slugBase = params.productId.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6).toUpperCase();
   const slug = `CR_${slugBase}_${Date.now().toString(36).toUpperCase()}`;
 
@@ -220,7 +243,7 @@ export async function createCreatorLinkForProduct(params: {
     data: {
       creatorId: creator.id,
       productId: params.productId,
-      operatorId: params.operatorId ?? null,
+      operatorId,
       slug,
       label: product.title,
       cookieDays: 30,
@@ -228,8 +251,10 @@ export async function createCreatorLinkForProduct(params: {
     },
   });
 
-  const path = `/marketplace/products/${product.id}?ref=${encodeURIComponent(slug)}`;
+  const path = storefrontPath
+    ? `/${storefrontPath}/products/${product.id}?ref=${encodeURIComponent(slug)}`
+    : `/marketplace/products/${product.id}?ref=${encodeURIComponent(slug)}`;
   const url = `${params.storefrontBaseUrl.replace(/\/$/, "")}${path}`;
 
-  return { link, url, code: slug, productId: product.id };
+  return { link, url, code: slug, productId: product.id, operatorId, storefrontPath };
 }

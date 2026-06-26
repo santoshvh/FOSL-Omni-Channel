@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { Button, Input } from "@fosl/ui";
 import { generateReferralLink, createReferralLink, type ReferralLink } from "@/lib/referral";
 import { isCreatorSignedIn, getCreatorReferralCode } from "@/lib/creator-session";
+import { useStorefrontPath } from "@/lib/storefront-path-context";
 import { CreatorSignupDialog } from "@/components/creator-signup-dialog";
 import { Link2, Copy, Check, X } from "lucide-react";
 
@@ -25,6 +26,7 @@ export function CreatorEarnButton({
   const [link, setLink] = useState<ReferralLink | null>(null);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { storefrontPath } = useStorefrontPath();
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
@@ -38,7 +40,7 @@ export function CreatorEarnButton({
 
       setLoading(true);
       const referralCode = getCreatorReferralCode() ?? "ALEX2026";
-      createReferralLink(productId, referralCode)
+      createReferralLink(productId, referralCode, storefrontPath)
         .then((generated) => {
           setLink(generated);
           setLinkOpen(true);
@@ -52,7 +54,7 @@ export function CreatorEarnButton({
         })
         .finally(() => setLoading(false));
     },
-    [productId, onGenerated]
+    [productId, onGenerated, storefrontPath]
   );
 
   const copyLink = useCallback(() => {

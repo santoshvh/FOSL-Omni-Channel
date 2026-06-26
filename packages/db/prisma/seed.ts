@@ -99,6 +99,31 @@ async function main() {
     },
   });
 
+  const operator2 = await prisma.operator.upsert({
+    where: { slug: "urban-market" },
+    update: {},
+    create: {
+      id: "op_2",
+      name: platformOperators[1]?.name ?? "Urban Market LLC",
+      slug: "urban-market",
+      contactEmail: platformOperators[1]?.email ?? "admin@urbanmarket.com",
+      subscriptionState: SubscriptionState.GRACE_PERIOD,
+      planName: "Starter",
+    },
+  });
+
+  await prisma.storefront.upsert({
+    where: { path: "operator2" },
+    update: {},
+    create: {
+      operatorId: operator2.id,
+      name: "Urban Market Store",
+      path: "operator2",
+      isDefault: true,
+      subscriptionState: SubscriptionState.ACTIVE,
+    },
+  });
+
   for (const mv of marketplaceVendors) {
     await prisma.vendor.upsert({
       where: { slug: mv.slug },
@@ -128,6 +153,22 @@ async function main() {
       create: {
         operatorId: operator.id,
         vendorId: mv.id,
+        status: "APPROVED",
+        minCommissionPct: 8,
+        defaultCommissionPct: 10,
+      },
+    });
+  }
+
+  for (const vendorId of ["ven_1", "ven_2"]) {
+    await prisma.operatorVendor.upsert({
+      where: {
+        operatorId_vendorId: { operatorId: operator2.id, vendorId },
+      },
+      update: { status: "APPROVED" },
+      create: {
+        operatorId: operator2.id,
+        vendorId,
         status: "APPROVED",
         minCommissionPct: 8,
         defaultCommissionPct: 10,
@@ -233,7 +274,11 @@ async function main() {
     });
   }
 
-  console.log("Seed complete.", { admin: admin.email, operator: operator.slug });
+  console.log("Seed complete.", {
+    admin: admin.email,
+    operators: [operator.slug, operator2.slug],
+    storefronts: ["demo", "operator2"],
+  });
 }
 
 main()

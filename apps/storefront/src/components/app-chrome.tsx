@@ -14,6 +14,7 @@ import { MobileBottomNav } from "./mobile-bottom-nav";
 import { SubscriptionBanner } from "./subscription-banner";
 import { MswInit } from "./msw-init";
 import { PlatformUrlsProvider } from "@/lib/platform-urls-context";
+import { StorefrontPathProvider } from "@/lib/storefront-path-context";
 import { usePlatformConfig } from "@/lib/use-platform-config";
 
 export function AppChrome({ children }: { children: React.ReactNode }) {
@@ -32,6 +33,7 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
   return (
     <PlatformUrlsProvider config={config}>
       <CartProvider mode={isMarketplace ? "marketplace" : "storefront"}>
+      <StorefrontPathProvider>
       <MswInit apiMockingEnabled={loading ? null : config?.apiMocking.enabled} />
       <div className="flex min-h-screen flex-col pb-16 md:pb-0">
         <SubscriptionBanner state={subscriptionState} />
@@ -46,6 +48,7 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
           <CreatorAuthReturn />
         </Suspense>
       </div>
+      </StorefrontPathProvider>
     </CartProvider>
     </PlatformUrlsProvider>
   );

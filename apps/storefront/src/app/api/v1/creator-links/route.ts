@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  let body: { productId?: string; referralCode?: string };
+  let body: { productId?: string; referralCode?: string; storefrontPath?: string };
   try {
     body = await request.json();
   } catch {
@@ -33,6 +33,7 @@ export async function POST(request: Request) {
       referralCode,
       productId,
       storefrontBaseUrl: origin,
+      storefrontPath: body.storefrontPath?.trim() || null,
     });
 
     if (!result) {
