@@ -22,8 +22,9 @@ export function isHostedProductionHub(hostname?: string) {
 }
 
 export function isAuthEnabled(hostname?: string): boolean {
+  if (isHostedProductionHub(hostname)) return true;
+
   const secret = getAuthSecret();
-  if (isHostedProductionHub(hostname) && secret) return true;
 
   const flag = process.env.AUTH_ENABLED?.trim().toLowerCase();
   if (flag === "true" || flag === "1" || flag === "on") return true;
