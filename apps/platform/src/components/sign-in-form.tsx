@@ -10,7 +10,19 @@ export function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/vendor";
+  const intent = searchParams.get("intent");
   const resetSuccess = searchParams.get("reset") === "success";
+
+  const intentLabel =
+    intent === "creator"
+      ? "Return to shop as Creator"
+      : intent === "operator"
+        ? "Open Operator dashboard"
+        : intent === "vendor"
+          ? "Open Vendor dashboard"
+          : intent === "admin"
+            ? "Open Admin"
+            : null;
 
   const [email, setEmail] = useState("alex@acmecatalog.com");
   const [password, setPassword] = useState("demo123");
@@ -52,6 +64,9 @@ export function SignInForm() {
         </Link>
         <CardTitle className="mt-4">Sign in</CardTitle>
         <p className="text-sm text-slate-500">One account for Vendor, Creator, and Operator roles</p>
+        {intentLabel && (
+          <p className="mt-2 text-xs font-medium text-primary-dark">{intentLabel}</p>
+        )}
       </CardHeader>
       <CardContent>
         {resetSuccess && (

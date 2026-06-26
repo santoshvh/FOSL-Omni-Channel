@@ -5,6 +5,7 @@ import Image from "next/image";
 import { FoslLogo } from "@fosl/ui";
 import { externalLinks, fosloneImages } from "@/lib/foslone";
 import { usePlatformUrls } from "@/lib/platform-urls-context";
+import { hubSignInUrl } from "@/lib/shop-auth";
 import { legalPageHref, legalPages } from "@/lib/legal";
 
 const footerLegalSlugs = [
@@ -16,7 +17,7 @@ const footerLegalSlugs = [
 ] as const;
 
 export function FosloneFooter() {
-  const { hubLoginUrl } = usePlatformUrls();
+  const urls = usePlatformUrls();
 
   return (
     <footer className="border-t border-slate-100 bg-ink text-white">
@@ -110,8 +111,18 @@ export function FosloneFooter() {
                 </Link>
               </li>
               <li>
-                <a href={hubLoginUrl} className="text-white/70 hover:text-primary">
-                  Hub login
+                <a href={hubSignInUrl("creator", urls)} className="text-white/70 hover:text-primary">
+                  Creator login
+                </a>
+              </li>
+              <li>
+                <a href={hubSignInUrl("operator", urls)} className="text-white/70 hover:text-primary">
+                  Operator hub
+                </a>
+              </li>
+              <li>
+                <a href={hubSignInUrl("vendor", urls)} className="text-white/70 hover:text-primary">
+                  Vendor hub
                 </a>
               </li>
             </ul>

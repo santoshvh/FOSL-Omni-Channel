@@ -39,7 +39,15 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
 
   await clearCommissionsForOrder(order.id);
 
-  if (paymentIntent.metadata.settlement === "multi_vendor") {
+  const settlement = paymentIntent.metadata.settlement;
+  if (settlement === "operator_direct" || settlement === "operator_multi_vendor") {
+    try {
+      const { settleOperatorPayment } = await import("@/lib/operator-settlement");
+      await settleOperatorPayment(paymentIntent.id);
+    } catch (err) {
+      console.error("[stripe-webhook] operator settlement failed:", err);
+    }
+  } else if (settlement === "multi_vendor") {
     try {
       await settleMultiVendorPayment(paymentIntent.id);
     } catch (err) {

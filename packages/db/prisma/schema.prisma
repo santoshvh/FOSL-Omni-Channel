@@ -173,6 +173,9 @@ model Operator {
   planName           String?
   stripeCustomerId   String?           @unique
   stripeSubscriptionId String?
+  /// Stripe Connect Express — operator is merchant of record at checkout
+  stripeConnectId    String?           @unique
+  stripeConnectOnboardedAt DateTime?
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
 
@@ -194,6 +197,10 @@ model Storefront {
   path              String            @unique
   isDefault         Boolean           @default(false)
   customDomain      String?           @unique
+  /// Public key for headless / self-hosted shop clients (`pk_sf_…`)
+  publishableKey    String?           @unique
+  secretKeyHash     String?
+  allowedOrigins    Json?
   subscriptionState SubscriptionState @default(ACTIVE)
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt

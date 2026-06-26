@@ -9,6 +9,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@fosl/commerce-api": "*",
     "@fosl/contracts": "*",
     "@fosl/db": "*",
     "@fosl/mocks": "*",

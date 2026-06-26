@@ -71,6 +71,7 @@ export const paymentIntentBodySchema = z.object({
   amountCents: z.number().int().min(50),
   email: z.string().email().optional(),
   lines: z.array(createOrderLineSchema).optional(),
+  storefrontPath: z.string().optional(),
 });
 
 export const referralClickSchema = z.object({

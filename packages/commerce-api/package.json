@@ -1,0 +1,19 @@
+{
+  "name": "@fosl/commerce-api",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fosl/contracts": "*",
+    "@fosl/db": "*",
+    "@fosl/mocks": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

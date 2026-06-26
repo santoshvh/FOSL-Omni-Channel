@@ -6,7 +6,7 @@ No Docker. Deploy to ICDSoft WebApps using the **sureapp** CLI (same pattern as 
 
 | | **YooSupport** | **FOSL** |
 |---|----------------|----------|
-| Apps | 1 Next.js app (`yoosupport`) | **2 WebApps:** `fosl-hub` (platform), `Storefront` |
+| Apps | 1 Next.js app (`yoosupport`) | **3 WebApps:** `fosl-hub`, `Storefront`, `fosl-api` |
 | Repo on server | Git clone + rsync to app dir | Single monorepo at `/home/foslone/private/FOSL` |
 | Start command | `npm start` in app dir | `node scripts/icdsoft-start.mjs` per service |
 | Restart | `--stop` then `--start` (no `--restart`) | Same |
@@ -42,14 +42,15 @@ Or run `bash scripts/git-deploy-pull.sh` from the repo root (same commands).
 - MySQL 8 (default; ICDSoft MySQL script) or PostgreSQL
 - SSH access + sureapp CLI
 - **Subdomains only** — the apex domain [foslone.com](https://foslone.com) stays the existing marketing site; FOSL apps run on subdomains below
-- Stripe webhook URL: `https://shop.foslone.com/api/webhooks/stripe`
+- Stripe webhook URL: `https://shop.foslone.com/api/webhooks/stripe` (or `https://api.foslone.com/api/webhooks/stripe` when using dedicated API host)
 
 ## Domain mapping
 
 | Domain | App | Purpose |
 |--------|-----|---------|
 | `https://hub.foslone.com` | Platform | Vendor, Creator, Operator workspaces + `/admin` settings |
-| `https://shop.foslone.com` | Storefront | Customer shop, marketplace, checkout |
+| `https://shop.foslone.com` | Storefront | Customer shop UI, marketplace, checkout |
+| `https://api.foslone.com` | Commerce API | Headless catalog/checkout API (`@fosl/api`) |
 | `https://admin.foslone.com` | *(redirect)* | Redirects to `https://hub.foslone.com/admin` (middleware) |
 
 The apex **`https://foslone.com`** is not used for FOSL apps at this stage — keep it on the current FOSLOne marketing site. Link to the shop from there (e.g. Marketplace → `shop.foslone.com`).
@@ -60,6 +61,7 @@ In **Platform → Admin → Settings → App URLs**, use exactly:
 |---------|-----|
 | Platform (Hub) | `https://hub.foslone.com` |
 | Storefront | `https://shop.foslone.com` |
+| Commerce API | `https://api.foslone.com` |
 | Admin | `https://hub.foslone.com/admin` |
 | Auth URL | `https://hub.foslone.com` |
 
@@ -72,26 +74,32 @@ In **Platform → Admin → Settings → App URLs**, use exactly:
 
 Deploy the **entire monorepo** — not a single `apps/platform` folder. Workspaces need `packages/`, root `package.json`, etc.
 
-## WebApps (two services)
+## WebApps (three services)
 
-Create **two** ICDSoft Node.js WebApps, each with working directory `/home/foslone/private/FOSL`:
+Create **three** ICDSoft Node.js WebApps, each with working directory `/home/foslone/private/FOSL`:
+
+| WebApp | `FOSL_APP` | Example port |
+|--------|------------|--------------|
+| fosl-hub | `platform` | 26104 |
+| Storefront | `storefront` | 1629 |
+| fosl-api | `api` | 27104 |
 
 | Service | Start command (ICDSoft panel) |
 |---------|--------------------------------|
-| **Both** | `node scripts/icdsoft-start.mjs` |
+| **All three** | `node scripts/icdsoft-start.mjs` |
 
 Both use release directory `/home/foslone/private/FOSL`. **Do not use plain `npm start`** — the repo root has no `start` script.
 
 ### Shared release directory (important)
 
-ICDSoft stores **one `start_cmd` per release directory**. Both WebApps share `/home/foslone/private/FOSL`, so `sureapp project modify --start-cmd` in any shell updates **both** projects.
+ICDSoft stores **one `start_cmd` per release directory**. All three WebApps share `/home/foslone/private/FOSL`, so `sureapp project modify --start-cmd` in any shell updates **all** projects.
 
 Use the router script `scripts/icdsoft-start.mjs`. It picks the app from:
 
-1. `FOSL_APP` (`platform` / `storefront`) via `sureapp env set` in each WebApp shell, or
+1. `FOSL_APP` (`platform` / `storefront` / `api`) via `sureapp env set` in each WebApp shell, or
 2. `PORT` from `sureapp project list` (defaults baked into the script for foslone@s1282).
 
-**One-time setup** (run once from any shell):
+**One-time setup** (run once per WebApp shell):
 
 ```bash
 cd /home/foslone/private/FOSL
@@ -103,7 +111,21 @@ exit
 sureapp project shell Storefront
 sureapp env set FOSL_APP storefront
 exit
+
+sureapp project shell fosl-api
+sureapp env set FOSL_APP api
+sureapp env set STOREFRONT_INTERNAL_ORIGIN 'http://127.0.0.1:1629'
+exit
 ```
+
+Set on **Storefront** (and platform if desired) for custom-domain rewrites + API proxy:
+
+```bash
+sureapp env set FOSL_INTERNAL_SECRET 'random-secret-min-32-chars'
+sureapp env set STOREFRONT_INTERNAL_ORIGIN 'http://127.0.0.1:1629'
+```
+
+On **fosl-api**, set `STOREFRONT_INTERNAL_ORIGIN` to the internal Storefront URL so checkout/product routes proxy correctly.
 
 If ports change after recreating WebApps, update `PORT_TO_APP` in `scripts/icdsoft-start.mjs` to match `sureapp project list`.
 
@@ -124,7 +146,19 @@ Map domains in ICDSoft:
 | ICDSoft service (`sureapp project list`) | Domain |
 |------------------------------------------|--------|
 | `Storefront` | `shop.foslone.com` |
+| `fosl-api` | `api.foslone.com` |
 | `fosl-hub` | `hub.foslone.com` (+ optional `admin.foslone.com` → same app) |
+
+### Operator Connect + headless storefronts (after pull)
+
+1. Apply migration `20250624120000_operator_connect_storefront_keys` (or `npm run db:push` on fresh DB).
+2. `npm run db:seed` — seeds `pk_sf_…` keys on demo storefronts and demo operator Connect id.
+3. **Hub → Operator → Payments & Stripe Connect** — complete Express onboarding (production).
+4. **Hub → Operator → Storefronts** — copy publishable key for self-hosted shops.
+5. **Hub → Operator → Domains** — custom domain + CORS origins.
+6. Rebuild all three apps: `npm run build -w @fosl/platform && npm run build -w @fosl/storefront && npm run build -w @fosl/api`
+
+See also `docs/NETWORK-CATALOG-SPEC.md`, `docs/API-REFERENCE.md`, `templates/operator-starter/`.
 
 ## First-time deploy
 

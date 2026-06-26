@@ -17,6 +17,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const PORT_TO_APP = {
   "26104": "platform",
   "1629": "storefront",
+  "27104": "api",
 };
 
 const FOSL_APP = process.env.FOSL_APP?.trim().toLowerCase();
@@ -25,13 +26,13 @@ const legacyApp =
   FOSL_APP === "hub" || FOSL_APP === "admin" ? "platform" : FOSL_APP;
 const app = PORT_TO_APP[port] || legacyApp;
 
-if (!app || !["platform", "storefront"].includes(app)) {
+if (!app || !["platform", "storefront", "api"].includes(app)) {
   console.error(
     [
       "Cannot determine FOSL app to start.",
       `PORT=${port || "(unset)"}`,
       `FOSL_APP=${FOSL_APP || "(unset)"}`,
-      "Fix: sureapp env set FOSL_APP platform|storefront in each WebApp shell,",
+      "Fix: sureapp env set FOSL_APP platform|storefront|api in each WebApp shell,",
       "or update PORT_TO_APP in scripts/icdsoft-start.mjs to match `sureapp project list`.",
     ].join("\n")
   );

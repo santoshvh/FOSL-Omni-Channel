@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My FOSL Store</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; max-width: 960px; }
+      .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+      .card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; }
+      .price { font-weight: 700; margin-top: 0.5rem; }
+      #status { color: #64748b; margin-bottom: 1rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Operator storefront</h1>
+    <p id="status">Loading catalog…</p>
+    <div id="grid" class="grid"></div>
+    <script src="config.js"></script>
+    <script src="shop.js"></script>
+  </body>
+</html>

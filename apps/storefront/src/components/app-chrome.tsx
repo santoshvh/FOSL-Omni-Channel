@@ -6,7 +6,7 @@ import { StorefrontHeader } from "./storefront-header";
 import { MarketplaceHeader } from "./marketplace-header";
 import { CookieConsent } from "./cookie-consent";
 import { ReferralAttribution } from "./referral-attribution";
-import { CreatorAuthReturn } from "./creator-auth-return";
+import { ShopAuthReturn } from "./shop-auth-return";
 import { FosloneFooter } from "./foslone-footer";
 import { CartProvider } from "@/lib/cart-context";
 import { CartDrawer } from "./cart-drawer";
@@ -45,7 +45,7 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
         <CookieConsent />
         <Suspense fallback={null}>
           <ReferralAttribution />
-          <CreatorAuthReturn />
+          <ShopAuthReturn />
         </Suspense>
       </div>
       </StorefrontPathProvider>

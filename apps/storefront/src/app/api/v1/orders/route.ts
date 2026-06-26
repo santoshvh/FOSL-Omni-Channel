@@ -10,21 +10,33 @@ import {
 } from "@/lib/attribution";
 import { sendOrderConfirmationEmail } from "@/lib/email";
 import { fetchOrdersList } from "@/lib/orders-service";
+import { corsHeadersForStorefront, withCors } from "@/lib/cors";
+import { resolveStorefrontFromRequest } from "@/lib/resolve-storefront-request";
+
+export async function OPTIONS(request: Request) {
+  const { storefront } = await resolveStorefrontFromRequest(request);
+  return new NextResponse(null, { status: 204, headers: corsHeadersForStorefront(request, storefront) });
+}
 
 function orderNumber() {
   return `FOSL-${Date.now().toString(36).toUpperCase()}`;
 }
 
 export async function GET(request: Request) {
+  const { storefront } = await resolveStorefrontFromRequest(request);
+  const cors = corsHeadersForStorefront(request, storefront);
   const { searchParams } = new URL(request.url);
   const email = searchParams.get("email")?.trim().toLowerCase() || undefined;
   const vendorId = searchParams.get("vendorId")?.trim() || undefined;
   const operatorId = searchParams.get("operatorId")?.trim() || undefined;
 
   if (!email && !vendorId && !operatorId) {
-    return NextResponse.json(
+    return withCors(
+      NextResponse.json(
       { error: "Provide email, vendorId, or operatorId to list orders." },
       { status: 400 }
+    ),
+      cors
     );
   }
 
@@ -38,17 +50,20 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const { storefront } = await resolveStorefrontFromRequest(request);
+  const cors = corsHeadersForStorefront(request, storefront);
+
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+    return withCors(NextResponse.json({ error: "Invalid JSON body." }, { status: 400 }), cors);
   }
 
   const parsed = createOrderSchema.safeParse(body);
   if (!parsed.success) {
     const message = parsed.error.errors[0]?.message ?? "Invalid order payload.";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return withCors(NextResponse.json({ error: message }, { status: 400 }), cors);
   }
 
   const { email, lines, shippingCents, taxCents, shipping, storefrontPath, stripePaymentIntentId } =
@@ -215,7 +230,8 @@ export async function POST(request: Request) {
       console.error("[orders] external order push failed:", err);
     });
 
-    return NextResponse.json(
+    return withCors(
+      NextResponse.json(
       {
         data: {
           id: order.id,
@@ -228,9 +244,11 @@ export async function POST(request: Request) {
         },
       },
       { status: 201 }
+    ),
+      cors
     );
   } catch (err) {
     console.error("[orders] create failed:", err);
-    return NextResponse.json({ error: "Unable to create order." }, { status: 500 });
+    return withCors(NextResponse.json({ error: "Unable to create order." }, { status: 500 }), cors);
   }
 }

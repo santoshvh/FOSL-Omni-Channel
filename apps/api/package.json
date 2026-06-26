@@ -1,0 +1,26 @@
+{
+  "name": "@fosl/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "dotenv -e ../../.env -- next dev --port 3002",
+    "build": "next build",
+    "start": "node ../../scripts/next-start.mjs",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fosl/commerce-api": "*",
+    "@fosl/contracts": "*",
+    "@fosl/db": "*",
+    "@fosl/mocks": "*",
+    "next": "^15.3.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "@types/react": "^19.1.4",
+    "dotenv-cli": "^8.0.0",
+    "typescript": "^5.8.3"
+  }
+}

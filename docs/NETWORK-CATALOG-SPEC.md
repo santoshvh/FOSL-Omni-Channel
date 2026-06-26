@@ -118,3 +118,49 @@ Operator product URLs: `/{storefrontPath}/products/{productId}`
 - Separate databases per operator
 - SKU-level curation (`SKU_LEVEL` scope) — schema only
 - Vendor portal accept/decline UI — operator approve only for now
+
+## 8. Headless storefronts & API keys
+
+Each `Storefront` has:
+
+| Field | Purpose |
+|-------|---------|
+| `publishableKey` (`pk_sf_…`) | Browser / static shop — `Authorization: Bearer pk_sf_…` |
+| `secretKeyHash` | Server-side integrations (rotate via hub) |
+| `customDomain` | Resolve tenant from `Host` header |
+| `allowedOrigins` | CORS allowlist for self-hosted shops |
+
+### Resolve order
+
+1. `Authorization: Bearer pk_sf_…`
+2. `Host` → `customDomain`
+3. `storefrontPath` query (legacy path routing)
+
+### Headless endpoints (shop / future `api.*`)
+
+| Endpoint | Notes |
+|----------|--------|
+| `GET /api/v1/products/search?q=` | Product search |
+| `GET /api/v1/categories` | Network categories (DB) |
+| `GET /api/v1/vendors` | Network vendors (DB) |
+| `GET /api/v1/storefront/me` | Metadata from key or domain |
+| `GET /api/v1/products?scope=operator` | Catalog when key/path resolves |
+| `POST /api/v1/checkout/payment-intent` | Includes `storefrontPath`; uses operator Connect when configured |
+| `POST /api/v1/orders` | `storefrontPath` for attribution |
+
+Hub: `GET/POST /api/v1/operator/storefronts`, `POST /api/v1/operator/stripe-connect`.
+
+## 9. Payments — Operator Connect (Model 1)
+
+When `Operator.stripeConnectId` is set:
+
+- Checkout charges the **operator Connect account** (operator MoR).
+- **FOSL** takes `application_fee_amount` (default 10%).
+- **Vendors** receive transfers from the operator balance on `payment_intent.succeeded`.
+- **Creators** — commission rows in DB; payout job transfers (same as before).
+
+When operator has **no** Connect account (marketplace / fallback):
+
+- Legacy **platform MoR** — destination charge or multi-vendor settlement on platform balance.
+
+Settlement metadata values: `operator_direct`, `operator_multi_vendor`, `destination`, `multi_vendor`, `platform`.

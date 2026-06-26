@@ -2,6 +2,7 @@ import { PrismaClient, ProductType, CatalogSource, SubscriptionState } from "@pr
 import { hash } from "bcryptjs";
 import { products, getShippingForVendor } from "@fosl/mocks";
 import { marketplaceVendors, platformOperators } from "@fosl/mocks";
+import { generateStorefrontKeyPair } from "../src/storefront-auth";
 
 const prisma = new PrismaClient();
 const DEMO_PASSWORD = "demo123";
@@ -75,7 +76,10 @@ async function main() {
 
   const operator = await prisma.operator.upsert({
     where: { slug: "demo-storefront" },
-    update: {},
+    update: {
+      stripeConnectId: "acct_demo_operator",
+      stripeConnectOnboardedAt: new Date(),
+    },
     create: {
       id: "op_1",
       name: platformOperators[0]?.name ?? "Demo Storefront Co.",
@@ -84,18 +88,27 @@ async function main() {
       ownerUserId: demoUser.id,
       subscriptionState: SubscriptionState.ACTIVE,
       planName: "Professional",
+      stripeConnectId: "acct_demo_operator",
+      stripeConnectOnboardedAt: new Date(),
     },
   });
 
+  const demoKeys = generateStorefrontKeyPair();
   await prisma.storefront.upsert({
     where: { path: "demo" },
-    update: {},
+    update: {
+      publishableKey: demoKeys.publishableKey,
+      secretKeyHash: demoKeys.secretKeyHash,
+    },
     create: {
       operatorId: operator.id,
       name: "Demo Storefront",
       path: "demo",
       isDefault: true,
       subscriptionState: SubscriptionState.ACTIVE,
+      publishableKey: demoKeys.publishableKey,
+      secretKeyHash: demoKeys.secretKeyHash,
+      allowedOrigins: [],
     },
   });
 
@@ -112,15 +125,22 @@ async function main() {
     },
   });
 
+  const op2Keys = generateStorefrontKeyPair();
   await prisma.storefront.upsert({
     where: { path: "operator2" },
-    update: {},
+    update: {
+      publishableKey: op2Keys.publishableKey,
+      secretKeyHash: op2Keys.secretKeyHash,
+    },
     create: {
       operatorId: operator2.id,
       name: "Urban Market Store",
       path: "operator2",
       isDefault: true,
       subscriptionState: SubscriptionState.ACTIVE,
+      publishableKey: op2Keys.publishableKey,
+      secretKeyHash: op2Keys.secretKeyHash,
+      allowedOrigins: [],
     },
   });
 

@@ -44,6 +44,32 @@ export {
   getStorefrontByPath,
 } from "./catalog";
 export {
+  resolveStorefront,
+  parsePublishableKeyFromAuthHeader,
+  storefrontAllowedOrigins,
+  generateStorefrontKeyPair,
+  hashStorefrontSecret,
+  listOperatorStorefronts,
+  createOperatorStorefront,
+  rotateStorefrontSecretKey,
+  updateStorefrontSettings,
+  getStorefrontByPublishableKey,
+  getStorefrontByCustomDomain,
+} from "./storefront-auth";
+export type { ResolvedStorefront, StorefrontResolveInput } from "./storefront-auth";
+export {
+  buildPaymentSettlementParams,
+  getOperatorStripeConnect,
+  setOperatorStripeConnectId,
+  DEFAULT_PLATFORM_FEE_PCT,
+} from "./payments";
+export type { ConnectSettlement, PaymentSettlementParams } from "./payments";
+export {
+  listNetworkVendors,
+  listNetworkCategories,
+  searchNetworkProducts,
+} from "./discovery";
+export {
   getPlatformSettingsFromDb,
   getPlatformSecretsFromDb,
   getPublicPlatformConfigFromDb,
