@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AdminShell } from "@/components/admin-shell";
 import { auth } from "@/auth";
-import { isAuthEnabled } from "@/lib/auth-secret";
 
 export const metadata: Metadata = {
   title: "FOSL Admin",
@@ -11,8 +10,15 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
+function isAdminAuthOptional() {
+  return (
+    process.env.NODE_ENV === "development" &&
+    process.env.AUTH_ENABLED?.trim().toLowerCase() === "false"
+  );
+}
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  if (isAuthEnabled()) {
+  if (!isAdminAuthOptional()) {
     const session = await auth();
     if (!session?.user) {
       redirect("/auth/sign-in?callbackUrl=/admin");
