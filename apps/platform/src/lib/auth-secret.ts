@@ -11,13 +11,16 @@ export function getAuthSecret(): string | undefined {
 }
 
 export function isAuthEnabled(): boolean {
+  const flag = process.env.AUTH_ENABLED?.trim().toLowerCase();
+  if (flag === "true" || flag === "1" || flag === "on") return true;
+  if (flag === "false" || flag === "0" || flag === "off") {
+    // Production deploys always protect routes when AUTH_SECRET is configured.
+    if (process.env.NODE_ENV === "production" && getAuthSecret()) return true;
+    return false;
+  }
+
   const secret = getAuthSecret();
   if (!secret) return false;
-
-  // Production: protect hub/admin whenever AUTH_SECRET is configured.
   if (process.env.NODE_ENV === "production") return true;
-
-  const flag = process.env.AUTH_ENABLED?.trim().toLowerCase();
-  if (flag === "false" || flag === "0" || flag === "off") return false;
   return true;
 }
