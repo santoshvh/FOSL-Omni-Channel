@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  return NextResponse.json({
+  const payload: Record<string, string> = {
     service: "fosl-commerce-api",
     version: "v1",
-    docs: "https://github.com/santoshvh/FOSL-Omni-Channel/blob/refactor/two-app-platform/docs/API-REFERENCE.md",
-  });
+    status: "ok",
+  };
+
+  const docs = process.env.FOSL_API_DOCS_URL?.trim();
+  if (docs) payload.docs = docs;
+
+  return NextResponse.json(payload);
 }
