@@ -1,4 +1,4 @@
-﻿CREATE TABLE `users` (
+CREATE TABLE `users` (
     `id` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `emailVerified` DATETIME(3) NULL,

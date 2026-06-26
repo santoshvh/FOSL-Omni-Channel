@@ -523,6 +523,17 @@ Use ICDSoft cron (from repo root):
 
 Create `/home/foslone/private/FOSL/.env` with your ICDSoft MySQL connection string (see above).
 
+### P3018 / MySQL error 1064 near `CREATE TABLE` (line 1)
+
+Often a **UTF-8 BOM** at the start of `migration.sql` (invisible `ï»¿` before `CREATE`). Fixed in repo — `git pull` then retry. If migrate already failed once:
+
+```bash
+cd /home/foslone/private/FOSL/packages/db
+npx dotenv -e ../../.env -- npx prisma migrate resolve --rolled-back 20250623120000_init
+cd /home/foslone/private/FOSL
+npm run db:migrate:deploy
+```
+
 ### P3018 / MySQL error 1064 near `-- CreateTable`
 
 ICDSoft MySQL can reject Prisma’s `-- CreateTable` comment lines. On a **fresh empty database**, use push instead:
