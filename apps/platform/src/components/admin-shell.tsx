@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import {
   LayoutDashboard,
   Users,
@@ -13,6 +14,7 @@ import {
   Bell,
   Search,
   TrendingUp,
+  LogOut,
 } from "lucide-react";
 import { FoslLogo, cn } from "@fosl/ui";
 import { MswInit } from "@/components/msw-init";
@@ -34,6 +36,15 @@ const nav = [
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { config, loading } = usePlatformConfig();
+  const { data: session, status } = useSession();
+
+  const displayName = session?.user?.name ?? "Platform Admin";
+  const displayEmail = session?.user?.email ?? "";
+  const avatarInitial = (displayName[0] ?? "A").toUpperCase();
+
+  async function handleSignOut() {
+    await signOut({ callbackUrl: "/auth/sign-in" });
+  }
 
   return (
     <div className="flex min-h-screen bg-surface">
@@ -72,7 +83,26 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
         <div className="border-t border-white/10 p-4 text-xs text-white/50">
-          FOSL Omni-Channel · Phase B
+          {status === "loading" ? (
+            <p>Loading session…</p>
+          ) : session?.user ? (
+            <>
+              <p className="font-medium text-white/80">{displayName}</p>
+              <p className="truncate">{displayEmail}</p>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="mt-2 flex items-center gap-1.5 font-medium text-white/70 hover:text-white"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                Sign out
+              </button>
+            </>
+          ) : (
+            <Link href="/auth/sign-in" className="font-medium text-white/70 hover:text-white">
+              Sign in
+            </Link>
+          )}
         </div>
       </aside>
 
@@ -97,11 +127,23 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </button>
             <div className="hidden h-8 w-px bg-slate-200 sm:block" />
             <div className="hidden text-right sm:block">
-              <p className="text-sm font-semibold text-ink">Platform Admin</p>
-              <p className="text-xs text-slate-500">admin@fosl.io</p>
+              <p className="text-sm font-semibold text-ink">{displayName}</p>
+              {displayEmail ? (
+                <p className="text-xs text-slate-500">{displayEmail}</p>
+              ) : null}
             </div>
+            {session?.user ? (
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="hidden items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 hover:bg-surface hover:text-ink sm:flex"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign out
+              </button>
+            ) : null}
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-              A
+              {avatarInitial}
             </div>
           </div>
         </header>

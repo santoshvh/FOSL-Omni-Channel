@@ -327,7 +327,7 @@ export function PlatformSettingsForm() {
                 })
               }
             />
-            Enable Hub route protection (Auth.js)
+            Enable Hub route protection (Auth.js). Always on in production when AUTH_SECRET is set.
           </label>
           <SetupGuide
             title={authSetupGuide.title}
