@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -39,14 +40,17 @@ type CartContextValue = {
   removeSaved: (productId: string) => void;
   setSavedQuantity: (productId: string, quantity: number) => void;
   maxQuantity: (product: Product) => number;
+  registerCatalogProducts: (items: Product[]) => void;
   cartHref: string;
   checkoutHref: string;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
 
+const catalogRegistry = new Map<string, Product>();
+
 function getProductById(id: string): Product | undefined {
-  return products.find((p) => p.id === id);
+  return catalogRegistry.get(id) ?? products.find((p) => p.id === id);
 }
 
 function defaultEntries(mode: CartMode): CartEntry[] {
@@ -121,6 +125,16 @@ export function CartProvider({
   const [entries, setEntries] = useState<CartEntry[]>(() => defaultEntries(mode));
   const [saved, setSaved] = useState<CartEntry[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const [catalogTick, setCatalogTick] = useState(0);
+  const modeRef = useRef(mode);
+  modeRef.current = mode;
+
+  const registerCatalogProducts = useCallback((items: Product[]) => {
+    for (const product of items) {
+      catalogRegistry.set(product.id, product);
+    }
+    setCatalogTick((n) => n + 1);
+  }, []);
 
   useEffect(() => {
     try {
@@ -209,8 +223,8 @@ export function CartProvider({
     });
   }, []);
 
-  const lines = useMemo(() => resolveLines(entries), [entries]);
-  const savedLines = useMemo(() => resolveLines(saved), [saved]);
+  const lines = useMemo(() => resolveLines(entries), [entries, catalogTick]);
+  const savedLines = useMemo(() => resolveLines(saved), [saved, catalogTick]);
   const itemCount = useMemo(
     () => lines.reduce((sum, line) => sum + line.quantity, 0),
     [lines]
@@ -243,6 +257,7 @@ export function CartProvider({
     removeSaved,
     setSavedQuantity,
     maxQuantity,
+    registerCatalogProducts,
     cartHref: mode === "marketplace" ? "/marketplace/cart" : "/cart",
     checkoutHref: mode === "marketplace" ? "/marketplace/checkout" : "/checkout",
   };

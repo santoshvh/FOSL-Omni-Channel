@@ -9,9 +9,11 @@ import { EmptyState } from "@fosl/ui";
 import { Button } from "@fosl/ui";
 import Link from "next/link";
 import { LayoutGrid, List } from "lucide-react";
+import { useCart } from "@/lib/cart-context";
 
 export function ProductsListing() {
   const searchParams = useSearchParams();
+  const { registerCatalogProducts } = useCart();
   const vendorFromUrl = searchParams.get("vendor");
   const [catalog, setCatalog] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,13 +35,17 @@ export function ProductsListing() {
     let cancelled = false;
     setLoading(true);
     setLoadError(null);
-    fetch("/api/v1/products")
+    fetch("/api/v1/products?scope=operator")
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load products.");
         return res.json() as Promise<{ data: Product[] }>;
       })
       .then((json) => {
-        if (!cancelled) setCatalog(json.data);
+        if (!cancelled) {
+          const items = Array.isArray(json.data) ? json.data : [];
+          setCatalog(items);
+          registerCatalogProducts(items);
+        }
       })
       .catch((err) => {
         if (!cancelled) setLoadError(err instanceof Error ? err.message : "Failed to load products.");
@@ -50,7 +56,7 @@ export function ProductsListing() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [registerCatalogProducts]);
 
   useEffect(() => {
     if (vendorNameFromUrl) setVendorFilter(vendorNameFromUrl);

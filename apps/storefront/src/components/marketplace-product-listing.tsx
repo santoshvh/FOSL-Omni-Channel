@@ -8,6 +8,7 @@ import { ProductCatalogSkeleton } from "@/components/product-catalog-skeleton";
 import { Button, EmptyState } from "@fosl/ui";
 import Link from "next/link";
 import { LayoutGrid, List } from "lucide-react";
+import { useCart } from "@/lib/cart-context";
 
 type MarketplaceProductListingProps = {
   title?: string;
@@ -21,6 +22,7 @@ export function MarketplaceProductListing({
   description,
   categorySlug,
 }: MarketplaceProductListingProps) {
+  const { registerCatalogProducts } = useCart();
   const [catalog, setCatalog] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -43,13 +45,17 @@ export function MarketplaceProductListing({
     let cancelled = false;
     setLoading(true);
     setLoadError(null);
-    fetch("/api/v1/products")
+    fetch("/api/v1/products?scope=network")
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load products.");
         return res.json() as Promise<{ data: Product[] }>;
       })
       .then((json) => {
-        if (!cancelled) setCatalog(Array.isArray(json.data) ? json.data : []);
+        if (!cancelled) {
+          const items = Array.isArray(json.data) ? json.data : [];
+          setCatalog(items);
+          registerCatalogProducts(items);
+        }
       })
       .catch((err) => {
         if (!cancelled) setLoadError(err instanceof Error ? err.message : "Failed to load products.");
@@ -60,7 +66,7 @@ export function MarketplaceProductListing({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [registerCatalogProducts]);
 
   const vendors = [...new Set(catalog.map((p) => p.vendorName))].sort();
 

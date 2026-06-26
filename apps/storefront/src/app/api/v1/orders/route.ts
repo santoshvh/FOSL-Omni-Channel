@@ -82,6 +82,22 @@ export async function POST(request: Request) {
 
     const productById = new Map(products.map((product) => [product.id, product]));
 
+    const storefront = storefrontPath
+      ? await prisma.storefront.findUnique({ where: { path: storefrontPath } })
+      : await prisma.storefront.findFirst({ where: { isDefault: true } });
+
+    if (storefront?.operatorId) {
+      const { areVendorsApprovedForOperator } = await import("@fosl/db");
+      const vendorIds = products.map((p) => p.vendorId);
+      const approved = await areVendorsApprovedForOperator(storefront.operatorId, vendorIds);
+      if (!approved) {
+        return NextResponse.json(
+          { error: "One or more products are not available from approved network vendors." },
+          { status: 400 }
+        );
+      }
+    }
+
     for (const line of lines) {
       const product = productById.get(line.productId)!;
       if (product.type === "LEAD_GEN" && line.quantity > 1) {
@@ -111,10 +127,6 @@ export async function POST(request: Request) {
     });
 
     const totalCents = subtotalCents + shippingCents + taxCents;
-
-    const storefront = storefrontPath
-      ? await prisma.storefront.findUnique({ where: { path: storefrontPath } })
-      : await prisma.storefront.findFirst({ where: { isDefault: true } });
 
     const cookieStore = await cookies();
     const attributionRaw = cookieStore.get(ATTRIBUTION_COOKIE)?.value;

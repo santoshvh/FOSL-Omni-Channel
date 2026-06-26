@@ -27,6 +27,22 @@ export {
 export { computeVendorSettlementShares } from "./settlement";
 export type { VendorSettlementShare } from "./settlement";
 export {
+  resolveOperatorId,
+  getDefaultOperatorId,
+  getOperatorForUserId,
+  listNetworkProducts,
+  listOperatorProducts,
+  getNetworkProduct,
+  getOperatorProduct,
+  areVendorsApprovedForOperator,
+  listOperatorVendorLinks,
+  getOperatorVendorLinkById,
+  findVendorBySlug,
+  inviteVendorToOperator,
+  updateOperatorVendorStatus,
+  createCreatorLinkForProduct,
+} from "./catalog";
+export {
   getPlatformSettingsFromDb,
   getPlatformSecretsFromDb,
   getPublicPlatformConfigFromDb,

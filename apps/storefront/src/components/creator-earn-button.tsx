@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { Button, Input } from "@fosl/ui";
-import { generateReferralLink, type ReferralLink } from "@/lib/referral";
-import { isCreatorSignedIn } from "@/lib/creator-session";
+import { generateReferralLink, createReferralLink, type ReferralLink } from "@/lib/referral";
+import { isCreatorSignedIn, getCreatorReferralCode } from "@/lib/creator-session";
 import { CreatorSignupDialog } from "@/components/creator-signup-dialog";
 import { Link2, Copy, Check, X } from "lucide-react";
 
@@ -37,13 +37,20 @@ export function CreatorEarnButton({
       }
 
       setLoading(true);
-      window.setTimeout(() => {
-        const generated = generateReferralLink(productId);
-        setLink(generated);
-        setLinkOpen(true);
-        setLoading(false);
-        onGenerated?.(generated);
-      }, 400);
+      const referralCode = getCreatorReferralCode() ?? "ALEX2026";
+      createReferralLink(productId, referralCode)
+        .then((generated) => {
+          setLink(generated);
+          setLinkOpen(true);
+          onGenerated?.(generated);
+        })
+        .catch(() => {
+          const fallback = generateReferralLink(productId);
+          setLink(fallback);
+          setLinkOpen(true);
+          onGenerated?.(fallback);
+        })
+        .finally(() => setLoading(false));
     },
     [productId, onGenerated]
   );
