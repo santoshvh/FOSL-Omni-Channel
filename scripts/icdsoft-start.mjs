@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * ICDSoft runs one shared start_cmd per release directory. FOSL uses two
- * WebApps (platform + storefront) on /home/foslone/private/FOSL.
+ * WebApps (platform + storefront + api) on /home/foslone/private/FOSL.
  * Route via PORT from `sureapp project list` or FOSL_APP env.
  */
 import { spawn } from "node:child_process";
@@ -17,7 +17,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const PORT_TO_APP = {
   "26104": "platform",
   "1629": "storefront",
-  "27104": "api",
+  "21942": "api",
 };
 
 const FOSL_APP = process.env.FOSL_APP?.trim().toLowerCase();

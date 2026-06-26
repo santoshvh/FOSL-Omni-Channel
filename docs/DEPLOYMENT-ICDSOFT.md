@@ -82,7 +82,7 @@ Create **three** ICDSoft Node.js WebApps, each with working directory `/home/fos
 |--------|------------|--------------|
 | fosl-hub | `platform` | 26104 |
 | Storefront | `storefront` | 1629 |
-| fosl-api | `api` | 27104 |
+| fosl-api | `api` | 21942 |
 
 | Service | Start command (ICDSoft panel) |
 |---------|--------------------------------|
@@ -272,6 +272,7 @@ Use this when services return **503**, **ChunkLoadError**, **MissingSecret**, **
 |---------|--------------|------|
 | Platform | `fosl-hub` | **26104** |
 | Storefront | `Storefront` | **1629** |
+| Commerce API | `fosl-api` | **21942** |
 
 ### 1. SSH and enter hub shell
 
@@ -340,6 +341,7 @@ sureapp env set FOSL_APP storefront
 ```bash
 fuser -k 26104/tcp 2>/dev/null || true
 fuser -k 1629/tcp 2>/dev/null || true
+fuser -k 21942/tcp 2>/dev/null || true
 sleep 2
 ```
 
@@ -653,6 +655,7 @@ Stale Node processes after a crash loop can hold ports **26104** and **1629**:
 ```bash
 fuser -k 26104/tcp 2>/dev/null || true
 fuser -k 1629/tcp 2>/dev/null || true
+fuser -k 21942/tcp 2>/dev/null || true
 sleep 2
 sureapp service manage --start Storefront
 # restart fosl-hub via panel or from Storefront shell
