@@ -1,18 +1,22 @@
 import { NextResponse } from "next/server";
-import NextAuth from "next-auth";
+import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 import type { UserRole } from "@fosl/contracts";
-import { authConfig } from "@/auth.config";
-import { isAuthEnabled, isHostedProductionHub } from "@/lib/auth-secret";
+import { getAuthSecret, isAuthEnabled, isHostedProductionHub } from "@/lib/auth-secret";
 
-const { auth } = NextAuth(authConfig);
+const WORKSPACE_ROUTES: { prefix: string; role: UserRole }[] = [
+  { prefix: "/vendor", role: "vendor" },
+  { prefix: "/creator", role: "creator" },
+  { prefix: "/operator", role: "operator" },
+];
 
-function requestHostname(req: { headers: Headers; nextUrl: URL }) {
+function requestHostname(req: NextRequest) {
   const forwarded = req.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
   const host = req.headers.get("host")?.split(":")[0]?.trim();
   return forwarded || host || req.nextUrl.hostname;
 }
 
-function hasAuthSessionCookie(req: { cookies: { has: (name: string) => boolean } }) {
+function hasAuthSessionCookie(req: NextRequest) {
   return (
     req.cookies.has("__Secure-authjs.session-token") ||
     req.cookies.has("authjs.session-token") ||
@@ -20,17 +24,11 @@ function hasAuthSessionCookie(req: { cookies: { has: (name: string) => boolean }
   );
 }
 
-function redirectToSignIn(req: { nextUrl: URL }, pathname: string) {
+function redirectToSignIn(req: NextRequest, pathname: string) {
   const signIn = new URL("/auth/sign-in", req.nextUrl.origin);
   signIn.searchParams.set("callbackUrl", pathname);
   return NextResponse.redirect(signIn);
 }
-
-const WORKSPACE_ROUTES: { prefix: string; role: UserRole }[] = [
-  { prefix: "/vendor", role: "vendor" },
-  { prefix: "/creator", role: "creator" },
-  { prefix: "/operator", role: "operator" },
-];
 
 function hasRole(roles: UserRole[] | undefined, role: UserRole) {
   return roles?.includes(role) ?? false;
@@ -73,12 +71,16 @@ function forbiddenApi() {
   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 }
 
-export default auth((req) => {
+function isProductionHost(req: NextRequest, hostname: string) {
+  const hostHeader = req.headers.get("host") ?? "";
+  return hostHeader.includes("foslone.com") || isHostedProductionHub(hostname);
+}
+
+export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const hostname = requestHostname(req);
 
-  // Legacy admin subdomain → platform /admin (same WebApp on ICDSoft)
-  if (req.nextUrl.hostname === "admin.foslone.com") {
+  if (hostname === "admin.foslone.com") {
     const platformBase =
       process.env.NEXT_PUBLIC_HUB_URL ?? "https://hub.foslone.com";
     const dest = new URL(platformBase);
@@ -89,42 +91,38 @@ export default auth((req) => {
     return NextResponse.redirect(dest);
   }
 
-  const hostHeader = req.headers.get("host") ?? "";
-  const isProductionHost =
-    hostHeader.includes("foslone.com") || isHostedProductionHub(hostname);
+  const productionHost = isProductionHost(req, hostname);
+  const authActive = productionHost || isAuthEnabled(hostname);
 
-  if (isProductionHost && !isPublicPath(pathname) && !hasAuthSessionCookie(req)) {
+  if (authActive && !isPublicPath(pathname) && !hasAuthSessionCookie(req)) {
     if (pathname.startsWith("/api/")) return unauthorizedApi();
     return redirectToSignIn(req, pathname);
   }
 
-  if (!isAuthEnabled(hostname)) return NextResponse.next();
+  if (!authActive) return NextResponse.next();
 
-  const isApi = pathname.startsWith("/api/");
-  const isPublic = isPublicPath(pathname);
+  const token = await getToken({
+    req,
+    secret: getAuthSecret(),
+  });
 
-  if (!hasAuthSessionCookie(req) && !req.auth?.user && !isPublic) {
-    if (isApi) return unauthorizedApi();
-    return redirectToSignIn(req, pathname);
-  }
-
-  if (req.auth?.user) {
-    const roles = req.auth.user?.roles;
+  if (token) {
+    const roles = token.roles as UserRole[] | undefined;
 
     if (isAdminPath(pathname) && !hasRole(roles, "admin")) {
-      if (isApi) return forbiddenApi();
+      if (pathname.startsWith("/api/")) return forbiddenApi();
       return NextResponse.redirect(new URL(roleHomePath(roles), req.nextUrl.origin));
     }
 
     const workspaceRole = workspaceRoleForPath(pathname);
     if (workspaceRole && !hasRole(roles, workspaceRole)) {
-      if (isApi) return forbiddenApi();
+      if (pathname.startsWith("/api/")) return forbiddenApi();
       return NextResponse.redirect(new URL(roleHomePath(roles), req.nextUrl.origin));
     }
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
