@@ -35,8 +35,19 @@ export NEXT_TELEMETRY_DISABLED=1
 rm -rf apps/platform/.next
 npm run build -w @fosl/platform
 
-fuser -k 26104/tcp 2>/dev/null || true
+kill_port() {
+  port=$1
+  pids=$(ss -tlnp 2>/dev/null | grep ":${port} " | sed -n 's/.*pid=\([0-9]*\).*/\1/p' | sort -u)
+  for pid in $pids; do
+    kill -9 "$pid" 2>/dev/null || true
+  done
+  fuser -k "${port}/tcp" 2>/dev/null || true
+}
+
+sureapp service manage --stop fosl-hub 2>/dev/null || true
+kill_port 26104
 sleep 3
+ss -tlnp 2>/dev/null | grep ":26104 " && echo "WARN: port 26104 still in use" || echo "Port 26104 free"
 
 sureapp service manage --start fosl-hub
 sleep 8
