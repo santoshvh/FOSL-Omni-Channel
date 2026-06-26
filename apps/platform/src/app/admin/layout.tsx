@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminShell } from "@/components/admin-shell";
 import { auth } from "@/auth";
+import { isHostedProductionHub } from "@/lib/auth-secret";
 
 export const metadata: Metadata = {
   title: "FOSL Admin",
@@ -10,12 +12,8 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-function isAdminAuthOptional() {
-  const hubUrl =
-    process.env.AUTH_URL?.trim() ||
-    process.env.NEXT_PUBLIC_HUB_URL?.trim() ||
-    "";
-  if (hubUrl.includes("foslone.com")) return false;
+function isAdminAuthOptional(hostname: string | null) {
+  if (isHostedProductionHub(hostname ?? undefined)) return false;
 
   return (
     process.env.NODE_ENV === "development" &&
@@ -24,7 +22,9 @@ function isAdminAuthOptional() {
 }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  if (!isAdminAuthOptional()) {
+  const hostname = (await headers()).get("host")?.split(":")[0] ?? null;
+
+  if (!isAdminAuthOptional(hostname)) {
     const session = await auth();
     if (!session?.user) {
       redirect("/auth/sign-in?callbackUrl=/admin");

@@ -43,4 +43,4 @@ sleep 8
 
 echo "=== smoke ==="
 curl -sI http://127.0.0.1:26104/auth/sign-in | head -1
-curl -sI http://127.0.0.1:26104/admin | head -3
+curl -sI -H "Host: hub.foslone.com" http://127.0.0.1:26104/admin | head -5

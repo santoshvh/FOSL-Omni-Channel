@@ -1,6 +1,8 @@
 import { StatCard, StatCardCurrency } from "@fosl/ui";
 import { Activity, CreditCard, ShoppingCart, Users } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default function AdminDashboardPage() {
   return (
     <div className="space-y-8">

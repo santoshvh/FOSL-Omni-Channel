@@ -68,7 +68,7 @@ export default auth((req) => {
     return NextResponse.redirect(dest);
   }
 
-  if (!isAuthEnabled()) return NextResponse.next();
+  if (!isAuthEnabled(req.nextUrl.hostname)) return NextResponse.next();
 
   const isApi = pathname.startsWith("/api/");
   const isPublic = isPublicPath(pathname);
