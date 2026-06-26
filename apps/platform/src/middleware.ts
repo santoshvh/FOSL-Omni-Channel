@@ -6,6 +6,12 @@ import { isAuthEnabled } from "@/lib/auth-secret";
 
 const { auth } = NextAuth(authConfig);
 
+function requestHostname(req: { headers: Headers; nextUrl: URL }) {
+  const forwarded = req.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const host = req.headers.get("host")?.split(":")[0]?.trim();
+  return forwarded || host || req.nextUrl.hostname;
+}
+
 const WORKSPACE_ROUTES: { prefix: string; role: UserRole }[] = [
   { prefix: "/vendor", role: "vendor" },
   { prefix: "/creator", role: "creator" },
@@ -68,19 +74,19 @@ export default auth((req) => {
     return NextResponse.redirect(dest);
   }
 
-  if (!isAuthEnabled(req.nextUrl.hostname)) return NextResponse.next();
+  if (!isAuthEnabled(requestHostname(req))) return NextResponse.next();
 
   const isApi = pathname.startsWith("/api/");
   const isPublic = isPublicPath(pathname);
 
-  if (!req.auth && !isPublic) {
+  if (!req.auth?.user && !isPublic) {
     if (isApi) return unauthorizedApi();
     const signIn = new URL("/auth/sign-in", req.nextUrl.origin);
     signIn.searchParams.set("callbackUrl", pathname);
     return Response.redirect(signIn);
   }
 
-  if (req.auth) {
+  if (req.auth?.user) {
     const roles = req.auth.user?.roles;
 
     if (isAdminPath(pathname) && !hasRole(roles, "admin")) {
