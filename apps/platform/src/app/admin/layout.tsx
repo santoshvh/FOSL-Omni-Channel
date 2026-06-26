@@ -11,6 +11,12 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 function isAdminAuthOptional() {
+  const hubUrl =
+    process.env.AUTH_URL?.trim() ||
+    process.env.NEXT_PUBLIC_HUB_URL?.trim() ||
+    "";
+  if (hubUrl.includes("foslone.com")) return false;
+
   return (
     process.env.NODE_ENV === "development" &&
     process.env.AUTH_ENABLED?.trim().toLowerCase() === "false"
