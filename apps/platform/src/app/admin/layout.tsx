@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminShell } from "@/components/admin-shell";
@@ -22,6 +23,7 @@ function isAdminAuthOptional(hostname: string | null) {
 }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  await connection();
   const hostname = (await headers()).get("host")?.split(":")[0] ?? null;
 
   if (!isAdminAuthOptional(hostname)) {

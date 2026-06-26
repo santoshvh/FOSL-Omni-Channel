@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import NextAuth from "next-auth";
 import type { UserRole } from "@fosl/contracts";
 import { authConfig } from "@/auth.config";
-import { isAuthEnabled } from "@/lib/auth-secret";
+import { isAuthEnabled, isHostedProductionHub } from "@/lib/auth-secret";
 
 const { auth } = NextAuth(authConfig);
 
@@ -61,6 +61,7 @@ function forbiddenApi() {
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
+  const hostname = requestHostname(req);
 
   // Legacy admin subdomain → platform /admin (same WebApp on ICDSoft)
   if (req.nextUrl.hostname === "admin.foslone.com") {
@@ -74,7 +75,18 @@ export default auth((req) => {
     return NextResponse.redirect(dest);
   }
 
-  if (!isAuthEnabled(requestHostname(req))) return NextResponse.next();
+  if (
+    isHostedProductionHub(hostname) &&
+    !isPublicPath(pathname) &&
+    !req.auth?.user
+  ) {
+    if (pathname.startsWith("/api/")) return unauthorizedApi();
+    const signIn = new URL("/auth/sign-in", req.nextUrl.origin);
+    signIn.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(signIn);
+  }
+
+  if (!isAuthEnabled(hostname)) return NextResponse.next();
 
   const isApi = pathname.startsWith("/api/");
   const isPublic = isPublicPath(pathname);

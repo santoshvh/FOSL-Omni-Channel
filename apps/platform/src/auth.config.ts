@@ -25,10 +25,15 @@ export const authConfig = {
       const { pathname } = request.nextUrl;
       if (isPublicPath(pathname)) return true;
 
+      const hostHeader = request.headers.get("host") ?? "";
       const hostname =
         request.headers.get("x-forwarded-host")?.split(",")[0]?.trim().split(":")[0] ||
-        request.headers.get("host")?.split(":")[0]?.trim() ||
+        hostHeader.split(":")[0]?.trim() ||
         request.nextUrl.hostname;
+
+      if (hostHeader.includes("foslone.com") || hostname.includes("foslone.com")) {
+        return !!auth?.user;
+      }
 
       if (!isAuthEnabled(hostname)) return true;
       return !!auth?.user;
