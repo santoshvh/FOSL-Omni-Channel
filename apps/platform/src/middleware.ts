@@ -12,6 +12,20 @@ function requestHostname(req: { headers: Headers; nextUrl: URL }) {
   return forwarded || host || req.nextUrl.hostname;
 }
 
+function hasAuthSessionCookie(req: { cookies: { has: (name: string) => boolean } }) {
+  return (
+    req.cookies.has("__Secure-authjs.session-token") ||
+    req.cookies.has("authjs.session-token") ||
+    req.cookies.has("__Host-authjs.session-token")
+  );
+}
+
+function redirectToSignIn(req: { nextUrl: URL }, pathname: string) {
+  const signIn = new URL("/auth/sign-in", req.nextUrl.origin);
+  signIn.searchParams.set("callbackUrl", pathname);
+  return NextResponse.redirect(signIn);
+}
+
 const WORKSPACE_ROUTES: { prefix: string; role: UserRole }[] = [
   { prefix: "/vendor", role: "vendor" },
   { prefix: "/creator", role: "creator" },
@@ -75,15 +89,13 @@ export default auth((req) => {
     return NextResponse.redirect(dest);
   }
 
-  if (
-    isHostedProductionHub(hostname) &&
-    !isPublicPath(pathname) &&
-    !req.auth?.user
-  ) {
+  const hostHeader = req.headers.get("host") ?? "";
+  const isProductionHost =
+    hostHeader.includes("foslone.com") || isHostedProductionHub(hostname);
+
+  if (isProductionHost && !isPublicPath(pathname) && !hasAuthSessionCookie(req)) {
     if (pathname.startsWith("/api/")) return unauthorizedApi();
-    const signIn = new URL("/auth/sign-in", req.nextUrl.origin);
-    signIn.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(signIn);
+    return redirectToSignIn(req, pathname);
   }
 
   if (!isAuthEnabled(hostname)) return NextResponse.next();
@@ -91,11 +103,9 @@ export default auth((req) => {
   const isApi = pathname.startsWith("/api/");
   const isPublic = isPublicPath(pathname);
 
-  if (!req.auth?.user && !isPublic) {
+  if (!hasAuthSessionCookie(req) && !req.auth?.user && !isPublic) {
     if (isApi) return unauthorizedApi();
-    const signIn = new URL("/auth/sign-in", req.nextUrl.origin);
-    signIn.searchParams.set("callbackUrl", pathname);
-    return Response.redirect(signIn);
+    return redirectToSignIn(req, pathname);
   }
 
   if (req.auth?.user) {
