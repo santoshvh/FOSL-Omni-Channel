@@ -50,7 +50,7 @@ sleep 3
 ss -tlnp 2>/dev/null | grep ":26104 " && echo "WARN: port 26104 still in use" || echo "Port 26104 free"
 
 sureapp service manage --start fosl-hub
-sleep 8
+sleep 20
 
 echo "=== smoke ==="
 curl -sI http://127.0.0.1:26104/auth/sign-in | head -1
