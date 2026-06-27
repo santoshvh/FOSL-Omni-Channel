@@ -2,6 +2,7 @@
 
 import { SessionProvider } from "next-auth/react";
 import { HubRoleProvider } from "@/components/hub-role-context";
+import { ChunkRecovery } from "@/components/chunk-recovery";
 import { MswInit } from "@/components/msw-init";
 import { usePlatformConfig } from "@/lib/use-platform-config";
 
@@ -10,6 +11,7 @@ function HubMswGate({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <ChunkRecovery />
       <MswInit apiMockingEnabled={loading ? null : config?.apiMocking.enabled} />
       {children}
     </>

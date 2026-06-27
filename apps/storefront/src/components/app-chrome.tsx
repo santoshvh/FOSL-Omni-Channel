@@ -12,6 +12,7 @@ import { CartProvider } from "@/lib/cart-context";
 import { CartDrawer } from "./cart-drawer";
 import { MobileBottomNav } from "./mobile-bottom-nav";
 import { SubscriptionBanner } from "./subscription-banner";
+import { ChunkRecovery } from "./chunk-recovery";
 import { MswInit } from "./msw-init";
 import { PlatformUrlsProvider } from "@/lib/platform-urls-context";
 import { StorefrontPathProvider } from "@/lib/storefront-path-context";
@@ -34,6 +35,7 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
     <PlatformUrlsProvider config={config}>
       <CartProvider mode={isMarketplace ? "marketplace" : "storefront"}>
       <StorefrontPathProvider>
+      <ChunkRecovery />
       <MswInit apiMockingEnabled={loading ? null : config?.apiMocking.enabled} />
       <div className="flex min-h-screen flex-col pb-16 md:pb-0">
         <SubscriptionBanner state={subscriptionState} />

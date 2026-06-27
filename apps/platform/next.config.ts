@@ -21,14 +21,11 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@fosl/ui", "@fosl/contracts", "@fosl/mocks", "@fosl/db"],
   ...(Object.keys(edgeEnv).length > 0 ? { env: edgeEnv } : {}),
   async headers() {
+    const noStore = [{ key: "Cache-Control", value: "no-store, no-cache, must-revalidate" }];
     return [
       {
-        source: "/admin/:path*",
-        headers: [{ key: "Cache-Control", value: "no-store, no-cache, must-revalidate" }],
-      },
-      {
-        source: "/auth/:path*",
-        headers: [{ key: "Cache-Control", value: "no-store, no-cache, must-revalidate" }],
+        source: "/((?!_next/static|_next/image|favicon.ico).*)",
+        headers: noStore,
       },
     ];
   },
