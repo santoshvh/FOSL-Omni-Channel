@@ -3,7 +3,10 @@ import { loadRootEnv } from "../../scripts/load-root-env.mjs";
 
 loadRootEnv(import.meta.url);
 
+const deploymentId = process.env.NEXT_DEPLOYMENT_ID?.trim();
+
 const nextConfig: NextConfig = {
+  ...(deploymentId ? { deploymentId } : {}),
   env: {
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
   },

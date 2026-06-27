@@ -3,7 +3,10 @@ import type { NextConfig } from "next";
 const shopInternal =
   process.env.STOREFRONT_INTERNAL_ORIGIN?.trim() ?? "http://127.0.0.1:1629";
 
+const deploymentId = process.env.NEXT_DEPLOYMENT_ID?.trim();
+
 const nextConfig: NextConfig = {
+  ...(deploymentId ? { deploymentId } : {}),
   transpilePackages: ["@fosl/commerce-api", "@fosl/db", "@fosl/contracts", "@fosl/mocks"],
   async rewrites() {
     return [

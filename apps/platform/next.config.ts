@@ -17,7 +17,10 @@ if (hubUrl) edgeEnv.NEXT_PUBLIC_HUB_URL = hubUrl;
 if (process.env.AUTH_ENABLED?.trim()) edgeEnv.AUTH_ENABLED = process.env.AUTH_ENABLED.trim();
 
 /** Do not put AUTH_SECRET in `env` — it inlines at build time and breaks prod if missing during build. */
+const deploymentId = process.env.NEXT_DEPLOYMENT_ID?.trim();
+
 const nextConfig: NextConfig = {
+  ...(deploymentId ? { deploymentId } : {}),
   transpilePackages: ["@fosl/ui", "@fosl/contracts", "@fosl/mocks", "@fosl/db"],
   ...(Object.keys(edgeEnv).length > 0 ? { env: edgeEnv } : {}),
   async headers() {

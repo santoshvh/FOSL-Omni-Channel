@@ -23,6 +23,8 @@ export PATH="$(dirname "$NODE_BIN"):$REPO/node_modules/.bin:$PATH"
 export NPM_CONFIG_CACHE="$REPO/.npm-cache"
 export NODE_OPTIONS=--max-old-space-size=768
 export NEXT_TELEMETRY_DISABLED=1
+export NEXT_DEPLOYMENT_ID="$(git rev-parse --short HEAD)"
+echo "NEXT_DEPLOYMENT_ID=$NEXT_DEPLOYMENT_ID"
 
 rm -rf apps/platform/.next apps/storefront/.next
 npm run build -w @fosl/platform

@@ -36,6 +36,8 @@ git log -1 --oneline
 
 export NODE_OPTIONS=--max-old-space-size=768
 export NEXT_TELEMETRY_DISABLED=1
+export NEXT_DEPLOYMENT_ID="$(git rev-parse --short HEAD)"
+echo "NEXT_DEPLOYMENT_ID=$NEXT_DEPLOYMENT_ID"
 
 echo "=== building platform ==="
 npm run build -w @fosl/platform

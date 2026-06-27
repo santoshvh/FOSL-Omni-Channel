@@ -66,6 +66,8 @@ fi
 export NODE_OPTIONS=--max-old-space-size=768
 export NEXT_TELEMETRY_DISABLED=1
 export LOW_MEMORY_BUILD=true
+export NEXT_DEPLOYMENT_ID="$(git rev-parse --short HEAD)"
+echo "NEXT_DEPLOYMENT_ID=$NEXT_DEPLOYMENT_ID"
 
 echo "=== wipe old builds ==="
 rm -rf apps/platform/.next apps/storefront/.next apps/api/.next
