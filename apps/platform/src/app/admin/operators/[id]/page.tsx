@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getPlatformOperatorById } from "@fosl/mocks";
+import { getAdminOperatorById } from "@fosl/db";
 import { Button, formatCurrency } from "@fosl/ui";
 
 export default async function AdminOperatorDetailPage({
@@ -9,7 +9,9 @@ export default async function AdminOperatorDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const op = getPlatformOperatorById(id);
+  if (!process.env.DATABASE_URL) notFound();
+
+  const op = await getAdminOperatorById(id);
   if (!op) notFound();
 
   return (
@@ -37,7 +39,7 @@ export default async function AdminOperatorDetailPage({
           <dl className="mt-4 space-y-2 text-sm">
             <div className="flex justify-between">
               <dt className="text-slate-500">Plan</dt>
-              <dd className="font-medium">{op.plan}</dd>
+              <dd className="font-medium">{op.plan ?? "—"}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-slate-500">Status</dt>
@@ -49,37 +51,32 @@ export default async function AdminOperatorDetailPage({
             </div>
             <div className="flex justify-between">
               <dt className="text-slate-500">GMV (30d)</dt>
-              <dd>{formatCurrency(op.gmvCents)}</dd>
+              <dd>{formatCurrency(op.gmvCentsLast30Days)}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-slate-500">Vendors linked</dt>
+              <dd>{op.vendorCount}</dd>
             </div>
           </dl>
         </div>
 
         <div className="rounded-lg border border-slate-200 bg-white p-6">
-          <h2 className="font-semibold">Domains</h2>
+          <h2 className="font-semibold">Storefronts</h2>
           <ul className="mt-4 space-y-2 text-sm">
-            <li className="flex justify-between border-b border-slate-100 pb-2">
-              <span>/ (operator storefront)</span>
-              <span className="text-green-600">Active</span>
-            </li>
-            <li className="flex justify-between border-b border-slate-100 pb-2">
-              <span>/acme-audio, /bright-labs, …</span>
-              <span className="text-green-600">Vendor paths</span>
-            </li>
-            <li className="flex justify-between">
-              <span>shop.{op.name.split(" ")[0].toLowerCase()}.com</span>
-              <span className="text-amber-600">DNS pending</span>
-            </li>
+            {op.storefrontList.length === 0 ? (
+              <li className="text-slate-500">No storefronts configured.</li>
+            ) : (
+              op.storefrontList.map((sf) => (
+                <li key={sf.id} className="flex justify-between border-b border-slate-100 pb-2">
+                  <span>
+                    {sf.name} · /{sf.path}
+                  </span>
+                  <span className="text-green-600">Active</span>
+                </li>
+              ))
+            )}
           </ul>
         </div>
-      </div>
-
-      <div className="rounded-lg border border-slate-200 bg-white p-6">
-        <h2 className="font-semibold">Recent activity</h2>
-        <ul className="mt-4 space-y-2 text-sm text-slate-600">
-          <li>Mar 15 — Checkout enabled after grace period payment</li>
-          <li>Mar 10 — Added custom domain</li>
-          <li>Mar 1 — Upgraded to {op.plan} plan</li>
-        </ul>
       </div>
     </div>
   );

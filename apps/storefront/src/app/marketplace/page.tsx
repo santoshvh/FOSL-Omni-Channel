@@ -1,12 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
-import { marketplaceCategories, marketplaceVendors } from "@fosl/mocks";
 import { Button, Input } from "@fosl/ui";
 import { MarketplaceProductListing } from "@/components/marketplace-product-listing";
 import { Search } from "lucide-react";
+import { loadMarketplaceCategories, loadMarketplaceVendors } from "@/lib/catalog-loader";
 
-export default function MarketplaceHomePage() {
+export default async function MarketplaceHomePage() {
+  const marketplaceCategories = await loadMarketplaceCategories();
+  const marketplaceVendors = await loadMarketplaceVendors();
+
   return (
     <div>
       <section className="bg-gradient-to-br from-primary via-primary-dark to-ink px-4 py-16 text-primary-foreground">
@@ -43,7 +46,9 @@ export default function MarketplaceHomePage() {
               className="group relative overflow-hidden rounded-lg border border-slate-200"
             >
               <div className="relative h-32">
-                <Image src={cat.imageUrl} alt="" fill className="object-cover" sizes="300px" />
+                {"imageUrl" in cat && cat.imageUrl ? (
+                  <Image src={cat.imageUrl} alt="" fill className="object-cover" sizes="300px" />
+                ) : null}
                 <div className="absolute inset-0 bg-black/40 transition group-hover:bg-black/50" />
                 <div className="absolute inset-0 flex flex-col justify-end p-4 text-white">
                   <p className="font-semibold">{cat.name}</p>
@@ -65,13 +70,16 @@ export default function MarketplaceHomePage() {
                 href={v.storefrontUrl}
                 className="rounded-lg border border-slate-200 bg-white p-4 transition-shadow hover:shadow-md"
               >
-                <div className="relative h-20 overflow-hidden rounded-md">
-                  <Image src={v.bannerUrl} alt="" fill className="object-cover" sizes="400px" />
-                </div>
+                {v.bannerUrl ? (
+                  <div className="relative h-20 overflow-hidden rounded-md">
+                    <Image src={v.bannerUrl} alt="" fill className="object-cover" sizes="400px" />
+                  </div>
+                ) : null}
                 <h3 className="mt-3 font-semibold">{v.name}</h3>
-                <p className="text-sm text-slate-500 line-clamp-2">{v.tagline}</p>
+                <p className="text-sm text-slate-500 line-clamp-2">{v.tagline ?? ""}</p>
                 <p className="mt-2 text-sm text-slate-600">
-                  ★ {v.rating} · {v.productCount} products
+                  {v.rating ? `★ ${v.rating} · ` : ""}
+                  {v.productCount} products
                 </p>
               </Link>
             ))}

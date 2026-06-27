@@ -24,8 +24,12 @@ export function SignInForm() {
             ? "Open Admin"
             : null;
 
-  const [email, setEmail] = useState("alex@acmecatalog.com");
-  const [password, setPassword] = useState("demo123");
+  const [email, setEmail] = useState(
+    process.env.NODE_ENV === "development" ? "alex@acmecatalog.com" : ""
+  );
+  const [password, setPassword] = useState(
+    process.env.NODE_ENV === "development" ? "demo123" : ""
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 

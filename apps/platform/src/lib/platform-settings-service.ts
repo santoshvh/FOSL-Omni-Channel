@@ -1,13 +1,8 @@
 import path from "node:path";
 import type { PlatformSettings } from "@fosl/contracts";
 import {
-  getMockPlatformSettings,
-  getMockPlatformSecrets,
-  triggerMockDeploy,
-  updateMockPlatformSettings,
-} from "@fosl/mocks";
-import {
   buildRuntimeEnv,
+  defaultPlatformSettings,
   getPlatformSettingsFromDb,
   getPlatformSecretsFromDb,
   recordDeployInDb,
@@ -20,11 +15,17 @@ function getRepoRoot() {
   return path.resolve(process.cwd(), "../..");
 }
 
+function requireDatabase() {
+  if (!process.env.DATABASE_URL?.trim()) {
+    throw new Error("Database not configured.");
+  }
+}
+
 export async function fetchPlatformSettings(): Promise<{
   data: PlatformSettings;
-  source: "database" | "mock";
+  source: "database" | "defaults";
 }> {
-  if (process.env.DATABASE_URL) {
+  if (process.env.DATABASE_URL?.trim()) {
     try {
       const data = await getPlatformSettingsFromDb();
       if (data) return { data, source: "database" };
@@ -32,51 +33,32 @@ export async function fetchPlatformSettings(): Promise<{
       console.error("[platform-settings] db read failed:", err);
     }
   }
-  return { data: getMockPlatformSettings(), source: "mock" };
+
+  return { data: defaultPlatformSettings, source: "defaults" };
 }
 
 export async function savePlatformSettings(patch: SettingsPatch) {
-  if (process.env.DATABASE_URL) {
-    try {
-      const { settings, secrets } = await updatePlatformSettingsInDb(patch);
-      const runtimeEnv = buildRuntimeEnv(settings, secrets);
-      writeRuntimeConfigFile(getRepoRoot(), runtimeEnv);
-      return {
-        data: settings,
-        source: "database" as const,
-        message:
-          "Settings saved. Restart dev servers (platform + storefront) so `.fosl-runtime.json` is loaded.",
-      };
-    } catch (err) {
-      console.error("[platform-settings] db write failed:", err);
-    }
-  }
+  requireDatabase();
 
-  const data = updateMockPlatformSettings(patch as Record<string, unknown>);
-  const mockSecrets = getMockPlatformSecrets();
-  const runtimeEnv = buildRuntimeEnv(data, {
-    databasePassword: mockSecrets.databasePassword,
-    authSecret: mockSecrets.authSecret,
-    postmarkServerToken: mockSecrets.postmarkServerToken,
-    resendApiKey: mockSecrets.resendApiKey,
-    s3AccessKey: mockSecrets.s3AccessKey,
-    s3SecretKey: mockSecrets.s3SecretKey,
-    stripeSecretKey: mockSecrets.stripeSecretKey,
-    stripePublishableKey: mockSecrets.stripePublishableKey,
-    stripeWebhookSecret: mockSecrets.stripeWebhookSecret,
-    payoutJobSecret: mockSecrets.payoutJobSecret,
-    autoDeployWebhookSecret: mockSecrets.autoDeployWebhookSecret,
-  });
-  writeRuntimeConfigFile(getRepoRoot(), runtimeEnv);
-  return {
-    data,
-    source: "mock" as const,
-    message:
-      "Settings saved (mock). Restart dev servers (platform + storefront) so `.fosl-runtime.json` is loaded.",
-  };
+  try {
+    const { settings, secrets } = await updatePlatformSettingsInDb(patch);
+    const runtimeEnv = buildRuntimeEnv(settings, secrets);
+    writeRuntimeConfigFile(getRepoRoot(), runtimeEnv);
+    return {
+      data: settings,
+      source: "database" as const,
+      message:
+        "Settings saved. Restart dev servers (platform + storefront) so `.fosl-runtime.json` is loaded.",
+    };
+  } catch (err) {
+    console.error("[platform-settings] db write failed:", err);
+    throw err;
+  }
 }
 
 export async function runPlatformDeploy() {
+  requireDatabase();
+
   const targets: string[] = [];
   const { data: settings } = await fetchPlatformSettings();
   if (settings.autoDeploy.deployHub || settings.autoDeploy.deployAdmin) {
@@ -86,15 +68,11 @@ export async function runPlatformDeploy() {
 
   const message = `Deploy queued for: ${targets.join(", ") || "no apps selected"}.`;
 
-  if (process.env.DATABASE_URL) {
-    try {
-      const data = await recordDeployInDb(message, "success");
-      return { data, source: "database" as const };
-    } catch (err) {
-      console.error("[platform-settings] deploy record failed:", err);
-    }
+  try {
+    const data = await recordDeployInDb(message, "success");
+    return { data, source: "database" as const };
+  } catch (err) {
+    console.error("[platform-settings] deploy record failed:", err);
+    throw err;
   }
-
-  const data = triggerMockDeploy();
-  return { data, source: "mock" as const };
 }

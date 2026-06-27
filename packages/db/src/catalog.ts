@@ -105,6 +105,87 @@ export async function getOperatorProduct(
   return row ? mapDbProduct(row) : null;
 }
 
+export async function listVendorProducts(vendorId: string): Promise<Product[]> {
+  const rows = await prisma.product.findMany({
+    where: { vendorId },
+    include: productInclude,
+    orderBy: { title: "asc" },
+  });
+  return rows.map(mapDbProduct);
+}
+
+export async function getVendorProduct(
+  vendorId: string,
+  productId: string
+): Promise<Product | null> {
+  const row = await prisma.product.findFirst({
+    where: { id: productId, vendorId },
+    include: productInclude,
+  });
+  return row ? mapDbProduct(row) : null;
+}
+
+export async function createVendorProduct(
+  vendorId: string,
+  input: {
+    sku: string;
+    title: string;
+    description: string;
+    type: "physical" | "digital" | "lead_gen";
+    priceCents: number;
+    inventory?: number;
+    category?: string;
+    imageUrl?: string;
+    published?: boolean;
+  }
+) {
+  const row = await prisma.product.create({
+    data: {
+      vendorId,
+      sku: input.sku,
+      title: input.title,
+      description: input.description,
+      type: input.type.toUpperCase() as import("@prisma/client").ProductType,
+      priceCents: input.priceCents,
+      inventory: input.inventory ?? 0,
+      category: input.category ?? "General",
+      imageUrl: input.imageUrl ?? "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600",
+      published: input.published ?? true,
+      catalogSource: "NATIVE",
+    },
+    include: productInclude,
+  });
+  return mapDbProduct(row);
+}
+
+export async function updateVendorProduct(
+  vendorId: string,
+  productId: string,
+  input: {
+    title?: string;
+    description?: string;
+    priceCents?: number;
+    inventory?: number;
+    published?: boolean;
+  }
+) {
+  const existing = await prisma.product.findFirst({ where: { id: productId, vendorId } });
+  if (!existing) return null;
+
+  const row = await prisma.product.update({
+    where: { id: productId },
+    data: {
+      ...(input.title != null ? { title: input.title } : {}),
+      ...(input.description != null ? { description: input.description } : {}),
+      ...(input.priceCents != null ? { priceCents: input.priceCents } : {}),
+      ...(input.inventory != null ? { inventory: input.inventory } : {}),
+      ...(input.published != null ? { published: input.published } : {}),
+    },
+    include: productInclude,
+  });
+  return mapDbProduct(row);
+}
+
 export async function areVendorsApprovedForOperator(
   operatorId: string,
   vendorIds: string[]
@@ -136,6 +217,22 @@ export async function listOperatorVendorLinks(operatorId: string) {
   });
 }
 
+export async function listVendorOperatorLinks(vendorId: string) {
+  return prisma.operatorVendor.findMany({
+    where: { vendorId },
+    include: {
+      operator: {
+        select: {
+          id: true,
+          name: true,
+          storefronts: { select: { id: true, name: true, path: true }, take: 1 },
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
 export async function getOperatorVendorLinkById(id: string) {
   return prisma.operatorVendor.findUnique({
     where: { id },
@@ -153,6 +250,22 @@ export async function getOperatorVendorLinkById(id: string) {
 export async function findVendorBySlug(slug: string) {
   return prisma.vendor.findUnique({
     where: { slug },
+    include: {
+      operatorLinks: {
+        where: { status: "APPROVED" },
+        include: { operator: { select: { id: true, name: true } } },
+      },
+      products: {
+        where: { published: true },
+        orderBy: { title: "asc" },
+      },
+    },
+  });
+}
+
+export async function findVendorById(id: string) {
+  return prisma.vendor.findUnique({
+    where: { id },
     include: {
       operatorLinks: {
         where: { status: "APPROVED" },

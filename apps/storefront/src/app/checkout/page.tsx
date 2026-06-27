@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, Input, Label, ShippingMethodSelector, AlertBanner } from "@fosl/ui";
 import { formatCurrency } from "@fosl/ui";
-import { getShippingForVendor } from "@fosl/mocks";
 import { useCart } from "@/lib/cart-context";
 import { CheckoutStepSkeleton } from "@/components/checkout-step-skeleton";
 import { CheckoutPayment } from "@/components/checkout-payment";
 import { setStoredOrderEmail } from "@/lib/order-email";
 import { useStorefrontPath } from "@/lib/storefront-path-context";
+import { useVendorsShipping } from "@/lib/use-vendor-shipping";
 
 const steps = ["Contact", "Shipping", "Payment"] as const;
 
@@ -58,13 +58,34 @@ export default function CheckoutPage() {
   const { storefrontPath } = useStorefrontPath();
   const [form, setForm] = useState<FormData>(initialForm);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
-  const physicalVendorIds = [
-    ...new Set(lines.filter((l) => l.product.type === "physical").map((l) => l.product.vendorId)),
-  ];
-  const [shippingSelections, setShippingSelections] = useState<Record<string, string>>({
-    ven_1: "ship_1",
-    ven_4: "ship_3",
-  });
+  const physicalVendorIds = useMemo(
+    () => [...new Set(lines.filter((l) => l.product.type === "physical").map((l) => l.product.vendorId))],
+    [lines]
+  );
+  const shippingByVendor = useVendorsShipping(physicalVendorIds);
+  const vendorNames = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const line of lines) {
+      if (line.product.type === "physical") {
+        map[line.product.vendorId] = line.product.vendorName;
+      }
+    }
+    return map;
+  }, [lines]);
+  const [shippingSelections, setShippingSelections] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setShippingSelections((prev) => {
+      const next = { ...prev };
+      for (const vendorId of physicalVendorIds) {
+        const methods = shippingByVendor[vendorId];
+        if (methods?.length && !next[vendorId]) {
+          next[vendorId] = methods[0]!.id;
+        }
+      }
+      return next;
+    });
+  }, [physicalVendorIds, shippingByVendor]);
 
   useEffect(() => {
     setReady(true);
@@ -72,7 +93,8 @@ export default function CheckoutPage() {
 
   const subtotal = subtotalCents;
   const shipping = physicalVendorIds.reduce((s, vid) => {
-    return s + (getShippingForVendor(vid).find((m) => m.id === shippingSelections[vid])?.priceCents ?? 0);
+    const methods = shippingByVendor[vid] ?? [];
+    return s + (methods.find((m) => m.id === shippingSelections[vid])?.priceCents ?? methods[0]?.priceCents ?? 0);
   }, 0);
   const tax = Math.round((subtotal + shipping) * 0.08);
   const total = subtotal + shipping + tax;
@@ -318,18 +340,19 @@ export default function CheckoutPage() {
                 </div>
               </div>
             </div>
-            <ShippingMethodSelector
-              vendorName="Acme Audio Co."
-              methods={getShippingForVendor("ven_1")}
-              selectedId={shippingSelections.ven_1}
-              onSelect={(id) => setShippingSelections((s) => ({ ...s, ven_1: id }))}
-            />
-            <ShippingMethodSelector
-              vendorName="Bright Labs"
-              methods={getShippingForVendor("ven_4")}
-              selectedId={shippingSelections.ven_4}
-              onSelect={(id) => setShippingSelections((s) => ({ ...s, ven_4: id }))}
-            />
+            {physicalVendorIds.map((vendorId) => {
+              const methods = shippingByVendor[vendorId] ?? [];
+              if (methods.length === 0) return null;
+              return (
+                <ShippingMethodSelector
+                  key={vendorId}
+                  vendorName={vendorNames[vendorId] ?? "Vendor"}
+                  methods={methods}
+                  selectedId={shippingSelections[vendorId] ?? methods[0]!.id}
+                  onSelect={(id) => setShippingSelections((s) => ({ ...s, [vendorId]: id }))}
+                />
+              );
+            })}
             <AlertBanner variant="info">
               Digital items in your order skip shipping and deliver instantly after payment.
             </AlertBanner>

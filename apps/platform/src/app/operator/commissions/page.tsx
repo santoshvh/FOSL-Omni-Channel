@@ -1,38 +1,64 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HubShell } from "@/components/hub-shell";
 import { AlertBanner, Button, Input, Label, Card, CardContent, CardHeader, CardTitle } from "@fosl/ui";
 
-const PLATFORM_FEE = 5;
+type CommissionRules = {
+  platformFeePct: number;
+  creatorPct: number;
+  operatorPct: number;
+  skuOverrides: { sku: string; creatorPct: number }[];
+};
 
-const initialOverrides = [
-  { sku: "WBH-001", creatorPct: 12 },
-  { sku: "ECM-101", creatorPct: 15 },
-];
+const DEFAULT_RULES: CommissionRules = {
+  platformFeePct: 5,
+  creatorPct: 10,
+  operatorPct: 15,
+  skuOverrides: [],
+};
 
-function validateNoLoss(creator: number, operator: number) {
-  const total = PLATFORM_FEE + creator + operator;
+function validateNoLoss(rules: CommissionRules) {
+  const total = rules.platformFeePct + rules.creatorPct + rules.operatorPct;
   if (total > 100) {
     return `Total allocation ${total}% exceeds 100%. Vendor would receive a negative share.`;
   }
-  if (100 - total < 0) return "Vendor share cannot be negative.";
   return null;
 }
 
 export default function OperatorCommissionsPage() {
-  const [creator, setCreator] = useState(10);
-  const [operator, setOperator] = useState(15);
+  const [rules, setRules] = useState<CommissionRules>(DEFAULT_RULES);
   const [saved, setSaved] = useState(false);
-  const [overrides, setOverrides] = useState(initialOverrides);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [sku, setSku] = useState("");
   const [overridePct, setOverridePct] = useState("");
   const [overrideError, setOverrideError] = useState<string | null>(null);
-  const error = validateNoLoss(creator, operator);
-  const vendorShare = 100 - PLATFORM_FEE - creator - operator;
 
-  function handleSave() {
+  useEffect(() => {
+    fetch("/api/v1/operator/commission-rules")
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("Failed to load rules"))))
+      .then((json: { data?: CommissionRules }) => {
+        if (json.data) setRules(json.data);
+      })
+      .catch(() => setLoadError("Unable to load saved commission rules."));
+  }, []);
+
+  const error = validateNoLoss(rules);
+  const vendorShare = 100 - rules.platformFeePct - rules.creatorPct - rules.operatorPct;
+
+  async function handleSave() {
     if (error) return;
+    const res = await fetch("/api/v1/operator/commission-rules", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(rules),
+    });
+    if (!res.ok) {
+      const json = (await res.json()) as { error?: string };
+      setLoadError(typeof json.error === "string" ? json.error : "Save failed.");
+      return;
+    }
+    setLoadError(null);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   }
@@ -47,11 +73,17 @@ export default function OperatorCommissionsPage() {
       setOverrideError("Enter a creator commission between 0 and 100.");
       return;
     }
-    if (PLATFORM_FEE + pct + operator > 100) {
+    if (rules.platformFeePct + pct + rules.operatorPct > 100) {
       setOverrideError("Override would violate no-loss rule with current operator margin.");
       return;
     }
-    setOverrides((o) => [...o.filter((x) => x.sku !== sku.trim()), { sku: sku.trim(), creatorPct: pct }]);
+    setRules((r) => ({
+      ...r,
+      skuOverrides: [
+        ...r.skuOverrides.filter((x) => x.sku !== sku.trim()),
+        { sku: sku.trim(), creatorPct: pct },
+      ],
+    }));
     setSku("");
     setOverridePct("");
     setOverrideError(null);
@@ -65,6 +97,12 @@ export default function OperatorCommissionsPage() {
           <p className="text-slate-600">Global rules with per-product overrides · no-loss validation</p>
         </div>
 
+        {loadError && (
+          <AlertBanner variant="error" title="Commission rules">
+            {loadError}
+          </AlertBanner>
+        )}
+
         {error && (
           <AlertBanner variant="error" title="No-loss validation failed">
             {error} Reduce creator or operator commission before saving.
@@ -73,7 +111,7 @@ export default function OperatorCommissionsPage() {
 
         {saved && (
           <AlertBanner variant="info" title="Rules saved">
-            Global commission rules updated. Per-product overrides unchanged.
+            Commission rules and per-SKU overrides saved.
           </AlertBanner>
         )}
 
@@ -93,8 +131,10 @@ export default function OperatorCommissionsPage() {
                   type="number"
                   min={0}
                   max={100}
-                  value={creator}
-                  onChange={(e) => setCreator(Number(e.target.value))}
+                  value={rules.creatorPct}
+                  onChange={(e) =>
+                    setRules((r) => ({ ...r, creatorPct: Number(e.target.value) }))
+                  }
                   className="mt-1"
                 />
                 <p className="mt-1 text-xs text-slate-500">Paid to referring creator on attributed sales.</p>
@@ -106,8 +146,10 @@ export default function OperatorCommissionsPage() {
                   type="number"
                   min={0}
                   max={100}
-                  value={operator}
-                  onChange={(e) => setOperator(Number(e.target.value))}
+                  value={rules.operatorPct}
+                  onChange={(e) =>
+                    setRules((r) => ({ ...r, operatorPct: Number(e.target.value) }))
+                  }
                   className="mt-1"
                 />
                 <p className="mt-1 text-xs text-slate-500">Your margin after platform fee and creator share.</p>
@@ -116,15 +158,15 @@ export default function OperatorCommissionsPage() {
             <dl className="rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-700">
               <div className="flex justify-between">
                 <dt>Platform fee</dt>
-                <dd>{PLATFORM_FEE}%</dd>
+                <dd>{rules.platformFeePct}%</dd>
               </div>
               <div className="flex justify-between">
                 <dt>Creator</dt>
-                <dd>{creator}%</dd>
+                <dd>{rules.creatorPct}%</dd>
               </div>
               <div className="flex justify-between">
                 <dt>Operator</dt>
-                <dd>{operator}%</dd>
+                <dd>{rules.operatorPct}%</dd>
               </div>
               <div className="mt-1 flex justify-between border-t border-slate-200 pt-1 font-medium">
                 <dt>Vendor remainder</dt>
@@ -142,7 +184,7 @@ export default function OperatorCommissionsPage() {
             <CardTitle>Per-product overrides</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {overrides.length > 0 && (
+            {rules.skuOverrides.length > 0 && (
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b text-left text-slate-500">
@@ -152,11 +194,13 @@ export default function OperatorCommissionsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {overrides.map((o) => (
+                  {rules.skuOverrides.map((o) => (
                     <tr key={o.sku}>
                       <td className="py-2 font-mono">{o.sku}</td>
                       <td className="py-2">{o.creatorPct}%</td>
-                      <td className="py-2 text-right">{100 - PLATFORM_FEE - o.creatorPct - operator}%</td>
+                      <td className="py-2 text-right">
+                        {100 - rules.platformFeePct - o.creatorPct - rules.operatorPct}%
+                      </td>
                     </tr>
                   ))}
                 </tbody>

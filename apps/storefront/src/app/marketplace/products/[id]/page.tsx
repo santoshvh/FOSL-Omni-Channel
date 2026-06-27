@@ -1,15 +1,12 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { getProductById, getMarketplaceVendorById } from "@fosl/mocks";
-import {
-  ProductTypeBadge,
-  formatCurrency,
-} from "@fosl/ui";
+import { ProductTypeBadge, formatCurrency } from "@fosl/ui";
 import { CreatorEarnButton } from "@/components/creator-earn-button";
 import { MarketplaceProductCard } from "@/components/marketplace-product-card";
 import { AddToCartButton } from "@/components/add-to-cart-button";
-import { getProductsByVendorId } from "@fosl/mocks";
+import { loadProductById, loadVendorStore } from "@/lib/catalog-loader";
+import { categorySlugFromName } from "@fosl/db";
 
 export default async function MarketplaceProductPage({
   params,
@@ -17,13 +14,15 @@ export default async function MarketplaceProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = getProductById(id);
+  const product = await loadProductById(id, "network");
   if (!product) notFound();
 
-  const vendor = getMarketplaceVendorById(product.vendorId);
-  const moreFromVendor = getProductsByVendorId(product.vendorId)
+  const store = await loadVendorStore(product.vendorId);
+  const moreFromVendor = (store?.products ?? [])
     .filter((p) => p.id !== product.id)
     .slice(0, 3);
+  const vendor = store?.vendor;
+  const categorySlug = categorySlugFromName(product.category);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -32,7 +31,7 @@ export default async function MarketplaceProductPage({
           Marketplace
         </Link>
         {" / "}
-        <Link href={`/marketplace/category/electronics`} className="hover:text-primary-dark">
+        <Link href={`/marketplace/category/${categorySlug}`} className="hover:text-primary-dark">
           {product.category}
         </Link>
         {" / "}
@@ -50,20 +49,20 @@ export default async function MarketplaceProductPage({
 
           {vendor && (
             <div className="mt-4 flex items-center gap-3 rounded-lg border border-slate-200 p-3">
-              <div className="relative h-10 w-10 overflow-hidden rounded-full">
-                <Image src={vendor.logoUrl} alt="" fill className="object-cover" sizes="40px" />
-              </div>
-              <div className="flex-1 min-w-0">
+              {vendor.logoUrl ? (
+                <div className="relative h-10 w-10 overflow-hidden rounded-full">
+                  <Image src={vendor.logoUrl} alt="" fill className="object-cover" sizes="40px" />
+                </div>
+              ) : null}
+              <div className="min-w-0 flex-1">
                 <p className="text-sm text-slate-500">Sold by</p>
                 <Link
-                  href={vendor.storefrontUrl}
+                  href={`/${vendor.slug}`}
                   className="font-semibold text-slate-900 hover:underline"
                 >
                   {vendor.name}
                 </Link>
                 <p className="text-xs text-slate-500">
-                  via {vendor.operatorName} · ★ {vendor.rating}
-                  {" · "}
                   <Link
                     href={`/marketplace/vendors/${vendor.id}`}
                     className="text-slate-400 hover:text-slate-600 hover:underline"
@@ -81,9 +80,7 @@ export default async function MarketplaceProductPage({
           <p className="mt-4 text-slate-600">{product.description}</p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <AddToCartButton productId={product.id}>
-              Add to marketplace cart
-            </AddToCartButton>
+            <AddToCartButton productId={product.id}>Add to marketplace cart</AddToCartButton>
             <CreatorEarnButton
               productId={product.id}
               productTitle={product.title}
@@ -91,10 +88,6 @@ export default async function MarketplaceProductPage({
               className="h-11 px-8"
             />
           </div>
-
-          <p className="mt-4 text-xs text-slate-500">
-            One checkout splits fulfillment across vendors and operators. Shipping calculated per vendor at checkout.
-          </p>
         </div>
       </div>
 

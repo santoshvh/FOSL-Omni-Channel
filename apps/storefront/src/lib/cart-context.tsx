@@ -11,7 +11,6 @@ import {
   type ReactNode,
 } from "react";
 import type { Product } from "@fosl/contracts";
-import { products, getMarketplaceCartProducts } from "@fosl/mocks";
 
 export type CartMode = "storefront" | "marketplace";
 
@@ -50,16 +49,11 @@ const CartContext = createContext<CartContextValue | null>(null);
 const catalogRegistry = new Map<string, Product>();
 
 function getProductById(id: string): Product | undefined {
-  return catalogRegistry.get(id) ?? products.find((p) => p.id === id);
+  return catalogRegistry.get(id);
 }
 
-function defaultEntries(mode: CartMode): CartEntry[] {
-  if (mode === "marketplace") {
-    return getMarketplaceCartProducts().map((p) => ({ productId: p.id, quantity: 1 }));
-  }
-  return [products[0], products[3]]
-    .filter(Boolean)
-    .map((p) => ({ productId: p!.id, quantity: 1 }));
+function defaultEntries(_mode: CartMode): CartEntry[] {
+  return [];
 }
 
 function storageKey(mode: CartMode) {
@@ -155,6 +149,31 @@ export function CartProvider({
     const payload: StoredCart = { entries, saved };
     localStorage.setItem(storageKey(mode), JSON.stringify(payload));
   }, [entries, saved, hydrated, mode]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    const ids = [...new Set([...entries, ...saved].map((e) => e.productId))];
+    const missing = ids.filter((id) => !catalogRegistry.has(id));
+    if (missing.length === 0) return;
+
+    let cancelled = false;
+    Promise.all(
+      missing.map(async (productId) => {
+        const res = await fetch(`/api/v1/products/${productId}`);
+        if (!res.ok) return null;
+        const json = (await res.json()) as { data?: Product };
+        return json.data ?? null;
+      })
+    ).then((loaded) => {
+      if (cancelled) return;
+      const valid = loaded.filter((p): p is Product => p != null);
+      if (valid.length > 0) registerCatalogProducts(valid);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, entries, saved, registerCatalogProducts]);
 
   const maxQuantity = useCallback((product: Product) => maxQuantityForProduct(product), []);
 

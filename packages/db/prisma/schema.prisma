@@ -176,6 +176,7 @@ model Operator {
   /// Stripe Connect Express — operator is merchant of record at checkout
   stripeConnectId    String?           @unique
   stripeConnectOnboardedAt DateTime?
+  settings           Json?
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
 

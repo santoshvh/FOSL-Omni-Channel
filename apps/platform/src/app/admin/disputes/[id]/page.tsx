@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getDisputeById } from "@fosl/mocks";
+import { getDisputeById } from "@fosl/db";
 import { Button } from "@fosl/ui";
 
 export default async function AdminDisputeDetailPage({
@@ -9,8 +9,17 @@ export default async function AdminDisputeDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const dispute = getDisputeById(id);
+  if (!process.env.DATABASE_URL) notFound();
+
+  const dispute = await getDisputeById(id);
   if (!dispute) notFound();
+
+  const timeline = [
+    { at: dispute.filedAt.toISOString(), note: "Dispute filed" },
+    ...(dispute.resolvedAt
+      ? [{ at: dispute.resolvedAt.toISOString(), note: "Dispute resolved" }]
+      : []),
+  ];
 
   return (
     <div className="space-y-6">
@@ -32,12 +41,14 @@ export default async function AdminDisputeDetailPage({
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-lg border border-slate-200 bg-white p-6">
-          <h2 className="font-semibold">Description</h2>
-          <p className="mt-3 text-sm text-slate-600">{dispute.description}</p>
+          <h2 className="font-semibold">Notes</h2>
+          <p className="mt-3 text-sm text-slate-600">
+            {dispute.notes ?? "No additional notes recorded."}
+          </p>
           <dl className="mt-4 space-y-2 text-sm">
             <div className="flex justify-between">
               <dt className="text-slate-500">Filed</dt>
-              <dd>{new Date(dispute.filedAt).toLocaleString()}</dd>
+              <dd>{dispute.filedAt.toLocaleString()}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-slate-500">Assignee</dt>
@@ -49,7 +60,7 @@ export default async function AdminDisputeDetailPage({
         <div className="rounded-lg border border-slate-200 bg-white p-6">
           <h2 className="font-semibold">Timeline</h2>
           <ol className="mt-4 space-y-3 border-l-2 border-slate-200 pl-4">
-            {dispute.timeline.map((e, i) => (
+            {timeline.map((e, i) => (
               <li key={i} className="text-sm">
                 <p className="text-xs text-slate-500">{new Date(e.at).toLocaleString()}</p>
                 <p className="mt-0.5">{e.note}</p>
@@ -60,10 +71,16 @@ export default async function AdminDisputeDetailPage({
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Button>Assign to me</Button>
-        <Button variant="outline">Request evidence</Button>
-        <Button variant="outline">Resolve — refund customer</Button>
-        <Button variant="outline">Resolve — favor vendor</Button>
+        <Button disabled>Assign to me</Button>
+        <Button variant="outline" disabled>
+          Request evidence
+        </Button>
+        <Button variant="outline" disabled>
+          Resolve — refund customer
+        </Button>
+        <Button variant="outline" disabled>
+          Resolve — favor vendor
+        </Button>
       </div>
     </div>
   );

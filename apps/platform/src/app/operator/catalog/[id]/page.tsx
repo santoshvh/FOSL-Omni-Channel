@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HubShell } from "@/components/hub-shell";
-import { getProductById } from "@fosl/mocks";
 import { Button, Input, Label, ProductTypeBadge } from "@fosl/ui";
+import { auth } from "@/auth";
+import { resolveOperatorIdForApi } from "@/lib/tenant-session";
+import { getOperatorProduct } from "@fosl/db";
 
 export default async function OperatorProductEditPage({
   params,
@@ -10,7 +12,12 @@ export default async function OperatorProductEditPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = getProductById(id);
+  const session = await auth();
+  const operatorId = await resolveOperatorIdForApi(session);
+
+  if (!process.env.DATABASE_URL || !operatorId) notFound();
+
+  const product = await getOperatorProduct(operatorId, id);
   if (!product) notFound();
 
   return (
@@ -39,8 +46,10 @@ export default async function OperatorProductEditPage({
             <input type="checkbox" defaultChecked className="ml-2" />
           </div>
           <div className="flex gap-3">
-            <Button>Save</Button>
-            <Button variant="outline">Unlist from storefront</Button>
+            <Button disabled>Save</Button>
+            <Button variant="outline" disabled>
+              Unlist from storefront
+            </Button>
           </div>
         </div>
       </div>

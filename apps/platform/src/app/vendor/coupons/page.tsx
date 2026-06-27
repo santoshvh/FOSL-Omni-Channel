@@ -1,53 +1,10 @@
-import Link from "next/link";
-import { HubShell } from "@/components/hub-shell";
-import { Button } from "@fosl/ui";
-import { vendorCoupons } from "@fosl/mocks";
-import { Plus } from "lucide-react";
+import { DeferredFeatureNotice } from "@/components/deferred-feature-notice";
 
 export default function VendorCouponsPage() {
   return (
-    <HubShell>
-      <div className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">Coupons</h1>
-            <p className="text-slate-600">Vendor-funded discounts — deducted from your earnings</p>
-          </div>
-          <Button asChild>
-            <Link href="/vendor/coupons/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Create coupon
-            </Link>
-          </Button>
-        </div>
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-          <table className="w-full text-sm">
-            <thead className="border-b bg-slate-50">
-              <tr>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Code</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Scope</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Discount</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Expires</th>
-                <th className="px-4 py-3 text-right font-medium text-slate-600">Redemptions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {vendorCoupons.map((c) => (
-                <tr key={c.id}>
-                  <td className="px-4 py-3 font-mono font-medium">{c.code}</td>
-                  <td className="px-4 py-3 text-slate-600">{c.scope}</td>
-                  <td className="px-4 py-3">{c.discount}</td>
-                  <td className="px-4 py-3">{c.expiresAt}</td>
-                  <td className="px-4 py-3 text-right">
-                    {c.redemptions}
-                    {c.maxRedemptions != null && ` / ${c.maxRedemptions}`}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </HubShell>
+    <DeferredFeatureNotice
+      title="Coupons"
+      description="Vendor coupon codes require a Coupon model and CRUD APIs. This area is deferred until the promotions schema ships."
+    />
   );
 }

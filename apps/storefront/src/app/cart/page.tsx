@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { getShippingForVendor } from "@fosl/mocks";
+import { useMemo } from "react";
 import { Button, formatCurrency, Input, Label } from "@fosl/ui";
 import { CartLineItem } from "@/components/cart-line-item";
 import { useCart } from "@/lib/cart-context";
+import { useVendorsShipping } from "@/lib/use-vendor-shipping";
 
 export default function CartPage() {
   const {
@@ -20,9 +21,13 @@ export default function CartPage() {
     maxQuantity,
   } = useCart();
 
-  const vendorIds = [...new Set(lines.filter((l) => l.product.type === "physical").map((l) => l.product.vendorId))];
+  const vendorIds = useMemo(
+    () => [...new Set(lines.filter((l) => l.product.type === "physical").map((l) => l.product.vendorId))],
+    [lines]
+  );
+  const shippingByVendor = useVendorsShipping(vendorIds);
   const shippingTotal = vendorIds.reduce((s, vid) => {
-    const methods = getShippingForVendor(vid);
+    const methods = shippingByVendor[vid] ?? [];
     return s + (methods[0]?.priceCents ?? 0);
   }, 0);
 
@@ -68,7 +73,8 @@ export default function CartPage() {
                 </ul>
                 {vendorLines.some((l) => l.product.type === "physical") && (
                   <p className="mt-2 text-sm text-slate-500">
-                    Shipping from {vendorName}: {formatCurrency(getShippingForVendor(vid)[0]?.priceCents ?? 0)}
+                    Shipping from {vendorName}:{" "}
+                    {formatCurrency(shippingByVendor[vid]?.[0]?.priceCents ?? 0)}
                   </p>
                 )}
               </div>

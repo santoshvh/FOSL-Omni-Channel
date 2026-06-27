@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { updateOrderSchema } from "@fosl/contracts";
 import { fetchOrderById } from "@/lib/orders-service";
+import { databaseRequiredResponse } from "@/lib/database-required";
 import { getOrderFromDb, mapDbOrder, updateOrderLineFulfillment, updateOrderStatus } from "@fosl/db";
 
 export async function GET(
@@ -27,9 +28,8 @@ export async function PATCH(
 ) {
   const { id } = await params;
 
-  if (!process.env.DATABASE_URL) {
-    return NextResponse.json({ data: { id, updated: true, source: "mock" } });
-  }
+  const blocked = databaseRequiredResponse();
+  if (blocked) return blocked;
 
   let body: unknown;
   try {

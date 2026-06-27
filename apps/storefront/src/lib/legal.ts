@@ -10,8 +10,7 @@ export const companyLegal = {
   privacyEmail: "privacy@foslone.com",
   legalEmail: "legal@foslone.com",
   supportEmail: "support@foslone.com",
-  /** Placeholder — replace with registered address before production launch */
-  address: "FOSLOne, c/o AIOne, United States",
+  address: "FOSLOne, 8 The Green, Suite A, Dover, DE 19901, United States",
   governingLaw: "State of Delaware, United States",
 } as const;
 

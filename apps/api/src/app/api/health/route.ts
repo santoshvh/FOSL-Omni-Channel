@@ -5,10 +5,12 @@ export async function GET() {
     service: "fosl-commerce-api",
     version: "v1",
     status: "ok",
+    docs: "/docs",
+    openapi: "/openapi.yaml",
   };
 
   const docs = process.env.FOSL_API_DOCS_URL?.trim();
-  if (docs) payload.docs = docs;
+  if (docs) payload.docsUrl = docs;
 
   return NextResponse.json(payload);
 }

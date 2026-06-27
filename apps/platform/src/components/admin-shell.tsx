@@ -15,6 +15,7 @@ import {
   Search,
   TrendingUp,
   LogOut,
+  Mail,
 } from "lucide-react";
 import { FoslLogo, cn } from "@fosl/ui";
 import { MswInit } from "@/components/msw-init";
@@ -25,6 +26,7 @@ const ADMIN = "/admin";
 const nav = [
   { href: ADMIN, label: "Dashboard", icon: LayoutDashboard },
   { href: `${ADMIN}/operators`, label: "Operators", icon: Users },
+  { href: `${ADMIN}/contact`, label: "Contact inbox", icon: Mail },
   { href: `${ADMIN}/disputes`, label: "Disputes", icon: Scale },
   { href: `${ADMIN}/payments`, label: "Payments", icon: CreditCard },
   { href: `${ADMIN}/subscription-plans`, label: "Plans", icon: TrendingUp },

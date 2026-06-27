@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
+import type { Product } from "@fosl/contracts";
 import { Input, formatCurrency } from "@fosl/ui";
-import { products, searchMarketplaceProducts } from "@fosl/mocks";
 
 export function ProductSearch({
   action,
@@ -19,17 +19,35 @@ export function ProductSearch({
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [results, setResults] = useState<Product[]>([]);
   const wrapRef = useRef<HTMLDivElement>(null);
   const isMarketplace = action.includes("marketplace");
 
-  const results =
-    query.length >= 2
-      ? (isMarketplace ? searchMarketplaceProducts(query) : products.filter(
-          (p) =>
-            p.title.toLowerCase().includes(query.toLowerCase()) ||
-            p.vendorName.toLowerCase().includes(query.toLowerCase())
-        )).slice(0, 5)
-      : [];
+  useEffect(() => {
+    if (query.length < 2) {
+      setResults([]);
+      return;
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      const scope = isMarketplace ? "network" : "operator";
+      const url = isMarketplace
+        ? `/api/v1/products?scope=network&q=${encodeURIComponent(query)}`
+        : `/api/v1/products?scope=${scope}&q=${encodeURIComponent(query)}`;
+      fetch(url, { signal: controller.signal })
+        .then((res) => (res.ok ? res.json() : { data: [] }))
+        .then((json: { data?: Product[] }) => {
+          setResults((json.data ?? []).slice(0, 5));
+        })
+        .catch(() => {
+          if (!controller.signal.aborted) setResults([]);
+        });
+    }, 250);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [query, isMarketplace]);
 
   useEffect(() => {
     function onDocClick(e: MouseEvent) {

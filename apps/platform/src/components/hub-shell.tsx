@@ -5,9 +5,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import type { UserRole, UserSession } from "@fosl/contracts";
-import { demoSession } from "@fosl/mocks";
 import { RoleSwitcher, FoslLogo, cn } from "@fosl/ui";
 import { useHubRole } from "@/components/hub-role-context";
+import { isAuthEnabled } from "@/lib/auth-secret";
 import {
   LayoutDashboard,
   Package,
@@ -31,8 +31,6 @@ const vendorNav = [
   { href: "/vendor/shipping", label: "Shipping", icon: Truck },
   { href: "/vendor/relationships", label: "Operators", icon: Users },
   { href: "/vendor/orders", label: "Orders", icon: Package },
-  { href: "/vendor/coupons", label: "Coupons", icon: Package },
-  { href: "/vendor/campaigns", label: "Campaigns", icon: BarChart3 },
   { href: "/vendor/payouts", label: "Payouts", icon: Wallet },
   { href: "/vendor/analytics", label: "Analytics", icon: BarChart3 },
 ];
@@ -40,10 +38,7 @@ const vendorNav = [
 const creatorNav = [
   { href: "/creator", label: "Dashboard", icon: LayoutDashboard },
   { href: "/creator/links", label: "Referral links", icon: Link2 },
-  { href: "/creator/collections", label: "Collections", icon: Package },
-  { href: "/creator/coupons", label: "Coupons", icon: Package },
   { href: "/creator/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/creator/referral-tree", label: "Referral tree", icon: Users },
   { href: "/creator/profile", label: "Public profile", icon: Store },
   { href: "/creator/payouts", label: "Earnings", icon: Wallet },
 ];
@@ -54,10 +49,7 @@ const operatorNav = [
   { href: "/operator/vendors", label: "Vendors", icon: Users },
   { href: "/operator/creators", label: "Creators", icon: Link2 },
   { href: "/operator/orders", label: "Orders", icon: Package },
-  { href: "/operator/coupons", label: "Coupons", icon: Package },
   { href: "/operator/commissions", label: "Commissions", icon: BarChart3 },
-  { href: "/operator/promotions", label: "Promotions", icon: Package },
-  { href: "/operator/lead-gen", label: "Lead gen", icon: Users },
   { href: "/operator/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/operator/payouts", label: "Payouts", icon: Wallet },
   { href: "/operator/storefront", label: "Storefront", icon: Store },
@@ -87,7 +79,22 @@ export function HubShell({ children }: { children: React.ReactNode }) {
         activeRole,
       };
     }
-    return { ...demoSession, roles, activeRole };
+    if (!isAuthEnabled()) {
+      return {
+        userId: "guest",
+        email: "guest@local.dev",
+        name: "Guest",
+        roles,
+        activeRole,
+      };
+    }
+    return {
+      userId: "",
+      email: "",
+      name: "Signed out",
+      roles: [],
+      activeRole: "vendor",
+    };
   }, [authSession, activeRole, roles]);
 
   const nav = navByRole[session.activeRole] ?? vendorNav;

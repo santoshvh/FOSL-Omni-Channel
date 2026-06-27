@@ -111,7 +111,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
         }
 
-        return authorizeDemo(email, password);
+        if (process.env.NODE_ENV === "development") {
+          return authorizeDemo(email, password);
+        }
+
+        return null;
       },
     }),
   ],

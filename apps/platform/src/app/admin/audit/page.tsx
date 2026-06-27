@@ -1,7 +1,21 @@
-import { auditLogs } from "@fosl/mocks";
 import { Button } from "@fosl/ui";
+import { listAuditLogs } from "@fosl/db";
 
-export default function AdminAuditPage() {
+async function loadAuditLogs() {
+  if (!process.env.DATABASE_URL) return [];
+  const rows = await listAuditLogs();
+  return rows.map((row) => ({
+    id: row.id,
+    timestamp: row.createdAt.toISOString(),
+    actor: row.actorEmail ?? row.actorId ?? "system",
+    action: row.action,
+    resource: row.resource,
+  }));
+}
+
+export default async function AdminAuditPage() {
+  const auditLogs = await loadAuditLogs();
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -10,23 +24,6 @@ export default function AdminAuditPage() {
           <p className="text-slate-600">Append-only · 7-year financial retention</p>
         </div>
         <Button variant="outline">Export CSV</Button>
-      </div>
-      <div className="flex gap-2">
-        <input
-          type="date"
-          className="h-9 rounded-md border border-slate-200 px-3 text-sm"
-          aria-label="From date"
-        />
-        <input
-          type="date"
-          className="h-9 rounded-md border border-slate-200 px-3 text-sm"
-          aria-label="To date"
-        />
-        <select className="h-9 rounded-md border border-slate-200 px-3 text-sm">
-          <option>All actions</option>
-          <option>Financial</option>
-          <option>Admin</option>
-        </select>
       </div>
       <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
         <table className="w-full text-sm">

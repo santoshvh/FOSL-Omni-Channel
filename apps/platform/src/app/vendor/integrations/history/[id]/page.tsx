@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { HubShell } from "@/components/hub-shell";
-import { getSyncJobById } from "@fosl/mocks";
 import { AlertBanner } from "@fosl/ui";
+import { fetchSyncJobDetail } from "@/lib/integrations-service";
 
 export default async function SyncJobDetailPage({
   params,
@@ -10,7 +10,7 @@ export default async function SyncJobDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const job = getSyncJobById(id);
+  const { data: job } = await fetchSyncJobDetail(id);
   if (!job) notFound();
 
   return (
@@ -49,19 +49,6 @@ export default async function SyncJobDetailPage({
             <dd className={job.failed > 0 ? "font-medium text-red-600" : ""}>{job.failed}</dd>
           </div>
         </dl>
-
-        {job.failed > 0 && (
-          <div className="rounded-lg border border-slate-200 p-6">
-            <h2 className="font-semibold">Failed SKUs</h2>
-            <ul className="mt-3 space-y-2 text-sm text-slate-600">
-              <li>MUG-202 — missing weight for shipping rate sync</li>
-              <li>WBH-002 — variant mapping conflict with Shopify</li>
-            </ul>
-            <p className="mt-4 text-xs text-slate-500">
-              Fix in your connected store or native catalog, then trigger a manual sync.
-            </p>
-          </div>
-        )}
       </div>
     </HubShell>
   );

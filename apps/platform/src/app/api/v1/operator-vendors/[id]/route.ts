@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { ApprovalStatus } from "@prisma/client";
 import { requireRoles } from "@/lib/api-auth";
+import { databaseRequiredResponse } from "@/lib/database-required";
 import { resolveOperatorIdForApi } from "@/lib/operator-session";
 
 export async function GET(
@@ -12,14 +13,8 @@ export async function GET(
 
   const { id } = await params;
 
-  if (!process.env.DATABASE_URL?.trim()) {
-    const { getOperatorVendorById } = await import("@fosl/mocks");
-    const vendor = getOperatorVendorById(id);
-    if (!vendor) {
-      return NextResponse.json({ error: "Not found." }, { status: 404 });
-    }
-    return NextResponse.json({ data: vendor, source: "mock" });
-  }
+  const blocked = databaseRequiredResponse();
+  if (blocked) return blocked;
 
   try {
     const operatorId = await resolveOperatorIdForApi(auth.session);
@@ -75,9 +70,8 @@ export async function PATCH(
     return NextResponse.json({ error: "Valid status is required." }, { status: 400 });
   }
 
-  if (!process.env.DATABASE_URL?.trim()) {
-    return NextResponse.json({ data: { id, status: status.toLowerCase() }, source: "mock" });
-  }
+  const blocked = databaseRequiredResponse();
+  if (blocked) return blocked;
 
   try {
     const operatorId = await resolveOperatorIdForApi(auth.session);

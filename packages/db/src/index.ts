@@ -34,15 +34,26 @@ export {
   listOperatorProducts,
   getNetworkProduct,
   getOperatorProduct,
+  listVendorProducts,
+  getVendorProduct,
+  createVendorProduct,
+  updateVendorProduct,
   areVendorsApprovedForOperator,
   listOperatorVendorLinks,
+  listVendorOperatorLinks,
   getOperatorVendorLinkById,
   findVendorBySlug,
+  findVendorById,
   inviteVendorToOperator,
   updateOperatorVendorStatus,
   createCreatorLinkForProduct,
   getStorefrontByPath,
 } from "./catalog";
+export {
+  getVendorForUserId,
+  getDefaultVendorId,
+  getCreatorProfileForUserId,
+} from "./tenant";
 export {
   resolveStorefront,
   parsePublishableKeyFromAuthHeader,
@@ -68,7 +79,34 @@ export {
   listNetworkVendors,
   listNetworkCategories,
   searchNetworkProducts,
+  listNetworkProductsByCategorySlug,
+  categorySlugFromName,
+  categoryMetaFromSlug,
 } from "./discovery";
+export { listShippingMethodsForVendor, createShippingMethod, updateShippingMethod, deleteShippingMethod } from "./shipping";
+export {
+  getOperatorCommissionRules,
+  saveOperatorCommissionRules,
+  type OperatorCommissionRules,
+} from "./operator-settings";
+export {
+  getAdminMetrics,
+  listAdminOperators,
+  getAdminOperatorById,
+  listDisputes,
+  getDisputeById,
+  listAuditLogs,
+  listContactSubmissions,
+  getContactSubmissionById,
+  getVendorDashboardSummary,
+  getCreatorProfileDetail,
+  getAdminHealthMetrics,
+  getAdminPaymentMetrics,
+  listCreatorsForOperator,
+  listCreatorLinksForUser,
+  listCommissionsForCreator,
+  getCommissionTotalsForCreator,
+} from "./admin";
 export {
   getPlatformSettingsFromDb,
   getPlatformSecretsFromDb,

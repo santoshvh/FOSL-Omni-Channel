@@ -1,8 +1,23 @@
 import Link from "next/link";
-import { disputes } from "@fosl/mocks";
 import { Button } from "@fosl/ui";
+import { listDisputes } from "@fosl/db";
 
-export default function AdminDisputesPage() {
+async function loadDisputes() {
+  if (!process.env.DATABASE_URL) return [];
+  const rows = await listDisputes();
+  return rows.map((d) => ({
+    id: d.id,
+    orderNumber: d.orderNumber,
+    parties: d.parties,
+    status: d.status,
+    filedAt: d.filedAt.toISOString(),
+    assignee: d.assignee ?? undefined,
+  }));
+}
+
+export default async function AdminDisputesPage() {
+  const disputes = await loadDisputes();
+
   return (
     <div className="space-y-6">
       <div>

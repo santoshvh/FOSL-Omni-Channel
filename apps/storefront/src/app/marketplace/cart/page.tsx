@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { getShippingForVendor } from "@fosl/mocks";
+import { useMemo } from "react";
 import { Button, formatCurrency, Input, Label } from "@fosl/ui";
 import { CartLineItem } from "@/components/cart-line-item";
 import { useCart } from "@/lib/cart-context";
+import { useVendorsShipping } from "@/lib/use-vendor-shipping";
 
 export default function MarketplaceCartPage() {
   const {
@@ -32,11 +33,14 @@ export default function MarketplaceCartPage() {
     return acc;
   }, {});
 
-  const physicalVendorIds = [
-    ...new Set(lines.filter((l) => l.product.type === "physical").map((l) => l.product.vendorId)),
-  ];
+  const physicalVendorIds = useMemo(
+    () => [...new Set(lines.filter((l) => l.product.type === "physical").map((l) => l.product.vendorId))],
+    [lines]
+  );
+  const shippingByVendor = useVendorsShipping(physicalVendorIds);
   const shippingTotal = physicalVendorIds.reduce((s, vid) => {
-    return s + (getShippingForVendor(vid)[0]?.priceCents ?? 0);
+    const methods = shippingByVendor[vid] ?? [];
+    return s + (methods[0]?.priceCents ?? 0);
   }, 0);
 
   return (
@@ -79,7 +83,8 @@ export default function MarketplaceCartPage() {
               </ul>
               {group.items.some((l) => l.product.type === "physical") && (
                 <p className="mt-2 text-sm text-slate-500">
-                  Shipping estimate: {formatCurrency(getShippingForVendor(vid)[0]?.priceCents ?? 0)}
+                  Shipping estimate:{" "}
+                  {formatCurrency(shippingByVendor[vid]?.[0]?.priceCents ?? 0)}
                 </p>
               )}
             </div>

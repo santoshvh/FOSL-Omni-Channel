@@ -2,10 +2,22 @@ import Link from "next/link";
 import { HubShell } from "@/components/hub-shell";
 import { Button, ProductTypeBadge } from "@fosl/ui";
 import { formatCurrency } from "@fosl/ui";
-import { products } from "@fosl/mocks";
 import { Plus } from "lucide-react";
+import { auth } from "@/auth";
+import { resolveVendorIdForApi } from "@/lib/tenant-session";
+import { listVendorProducts } from "@fosl/db";
+import type { Product } from "@fosl/contracts";
 
-export default function VendorCatalogPage() {
+async function loadVendorProducts(vendorId: string | null): Promise<Product[]> {
+  if (!process.env.DATABASE_URL || !vendorId) return [];
+  return listVendorProducts(vendorId);
+}
+
+export default async function VendorCatalogPage() {
+  const session = await auth();
+  const vendorId = await resolveVendorIdForApi(session);
+  const products = await loadVendorProducts(vendorId);
+
   return (
     <HubShell>
       <div className="space-y-6">

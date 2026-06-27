@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HubShell } from "@/components/hub-shell";
-import { getProductById } from "@fosl/mocks";
 import { Button, Input, Label, ProductTypeBadge } from "@fosl/ui";
+import { auth } from "@/auth";
+import { resolveVendorIdForApi } from "@/lib/tenant-session";
+import { getVendorProduct } from "@fosl/db";
 
 export default async function VendorProductEditPage({
   params,
@@ -10,7 +12,12 @@ export default async function VendorProductEditPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = getProductById(id);
+  const session = await auth();
+  const vendorId = await resolveVendorIdForApi(session);
+
+  if (!process.env.DATABASE_URL || !vendorId) notFound();
+
+  const product = await getVendorProduct(vendorId, id);
   if (!product) notFound();
 
   return (
@@ -29,7 +36,11 @@ export default async function VendorProductEditPage({
           </div>
           <div>
             <Label>Price (USD)</Label>
-            <Input type="number" defaultValue={(product.priceCents / 100).toFixed(2)} className="mt-1" />
+            <Input
+              type="number"
+              defaultValue={(product.priceCents / 100).toFixed(2)}
+              className="mt-1"
+            />
           </div>
           <div>
             <Label>Inventory</Label>
@@ -45,7 +56,7 @@ export default async function VendorProductEditPage({
           </div>
         </div>
         <div className="flex gap-3">
-          <Button>Save changes</Button>
+          <Button disabled>Save changes</Button>
           <Button variant="outline" asChild>
             <Link href="/vendor/catalog">Back to catalog</Link>
           </Button>

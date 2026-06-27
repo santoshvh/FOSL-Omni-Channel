@@ -1,16 +1,24 @@
 import { NextResponse } from "next/server";
-import { getMockPublicPlatformConfig } from "@fosl/mocks/platform-settings";
-import { resolvePublicPlatformConfig } from "@fosl/db";
+import { defaultPlatformSettings, resolvePublicPlatformConfig } from "@fosl/db";
 
 export async function GET() {
   try {
-    const result = await resolvePublicPlatformConfig(getMockPublicPlatformConfig);
+    const result = await resolvePublicPlatformConfig();
     return NextResponse.json(result);
   } catch (err) {
     console.error("[platform-config] GET failed:", err);
+    const settings = defaultPlatformSettings;
     return NextResponse.json({
-      data: getMockPublicPlatformConfig(),
-      source: "mock",
+      data: {
+        appUrls: settings.appUrls,
+        auth: { enabled: settings.auth.enabled, authUrl: settings.auth.authUrl },
+        apiMocking: settings.apiMocking,
+        storefront: settings.storefront,
+        featureFlags: settings.featureFlags,
+        stripePublishableKey: null,
+        emailProvider: settings.email.provider,
+      },
+      source: "defaults",
     });
   }
 }

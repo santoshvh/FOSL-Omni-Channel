@@ -2,13 +2,22 @@
 
 import { useEffect, useState } from "react";
 import type { Product } from "@fosl/contracts";
-import { marketplaceCategories, getProductsByCategorySlug } from "@fosl/mocks";
 import { MarketplaceProductCard } from "@/components/marketplace-product-card";
 import { ProductCatalogSkeleton } from "@/components/product-catalog-skeleton";
 import { Button, EmptyState } from "@fosl/ui";
 import Link from "next/link";
 import { LayoutGrid, List } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
+
+type CategoryOption = { slug: string; name: string };
+
+function categorySlugForProduct(category: string): string {
+  return category
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
 
 type MarketplaceProductListingProps = {
   title?: string;
@@ -24,6 +33,7 @@ export function MarketplaceProductListing({
 }: MarketplaceProductListingProps) {
   const { registerCatalogProducts } = useCart();
   const [catalog, setCatalog] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -38,8 +48,13 @@ export function MarketplaceProductListing({
   const [sort, setSort] = useState("featured");
 
   useEffect(() => {
-    if (categorySlug) setCategoryFilter(categorySlug);
-  }, [categorySlug]);
+    fetch("/api/v1/categories")
+      .then((res) => (res.ok ? res.json() : { data: [] }))
+      .then((json: { data?: CategoryOption[] }) => {
+        if (Array.isArray(json.data)) setCategories(json.data);
+      })
+      .catch(() => setCategories([]));
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -68,13 +83,16 @@ export function MarketplaceProductListing({
     };
   }, [registerCatalogProducts]);
 
+  useEffect(() => {
+    if (categorySlug) setCategoryFilter(categorySlug);
+  }, [categorySlug]);
+
   const vendors = [...new Set(catalog.map((p) => p.vendorName))].sort();
 
   let filtered = catalog.filter((p) => typeFilter.includes(p.type));
   if (vendorFilter !== "all") filtered = filtered.filter((p) => p.vendorName === vendorFilter);
   if (categoryFilter !== "all") {
-    const categoryIds = new Set(getProductsByCategorySlug(categoryFilter).map((p) => p.id));
-    filtered = filtered.filter((p) => categoryIds.has(p.id));
+    filtered = filtered.filter((p) => categorySlugForProduct(p.category) === categoryFilter);
   }
   if (inStockOnly) filtered = filtered.filter((p) => p.inventory > 0 || p.type !== "physical");
   if (minRating !== null) {
@@ -138,7 +156,7 @@ export function MarketplaceProductListing({
                   disabled={loading}
                 >
                   <option value="all">All categories</option>
-                  {marketplaceCategories.map((cat) => (
+                  {categories.map((cat) => (
                     <option key={cat.slug} value={cat.slug}>
                       {cat.name}
                     </option>

@@ -2,13 +2,20 @@ import { NextResponse } from "next/server";
 import { requireSession } from "@/lib/api-auth";
 import { connectIntegrationSchema } from "@fosl/contracts";
 import { fetchVendorIntegrations, connectIntegration } from "@/lib/integrations-service";
+import { resolveVendorIdForApi } from "@/lib/tenant-session";
 
 export async function GET(request: Request) {
   const auth = await requireSession();
   if (auth.error) return auth.error;
 
   const { searchParams } = new URL(request.url);
-  const vendorId = searchParams.get("vendorId")?.trim() || undefined;
+  let vendorId = searchParams.get("vendorId")?.trim() || undefined;
+  if (!vendorId) {
+    vendorId = (await resolveVendorIdForApi(auth.session)) ?? undefined;
+  }
+  if (!vendorId) {
+    return NextResponse.json({ error: "Vendor context required." }, { status: 400 });
+  }
 
   try {
     const result = await fetchVendorIntegrations(vendorId);
@@ -33,7 +40,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await connectIntegration(parsed.data);
+    const vendorId =
+      parsed.data.vendorId ?? (await resolveVendorIdForApi(auth.session)) ?? undefined;
+    if (!vendorId) {
+      return NextResponse.json({ error: "Vendor context required." }, { status: 400 });
+    }
+
+    const result = await connectIntegration({ ...parsed.data, vendorId });
     return NextResponse.json(result, { status: 201 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unable to connect integration.";

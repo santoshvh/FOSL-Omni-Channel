@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import type { Product } from "@fosl/contracts";
+import type { Product, ShippingMethod } from "@fosl/contracts";
 import {
   Button,
   ProductTypeBadge,
@@ -12,19 +12,19 @@ import {
   Label,
   Textarea,
 } from "@fosl/ui";
-import {
-  getShippingForVendor,
-  getRelatedProducts,
-  getProductsByVendor,
-  enrichProduct,
-} from "@fosl/mocks";
 import { Truck, Zap, MessageSquare, Star, ChevronRight } from "lucide-react";
 import { CreatorEarnButton } from "@/components/creator-earn-button";
 import { ProductGridSection } from "@/components/product-grid-section";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { QuantityStepper, quantityMaxFor } from "@/components/quantity-stepper";
+import { useVendorShipping } from "@/lib/use-vendor-shipping";
 
 type TabId = "description" | "additional" | "reviews";
+
+function withGallery(product: Product): Product {
+  if (product.galleryUrls?.length) return product;
+  return { ...product, galleryUrls: [product.imageUrl] };
+}
 
 function Breadcrumbs({
   product,
@@ -191,7 +191,7 @@ function PhysicalPurchaseSummary({
   product: Product;
   postcode: string;
   setPostcode: (v: string) => void;
-  shipping: ReturnType<typeof getShippingForVendor>;
+  shipping: ShippingMethod[];
 }) {
   const [qty, setQty] = useState(1);
   const inStock = product.inventory > 0;
@@ -436,18 +436,22 @@ export function ProductDetail({
   product: rawProduct,
   homeHref,
   catalogBasePath,
+  relatedProducts = [],
+  moreFromVendor = [],
 }: {
   product: Product;
   homeHref?: string;
   catalogBasePath?: string;
+  relatedProducts?: Product[];
+  moreFromVendor?: Product[];
 }) {
-  const product = enrichProduct(rawProduct);
+  const product = withGallery(rawProduct);
   const shopBase = catalogBasePath ?? "/products";
   const home = homeHref ?? "/";
   const [postcode, setPostcode] = useState("");
-  const shipping = product.type === "physical" ? getShippingForVendor(product.vendorId) : [];
-  const related = getRelatedProducts(product);
-  const byVendor = getProductsByVendor(product.vendorId, product.id);
+  const shipping = useVendorShipping(product.type === "physical" ? product.vendorId : undefined);
+  const related = relatedProducts;
+  const byVendor = moreFromVendor;
 
   if (product.type === "lead_gen") {
     return (

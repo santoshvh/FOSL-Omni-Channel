@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireRoles } from "@/lib/api-auth";
+import { emptyListResponse } from "@/lib/database-required";
 import { resolveOperatorIdForApi } from "@/lib/operator-session";
 
 export async function GET() {
@@ -7,11 +8,7 @@ export async function GET() {
   if (auth.error) return auth.error;
 
   if (!process.env.DATABASE_URL?.trim()) {
-    const { products } = await import("@fosl/mocks");
-    return NextResponse.json({
-      data: products.filter((p) => p.published),
-      source: "mock",
-    });
+    return emptyListResponse();
   }
 
   try {

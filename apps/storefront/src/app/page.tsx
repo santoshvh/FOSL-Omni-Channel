@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { products } from "@fosl/mocks";
 import { Button } from "@fosl/ui";
 import {
   creatorHighlights,
@@ -11,9 +10,12 @@ import {
   teamMembers,
 } from "@/lib/foslone";
 import { ProductCatalogCard } from "@/components/product-catalog-card";
+import { loadFeaturedProducts } from "@/lib/catalog-loader";
 import { Sparkles, ArrowRight, Truck } from "lucide-react";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const featuredProducts = await loadFeaturedProducts(4);
+
   return (
     <div>
       {/* Hero — full-bleed background */}
@@ -254,7 +256,7 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {products.slice(0, 4).map((p) => (
+          {featuredProducts.map((p) => (
             <ProductCatalogCard key={p.id} product={p} layout="grid" />
           ))}
         </div>

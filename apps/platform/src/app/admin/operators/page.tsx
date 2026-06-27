@@ -1,9 +1,16 @@
 import Link from "next/link";
-import { platformOperators } from "@fosl/mocks";
 import { formatCurrency } from "@fosl/ui";
 import { Button } from "@fosl/ui";
+import { listAdminOperators } from "@fosl/db";
 
-export default function AdminOperatorsPage() {
+async function loadOperators() {
+  if (!process.env.DATABASE_URL) return [];
+  return listAdminOperators();
+}
+
+export default async function AdminOperatorsPage() {
+  const operators = await loadOperators();
+
   return (
     <div className="space-y-6">
       <div>
@@ -23,7 +30,7 @@ export default function AdminOperatorsPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {platformOperators.map((op) => (
+            {operators.map((op) => (
               <tr key={op.id}>
                 <td className="px-4 py-3">
                   <p className="font-medium">{op.name}</p>
@@ -43,8 +50,10 @@ export default function AdminOperatorsPage() {
                     {op.status.replace("_", " ")}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-right">{op.storefronts}</td>
-                <td className="px-4 py-3 text-right">{formatCurrency(op.gmvCents)}</td>
+                <td className="px-4 py-3 text-right">{op.storefrontCount}</td>
+                <td className="px-4 py-3 text-right">
+                  {formatCurrency(op.gmvCentsLast30Days ?? 0)}
+                </td>
                 <td className="px-4 py-3 text-right">
                   <Button variant="ghost" size="sm" asChild>
                     <Link href={`/admin/operators/${op.id}`}>Manage</Link>

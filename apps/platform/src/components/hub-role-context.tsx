@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import type { UserRole } from "@fosl/contracts";
-import { demoSession } from "@fosl/mocks";
+import { isAuthEnabled } from "@/lib/auth-secret";
 
 type HubRoleContextValue = {
   activeRole: UserRole;
@@ -25,11 +25,12 @@ export function HubRoleProvider({ children }: { children: React.ReactNode }) {
 
   const roles = useMemo(() => {
     if (authSession?.user?.roles?.length) return authSession.user.roles;
-    return demoSession.roles;
+    if (!isAuthEnabled()) return ["vendor", "creator", "operator"] as UserRole[];
+    return [];
   }, [authSession]);
 
   const pathRole = roleFromPathname(pathname);
-  const sessionDefault = authSession?.user?.activeRole ?? demoSession.activeRole;
+  const sessionDefault = authSession?.user?.activeRole ?? roles[0] ?? "vendor";
 
   const [activeRole, setActiveRoleState] = useState<UserRole>(sessionDefault);
 

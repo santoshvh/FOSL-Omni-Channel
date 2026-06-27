@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireRoles } from "@/lib/api-auth";
+import { databaseRequiredResponse, emptyListResponse } from "@/lib/database-required";
 import { resolveOperatorIdForApi } from "@/lib/operator-session";
 
 export async function GET() {
@@ -7,8 +8,7 @@ export async function GET() {
   if (auth.error) return auth.error;
 
   if (!process.env.DATABASE_URL?.trim()) {
-    const { operatorVendors } = await import("@fosl/mocks");
-    return NextResponse.json({ data: operatorVendors, source: "mock" });
+    return emptyListResponse();
   }
 
   try {
@@ -54,9 +54,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "vendorId is required." }, { status: 400 });
   }
 
-  if (!process.env.DATABASE_URL?.trim()) {
-    return NextResponse.json({ data: { status: "pending" }, source: "mock" }, { status: 201 });
-  }
+  const blocked = databaseRequiredResponse();
+  if (blocked) return blocked;
 
   try {
     const operatorId = await resolveOperatorIdForApi(auth.session);

@@ -1,0 +1,442 @@
+openapi: 3.1.0
+info:
+  title: FOSL Commerce API
+  version: 1.0.0
+  description: |
+    Public headless commerce API for the FOSL network storefront.
+    Native handlers run on the API gateway (`apps/api`); checkout, orders, products,
+    shipping, and webhooks are proxied to the storefront service when configured.
+  contact:
+    name: FOSL Support
+    email: support@foslone.com
+servers:
+  - url: https://api.foslone.com
+    description: Production
+  - url: http://localhost:3002
+    description: Local API gateway
+tags:
+  - name: Discovery
+    description: Marketplace catalog discovery
+  - name: Products
+    description: Product catalog
+  - name: Commerce
+    description: Cart, checkout, and orders
+  - name: Storefront
+    description: Operator storefront resolution
+  - name: Platform
+    description: Runtime configuration
+paths:
+  /api/health:
+    get:
+      tags: [Platform]
+      summary: Health check
+      responses:
+        "200":
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  service:
+                    type: string
+                  version:
+                    type: string
+                  status:
+                    type: string
+                  docs:
+                    type: string
+  /api/v1/categories:
+    get:
+      tags: [Discovery]
+      summary: List marketplace categories
+      parameters:
+        - $ref: "#/components/parameters/StorefrontHost"
+      responses:
+        "200":
+          description: Category list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryListResponse"
+  /api/v1/vendors:
+    get:
+      tags: [Discovery]
+      summary: List network vendors
+      parameters:
+        - $ref: "#/components/parameters/StorefrontHost"
+      responses:
+        "200":
+          description: Vendor list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VendorListResponse"
+  /api/v1/products/search:
+    get:
+      tags: [Discovery]
+      summary: Search marketplace products
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/StorefrontHost"
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+  /api/v1/products:
+    get:
+      tags: [Products]
+      summary: List products
+      parameters:
+        - name: scope
+          in: query
+          schema:
+            type: string
+            enum: [network, operator]
+            default: network
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: operatorId
+          in: query
+          schema:
+            type: string
+        - name: storefrontPath
+          in: query
+          schema:
+            type: string
+        - $ref: "#/components/parameters/StorefrontHost"
+      responses:
+        "200":
+          description: Product list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+  /api/v1/products/{id}:
+    get:
+      tags: [Products]
+      summary: Get product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: scope
+          in: query
+          schema:
+            type: string
+            enum: [network, operator]
+        - name: storefrontPath
+          in: query
+          schema:
+            type: string
+        - $ref: "#/components/parameters/StorefrontHost"
+      responses:
+        "200":
+          description: Product detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+        "404":
+          description: Not found
+  /api/v1/shipping:
+    get:
+      tags: [Commerce]
+      summary: List shipping methods for a vendor
+      parameters:
+        - name: vendorId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Shipping methods
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ShippingMethod"
+  /api/v1/leads:
+    post:
+      tags: [Commerce]
+      summary: Submit a lead-gen request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId, name, email]
+              properties:
+                productId:
+                  type: string
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                message:
+                  type: string
+      responses:
+        "201":
+          description: Lead captured
+  /api/v1/contact:
+    post:
+      tags: [Platform]
+      summary: Submit storefront contact form
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, role, message]
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                role:
+                  type: string
+                message:
+                  type: string
+      responses:
+        "201":
+          description: Message stored
+  /api/v1/checkout/payment-intent:
+    post:
+      tags: [Commerce]
+      summary: Create Stripe payment intent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amountCents, email, lines]
+              properties:
+                amountCents:
+                  type: integer
+                email:
+                  type: string
+                lines:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      productId:
+                        type: string
+                      quantity:
+                        type: integer
+      responses:
+        "200":
+          description: Payment intent created
+  /api/v1/orders:
+    post:
+      tags: [Commerce]
+      summary: Create order after payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderRequest"
+      responses:
+        "201":
+          description: Order created
+    get:
+      tags: [Commerce]
+      summary: List orders (scoped by session or email)
+      parameters:
+        - name: email
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Order list
+  /api/v1/orders/{id}:
+    get:
+      tags: [Commerce]
+      summary: Get order by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Order detail
+        "404":
+          description: Not found
+  /api/v1/storefronts/{path}:
+    get:
+      tags: [Storefront]
+      summary: Resolve operator storefront by path
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Storefront metadata
+  /api/v1/platform-config:
+    get:
+      tags: [Platform]
+      summary: Public platform configuration
+      responses:
+        "200":
+          description: Publishable keys and app URLs
+components:
+  parameters:
+    StorefrontHost:
+      name: X-Storefront-Host
+      in: header
+      description: Custom domain host for CORS-scoped storefront requests
+      schema:
+        type: string
+  schemas:
+    CategoryListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              slug:
+                type: string
+              name:
+                type: string
+              productCount:
+                type: integer
+        source:
+          type: string
+    VendorListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              slug:
+                type: string
+              productCount:
+                type: integer
+        source:
+          type: string
+    ProductListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+        source:
+          type: string
+        scope:
+          type: string
+    ProductResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Product"
+        source:
+          type: string
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [physical, digital, lead_gen]
+        priceCents:
+          type: integer
+        vendorId:
+          type: string
+        vendorName:
+          type: string
+        category:
+          type: string
+        imageUrl:
+          type: string
+        inventory:
+          type: integer
+    ShippingMethod:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        priceCents:
+          type: integer
+        estimatedDays:
+          type: string
+    CreateOrderRequest:
+      type: object
+      required: [email, lines]
+      properties:
+        email:
+          type: string
+        stripePaymentIntentId:
+          type: string
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+              quantity:
+                type: integer
+              shippingMethodId:
+                type: string
+        shippingCents:
+          type: integer
+        taxCents:
+          type: integer
+        shipping:
+          type: object
+          properties:
+            fullName:
+              type: string
+            line1:
+              type: string
+            city:
+              type: string
+            postalCode:
+              type: string
+            country:
+              type: string

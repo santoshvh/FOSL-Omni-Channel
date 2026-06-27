@@ -10,6 +10,9 @@ type MswInitProps = {
 
 function resolveApiMockingEnabled(apiMockingEnabled?: boolean | null) {
   if (process.env.NODE_ENV === "production") return false;
+  if (typeof window !== "undefined" && window.location.hostname.includes("foslone.com")) {
+    return false;
+  }
   if (apiMockingEnabled === null || apiMockingEnabled === undefined) {
     if (apiMockingEnabled === null) return null;
     return isBrowserApiMockingEnabled();
