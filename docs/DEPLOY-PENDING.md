@@ -6,7 +6,8 @@ Track changes queued since the last successful production deploy (`36dbb3e` on s
 
 | Commit | Summary |
 |--------|---------|
-| _(pending)_ | Storefront customer login, SoComOTT URL, remove duplicate Marketplace |
+| `1178431` | Fix unreadable vendor store headings (title on white background) |
+| `1df8e71` | Storefront customer login, SoComOTT URL, remove duplicate Marketplace |
 | `f6dd500` | Hub user menu, in-app notifications |
 | `f234a49` | Referral clicks without marketing consent; cookie only when opted in |
 | `752df14` | Marketplace cart fix + referral code resolution |
@@ -55,6 +56,7 @@ Or run `bash scripts/icdsoft-deploy-full.sh` inside a sureapp shell (see [DEPLOY
 | https://hub.foslone.com/creator/links | Cards/table toggle; star to feature |
 | https://shop.foslone.com/login | Customer sign-in stays on shop (not hub) |
 | Header nav | Single Marketplace link; SoComOTT → socomott.com/net_channel/fosl |
+| https://shop.foslone.com/acme-audio | Vendor name + tagline readable below banner |
 
 Login: `alex@acmecatalog.com` / `demo123`
 
