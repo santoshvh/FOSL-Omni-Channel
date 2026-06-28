@@ -3,9 +3,9 @@
 import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
-  DEFAULT_ATTRIBUTION_DAYS,
-  hasMarketingConsent,
-  setAttributionCookie,
+  ATTRIBUTION_CONSENT_UPDATED_EVENT,
+  applyAttributionIfConsented,
+  flushPendingAttribution,
 } from "@/lib/attribution";
 
 export function ReferralAttribution() {
@@ -14,7 +14,7 @@ export function ReferralAttribution() {
   const ref = searchParams.get("ref");
 
   useEffect(() => {
-    if (!ref || !hasMarketingConsent()) return;
+    if (!ref) return;
 
     const productId = pathname.match(/\/products\/([^/]+)/)?.[1];
 
@@ -26,18 +26,20 @@ export function ReferralAttribution() {
       .then((res) => (res.ok ? res.json() : null))
       .then((json: { data?: { slug?: string } } | null) => {
         const slug = json?.data?.slug ?? ref;
-        setAttributionCookie(
-          { slug, productId, ts: Date.now() },
-          DEFAULT_ATTRIBUTION_DAYS
-        );
+        applyAttributionIfConsented({ slug, productId, ts: Date.now() });
       })
       .catch(() => {
-        setAttributionCookie(
-          { slug: ref, productId, ts: Date.now() },
-          DEFAULT_ATTRIBUTION_DAYS
-        );
+        applyAttributionIfConsented({ slug: ref, productId, ts: Date.now() });
       });
   }, [ref, pathname]);
+
+  useEffect(() => {
+    function onConsentUpdated() {
+      flushPendingAttribution();
+    }
+    window.addEventListener(ATTRIBUTION_CONSENT_UPDATED_EVENT, onConsentUpdated);
+    return () => window.removeEventListener(ATTRIBUTION_CONSENT_UPDATED_EVENT, onConsentUpdated);
+  }, []);
 
   return null;
 }

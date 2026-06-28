@@ -11,6 +11,17 @@ async function acceptMarketingCookies(page: import("@playwright/test").Page) {
   }
 }
 
+test("referral click is tracked without marketing consent", async ({ page }) => {
+  const clickPromise = page.waitForRequest(
+    (req) => req.url().includes("/api/v1/referral/click") && req.method() === "POST"
+  );
+  await page.goto("/products/prod_1?ref=alex");
+  await clickPromise;
+
+  const cookies = await page.context().cookies();
+  expect(cookies.find((cookie) => cookie.name === ATTRIBUTION_COOKIE)).toBeUndefined();
+});
+
 test("referral attribution cookie is set from ?ref=", async ({ page }) => {
   await page.goto("/products/prod_1?ref=alex");
   await acceptMarketingCookies(page);

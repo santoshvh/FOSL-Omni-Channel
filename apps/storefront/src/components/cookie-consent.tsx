@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@fosl/ui";
 import { legalPageHref } from "@/lib/legal";
-
-const STORAGE_KEY = "fosl_cookie_consent";
+import { ATTRIBUTION_CONSENT_KEY, ATTRIBUTION_CONSENT_UPDATED_EVENT } from "@/lib/attribution";
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
@@ -13,13 +12,14 @@ export function CookieConsent() {
   const [marketing, setMarketing] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && !localStorage.getItem(STORAGE_KEY)) {
+    if (typeof window !== "undefined" && !localStorage.getItem(ATTRIBUTION_CONSENT_KEY)) {
       setVisible(true);
     }
   }, []);
 
   function save(prefs: { analytics: boolean; marketing: boolean }) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+    localStorage.setItem(ATTRIBUTION_CONSENT_KEY, JSON.stringify(prefs));
+    window.dispatchEvent(new Event(ATTRIBUTION_CONSENT_UPDATED_EVENT));
     setVisible(false);
   }
 
