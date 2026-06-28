@@ -108,6 +108,7 @@ model User {
   creatorProfile CreatorProfile?
   vendorMembers  VendorMember[]
   operators      Operator[] @relation("OperatorOwner")
+  notifications  UserNotification[]
 
   @@map("users")
 }
@@ -556,6 +557,21 @@ model ContactSubmission {
   createdAt DateTime @default(now())
 
   @@map("contact_submissions")
+}
+
+model UserNotification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String?   @db.Text
+  href      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, readAt])
+  @@map("user_notifications")
 }
 
 model PlatformConfig {

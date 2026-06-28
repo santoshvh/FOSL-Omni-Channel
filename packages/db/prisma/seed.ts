@@ -3,6 +3,7 @@ import { hash } from "bcryptjs";
 import { products, getShippingForVendor } from "@fosl/mocks";
 import { marketplaceVendors, platformOperators } from "@fosl/mocks";
 import { generateStorefrontKeyPair } from "../src/storefront-auth";
+import { seedDemoNotifications } from "../src/notifications";
 
 const prisma = new PrismaClient();
 const DEMO_PASSWORD = "demo123";
@@ -325,6 +326,8 @@ async function main() {
       },
     });
   }
+
+  await seedDemoNotifications(creatorProfile.userId);
 
   if (creatorUser) {
     await prisma.creatorProfile.upsert({

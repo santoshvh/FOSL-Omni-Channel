@@ -5,8 +5,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import type { UserRole, UserSession } from "@fosl/contracts";
-import { RoleSwitcher, FoslLogo, cn } from "@fosl/ui";
+import { FoslLogo, cn } from "@fosl/ui";
 import { useHubRole } from "@/components/hub-role-context";
+import { HubNotifications, HubUserMenu } from "@/components/hub-header-controls";
 import { isAuthEnabled } from "@/lib/auth-secret";
 import {
   LayoutDashboard,
@@ -16,14 +17,12 @@ import {
   Settings,
   Menu,
   X,
-  Bell,
   Plug,
   Truck,
   Users,
   BarChart3,
   Wallet,
 } from "lucide-react";
-
 const vendorNav = [
   { href: "/vendor", label: "Dashboard", icon: LayoutDashboard },
   { href: "/vendor/catalog", label: "Catalog", icon: Package },
@@ -205,14 +204,12 @@ export function HubShell({ children }: { children: React.ReactNode }) {
           >
             Storefront
           </a>
-          <RoleSwitcher
-            roles={session.roles}
-            activeRole={session.activeRole}
+          <HubNotifications />
+          <HubUserMenu
+            session={session}
             onRoleChange={handleRoleChange}
+            onSignOut={handleSignOut}
           />
-          <button className="rounded-md p-2 hover:bg-slate-100" aria-label="Notifications">
-            <Bell className="h-5 w-5 text-slate-500" />
-          </button>
         </header>
         <main className="flex-1 p-4 lg:p-6">{children}</main>
       </div>
