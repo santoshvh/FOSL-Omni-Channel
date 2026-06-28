@@ -38,13 +38,26 @@ test -f .env || { echo "ERROR: .env missing at $REPO/.env"; exit 1; }
 grep -q '^DATABASE_URL=' .env || { echo "ERROR: DATABASE_URL missing in .env"; exit 1; }
 grep -q '^AUTH_SECRET=' .env || { echo "ERROR: AUTH_SECRET missing in .env"; exit 1; }
 
+kill_port() {
+  port=$1
+  pids=$(ss -tlnp 2>/dev/null | grep ":${port} " | sed -n 's/.*pid=\([0-9]*\).*/\1/p' | sort -u)
+  for pid in $pids; do
+    echo "kill -9 pid=$pid port=$port"
+    kill -9 "$pid" 2>/dev/null || true
+  done
+  fuser -k "${port}/tcp" 2>/dev/null || true
+}
+
 bash scripts/git-deploy-pull.sh
 
 echo "=== stop services (before build) ==="
 sureapp service manage --stop fosl-hub 2>/dev/null || true
 sureapp service manage --stop Storefront 2>/dev/null || true
 sureapp service manage --stop fosl-api 2>/dev/null || true
-fuser -k 26104/tcp 1629/tcp 21942/tcp 2>/dev/null || true
+kill_port 26104
+kill_port 1629
+kill_port 21942
+rm -rf apps/hub/.next apps/admin/.next
 sleep 5
 
 echo "=== npm ci ==="
@@ -80,6 +93,14 @@ echo "=== building api ==="
 npm run build -w @fosl/api
 
 echo "=== starting services ==="
+sureapp service manage --stop Storefront 2>/dev/null || true
+sureapp service manage --stop fosl-api 2>/dev/null || true
+sureapp service manage --stop fosl-hub 2>/dev/null || true
+kill_port 26104
+kill_port 1629
+kill_port 21942
+sleep 3
+
 sureapp service manage --start Storefront || true
 sleep 12
 sureapp service manage --start fosl-api || true

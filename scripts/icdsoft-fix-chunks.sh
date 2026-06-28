@@ -26,14 +26,23 @@ export NEXT_TELEMETRY_DISABLED=1
 export NEXT_DEPLOYMENT_ID="$(git rev-parse --short HEAD)"
 echo "NEXT_DEPLOYMENT_ID=$NEXT_DEPLOYMENT_ID"
 
+kill_port() {
+  port=$1
+  pids=$(ss -tlnp 2>/dev/null | grep ":${port} " | sed -n 's/.*pid=\([0-9]*\).*/\1/p' | sort -u)
+  for pid in $pids; do
+    kill -9 "$pid" 2>/dev/null || true
+  done
+  fuser -k "${port}/tcp" 2>/dev/null || true
+}
+
 rm -rf apps/platform/.next apps/storefront/.next
 npm run build -w @fosl/platform
 npm run build -w @fosl/storefront
 
-fuser -k 26104/tcp 1629/tcp 2>/dev/null || true
-sleep 3
 sureapp service manage --stop Storefront 2>/dev/null || true
 sureapp service manage --stop fosl-hub 2>/dev/null || true
+kill_port 26104
+kill_port 1629
 sleep 3
 sureapp service manage --start Storefront
 sleep 12
