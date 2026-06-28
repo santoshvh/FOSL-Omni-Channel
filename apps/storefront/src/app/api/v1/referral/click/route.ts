@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { referralClickSchema } from "@fosl/contracts";
-import { prisma } from "@fosl/db";
+import { trackCreatorLinkClick } from "@fosl/db";
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -19,24 +19,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ data: { tracked: false, source: "mock" } });
   }
 
-  const { slug } = parsed.data;
+  const { slug, productId } = parsed.data;
 
   try {
-    const link = await prisma.creatorLink.findFirst({
-      where: { slug, active: true },
-      select: { id: true },
-    });
+    const { link, tracked } = await trackCreatorLinkClick(slug, productId);
 
-    if (!link) {
+    if (!tracked || !link) {
       return NextResponse.json({ data: { tracked: false } });
     }
 
-    await prisma.creatorLink.update({
-      where: { id: link.id },
-      data: { clickCount: { increment: 1 } },
+    return NextResponse.json({
+      data: { tracked: true, slug: link.slug, source: "database" },
     });
-
-    return NextResponse.json({ data: { tracked: true, source: "database" } });
   } catch (err) {
     console.error("[referral/click] failed:", err);
     return NextResponse.json({ error: "Unable to track referral click." }, { status: 500 });

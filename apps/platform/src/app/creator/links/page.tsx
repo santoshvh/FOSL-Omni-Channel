@@ -29,8 +29,10 @@ export default function CreatorLinksPage() {
 
   const storefrontBase = process.env.NEXT_PUBLIC_STOREFRONT_URL ?? "http://localhost:3001";
   const selected = products.find((p) => p.id === selectedId);
+  const productLink = links.find((row) => row.product?.id === selectedId);
+  const linkSlug = productLink?.slug ?? referralCode;
   const link = selected
-    ? `${storefrontBase}/marketplace/products/${selected.id}?ref=${referralCode}`
+    ? `${storefrontBase}/marketplace/products/${selected.id}?ref=${encodeURIComponent(linkSlug)}`
     : "";
 
   useEffect(() => {

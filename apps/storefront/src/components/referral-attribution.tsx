@@ -17,16 +17,26 @@ export function ReferralAttribution() {
     if (!ref || !hasMarketingConsent()) return;
 
     const productId = pathname.match(/\/products\/([^/]+)/)?.[1];
-    setAttributionCookie(
-      { slug: ref, productId, ts: Date.now() },
-      DEFAULT_ATTRIBUTION_DAYS
-    );
 
     fetch("/api/v1/referral/click", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ slug: ref, productId }),
-    }).catch(() => undefined);
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json: { data?: { slug?: string } } | null) => {
+        const slug = json?.data?.slug ?? ref;
+        setAttributionCookie(
+          { slug, productId, ts: Date.now() },
+          DEFAULT_ATTRIBUTION_DAYS
+        );
+      })
+      .catch(() => {
+        setAttributionCookie(
+          { slug: ref, productId, ts: Date.now() },
+          DEFAULT_ATTRIBUTION_DAYS
+        );
+      });
   }, [ref, pathname]);
 
   return null;

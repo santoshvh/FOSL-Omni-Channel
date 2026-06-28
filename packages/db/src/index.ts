@@ -49,6 +49,7 @@ export {
   createCreatorLinkForProduct,
   getStorefrontByPath,
 } from "./catalog";
+export { resolveCreatorLinkForAttribution, trackCreatorLinkClick } from "./referral";
 export {
   getVendorForUserId,
   getDefaultVendorId,

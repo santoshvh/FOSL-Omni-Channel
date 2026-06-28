@@ -5,6 +5,7 @@ import { ProductTypeBadge, formatCurrency } from "@fosl/ui";
 import { CreatorEarnButton } from "@/components/creator-earn-button";
 import { MarketplaceProductCard } from "@/components/marketplace-product-card";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { CatalogProductRegistrar } from "@/components/catalog-product-registrar";
 import { loadProductById, loadVendorStore } from "@/lib/catalog-loader";
 import { categorySlugFromName } from "@fosl/db";
 
@@ -26,6 +27,7 @@ export default async function MarketplaceProductPage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
+      <CatalogProductRegistrar products={[product, ...moreFromVendor]} />
       <nav className="mb-6 text-sm text-slate-500">
         <Link href="/marketplace" className="hover:text-primary-dark">
           Marketplace
