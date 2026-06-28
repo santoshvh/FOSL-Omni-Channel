@@ -2,16 +2,23 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Home, ShoppingBag, Store, ShoppingCart, User } from "lucide-react";
-import { usePlatformUrls } from "@/lib/platform-urls-context";
 import { useCart } from "@/lib/cart-context";
 import { cn } from "@fosl/ui";
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const { hubLoginUrl } = usePlatformUrls();
   const { mode, itemCount, openCart } = useCart();
   const isMarketplace = mode === "marketplace";
+  const [signedIn, setSignedIn] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/v1/auth/customer-login")
+      .then((r) => r.json())
+      .then((json: { data?: { email: string } | null }) => setSignedIn(Boolean(json.data?.email)))
+      .catch(() => setSignedIn(false));
+  }, [pathname]);
 
   const links = [
     { href: "/", label: "Home", icon: Home, match: (p: string) => p === "/" },
@@ -69,16 +76,16 @@ export function MobileBottomNav() {
           </span>
           Cart
         </button>
-        <a
-          href={hubLoginUrl}
+        <Link
+          href="/login"
           className={cn(
             "flex flex-1 flex-col items-center gap-0.5 px-1 py-2 text-[10px] font-medium",
-            "text-slate-500"
+            pathname === "/login" ? "bg-primary-muted text-ink" : "text-slate-500"
           )}
         >
           <User className="h-5 w-5" />
-          Login
-        </a>
+          {signedIn ? "Account" : "Login"}
+        </Link>
       </div>
     </nav>
   );

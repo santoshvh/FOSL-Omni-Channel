@@ -6,8 +6,8 @@ Track changes queued since the last successful production deploy (`36dbb3e` on s
 
 | Commit | Summary |
 |--------|---------|
-| _(pending)_ | Hub user menu, in-app notifications |
-| `59257d7` | Creator public profile URL, featured products, cart deep links (`?add=1`) |
+| _(pending)_ | Storefront customer login, SoComOTT URL, remove duplicate Marketplace |
+| `f6dd500` | Hub user menu, in-app notifications |
 | `f234a49` | Referral clicks without marketing consent; cookie only when opted in |
 | `752df14` | Marketplace cart fix + referral code resolution |
 | `4b137df` | Deploy script hard-kill stale Next PIDs after `sureapp stop` |
@@ -53,7 +53,8 @@ Or run `bash scripts/icdsoft-deploy-full.sh` inside a sureapp shell (see [DEPLOY
 | https://shop.foslone.com/creators/ALEX2026 | Public creator page with featured products |
 | https://shop.foslone.com/marketplace/products/prod_5?ref=ALEX2026&add=1 | Product added to cart |
 | https://hub.foslone.com/creator/links | Cards/table toggle; star to feature |
-| Hub header | User menu dropdown + notifications panel |
+| https://shop.foslone.com/login | Customer sign-in stays on shop (not hub) |
+| Header nav | Single Marketplace link; SoComOTT → socomott.com/net_channel/fosl |
 
 Login: `alex@acmecatalog.com` / `demo123`
 

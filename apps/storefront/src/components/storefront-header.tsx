@@ -25,12 +25,6 @@ export function StorefrontHeader() {
           >
             Shop
           </Link>
-          <Link
-            href="/marketplace"
-            className="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-primary-muted hover:text-ink sm:inline"
-          >
-            Marketplace
-          </Link>
           <CartTrigger />
         </nav>
       </div>

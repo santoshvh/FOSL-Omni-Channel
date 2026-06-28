@@ -18,7 +18,7 @@ export const hubCreatorUrl = urls.hubCreatorUrl;
 export const platformAdminUrl = urls.platformAdminUrl;
 
 export const externalLinks = {
-  socomOtt: "https://www.foslone.com/socomm-ott/",
+  socomOtt: "https://www.socomott.com/net_channel/fosl",
   signupCreator: `${FOSLONE_SITE}/signup-as-a-coseller/`,
   fosloneContact: `${FOSLONE_SITE}/contact-us/`,
 } as const;
