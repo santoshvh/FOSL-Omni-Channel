@@ -49,23 +49,26 @@ export default async function StorePathPage({
       {bannerUrl ? (
         <div className="relative h-48 bg-slate-200 sm:h-64">
           <Image src={bannerUrl} alt="" fill className="object-cover" sizes="100vw" priority />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
         </div>
       ) : (
         <div className="h-48 bg-slate-200 sm:h-64" />
       )}
 
       <div className="mx-auto max-w-6xl px-4 pb-14">
-        <div className="-mt-12 flex flex-wrap items-end gap-4">
+        <div className="-mt-12">
           {logoUrl ? (
             <div className="relative h-24 w-24 overflow-hidden rounded-xl border-4 border-white bg-white shadow-lg">
               <Image src={logoUrl} alt="" fill className="object-cover" sizes="96px" />
             </div>
           ) : null}
-          <div className="flex-1 pb-2">
-            <h1 className="text-2xl font-bold text-white drop-shadow sm:text-3xl">{vendor.name}</h1>
-            {vendor.tagline ? <p className="text-white/90 drop-shadow">{vendor.tagline}</p> : null}
-          </div>
+        </div>
+
+        <div className="mt-4">
+          <h1 className="text-2xl font-bold text-ink sm:text-3xl">{vendor.name}</h1>
+          {vendor.tagline ? (
+            <p className="mt-1 max-w-2xl text-base text-slate-600">{vendor.tagline}</p>
+          ) : null}
         </div>
 
         <div className="mt-6 flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-600">
