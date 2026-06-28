@@ -7,7 +7,7 @@ export function generateReferralLink(productId: string, baseUrl?: string) {
     baseUrl ??
     (typeof window !== "undefined" ? window.location.origin : "http://localhost:3001");
   const code = `REF_${crypto.randomUUID().replace(/-/g, "").slice(0, 10).toUpperCase()}`;
-  const url = `${origin}/marketplace/products/${productId}?ref=${code}`;
+  const url = `${origin}/marketplace/products/${productId}?ref=${code}&add=1`;
   return { url, code, productId };
 }
 

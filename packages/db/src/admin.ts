@@ -171,11 +171,12 @@ export async function getCreatorProfileDetail(userId: string) {
               title: true,
               imageUrl: true,
               type: true,
+              priceCents: true,
               vendor: { select: { name: true } },
             },
           },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: [{ featured: "desc" }, { featuredOrder: "asc" }, { createdAt: "desc" }],
       },
     },
   });
@@ -298,8 +299,19 @@ export async function listCreatorLinksForUser(userId: string) {
     where: { userId },
     include: {
       links: {
-        include: { product: { select: { id: true, title: true, imageUrl: true } } },
-        orderBy: { createdAt: "desc" },
+        include: {
+          product: {
+            select: {
+              id: true,
+              title: true,
+              imageUrl: true,
+              type: true,
+              priceCents: true,
+              vendor: { select: { name: true } },
+            },
+          },
+        },
+        orderBy: [{ featured: "desc" }, { featuredOrder: "asc" }, { createdAt: "desc" }],
       },
     },
   });

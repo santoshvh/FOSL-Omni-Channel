@@ -382,6 +382,8 @@ model CreatorLink {
   operator   Operator? @relation(fields: [operatorId], references: [id], onDelete: SetNull)
   slug       String
   label      String?
+  featured   Boolean  @default(false)
+  featuredOrder Int?
   clickCount Int      @default(0)
   cookieDays Int      @default(30)
   active     Boolean  @default(true)

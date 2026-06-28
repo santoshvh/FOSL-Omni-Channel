@@ -301,12 +301,17 @@ async function main() {
     },
   });
 
-  for (const product of products.slice(0, 3)) {
+  for (const [index, product] of products.slice(0, 3).entries()) {
     await prisma.creatorLink.upsert({
       where: {
         creatorId_slug: { creatorId: creatorProfile.id, slug: `ALEX_${product.id}` },
       },
-      update: { productId: product.id, active: true },
+      update: {
+        productId: product.id,
+        active: true,
+        featured: true,
+        featuredOrder: index + 1,
+      },
       create: {
         creatorId: creatorProfile.id,
         operatorId: operator.id,
@@ -315,6 +320,8 @@ async function main() {
         label: product.title,
         cookieDays: 30,
         active: true,
+        featured: true,
+        featuredOrder: index + 1,
       },
     });
   }

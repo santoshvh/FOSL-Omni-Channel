@@ -365,8 +365,8 @@ export async function createCreatorLinkForProduct(params: {
   });
 
   const path = storefrontPath
-    ? `/${storefrontPath}/products/${product.id}?ref=${encodeURIComponent(slug)}`
-    : `/marketplace/products/${product.id}?ref=${encodeURIComponent(slug)}`;
+    ? `/${storefrontPath}/products/${product.id}?ref=${encodeURIComponent(slug)}&add=1`
+    : `/marketplace/products/${product.id}?ref=${encodeURIComponent(slug)}&add=1`;
   const url = `${params.storefrontBaseUrl.replace(/\/$/, "")}${path}`;
 
   return { link, url, code: slug, productId: product.id, operatorId, storefrontPath };

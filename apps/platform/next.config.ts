@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
   ...(deploymentId ? { deploymentId } : {}),
   transpilePackages: ["@fosl/ui", "@fosl/contracts", "@fosl/mocks", "@fosl/db"],
   ...(Object.keys(edgeEnv).length > 0 ? { env: edgeEnv } : {}),
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+    ],
+  },
   async headers() {
     const noStore = [{ key: "Cache-Control", value: "no-store, no-cache, must-revalidate" }];
     return [

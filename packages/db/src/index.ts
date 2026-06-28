@@ -51,6 +51,12 @@ export {
 } from "./catalog";
 export { resolveCreatorLinkForAttribution, trackCreatorLinkClick } from "./referral";
 export {
+  buildReferralProductUrl,
+  getPublicCreatorByReferralCode,
+  setCreatorLinkFeatured,
+  ensureCreatorProductLink,
+} from "./creator";
+export {
   getVendorForUserId,
   getDefaultVendorId,
   getCreatorProfileForUserId,
